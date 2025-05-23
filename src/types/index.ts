@@ -22,12 +22,17 @@ export interface Aquarium {
   lastWaterChange?: Date;
   nextWaterChangeReminder?: Date;
   notes?: string;
+  fishSpecies?: string; // e.g., "Neon Tetra, Guppy, Corydora"
+  fishCount?: number;
+  co2Injection?: boolean;
+  filterDetails?: string; // e.g., "Fluval 307 Canister"
 }
 
 export interface UserProfile {
   id: string;
   name: string;
-  avatarUrl?: string; 
+  avatarUrl?: string;
+  dataAiHint?: string;
 }
 
 export interface Answer {
@@ -69,4 +74,6 @@ export const questionCategories: Category[] = [
 // Re-export AI flow types for easier access if needed
 export type { AnalyzeTestStripInput, AnalyzeTestStripOutput } from '@/ai/flows';
 export type { RecommendTreatmentProductsInput, RecommendTreatmentProductsOutput } from '@/ai/flows/recommend-treatment-products';
+
+export type { AquariumFormValues } from '@/components/aquariums/AquariumForm';
 
