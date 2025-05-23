@@ -259,6 +259,9 @@ export interface FindLightingOutput {
 }
 
 // Discounts & Deals Types
+export const dealCategories = ['Fish Food', 'Filters & Media', 'Lighting', 'Tanks & Stands', 'Water Treatments', 'Decorations & Substrate', 'Heaters & Chillers', 'Other Equipment'] as const;
+export type DealCategory = typeof dealCategories[number];
+
 export interface DealItem {
   id: string;
   productName: string;
@@ -268,8 +271,9 @@ export interface DealItem {
   sourceName: string;
   url: string;
   imageUrl: string; // Required, will use placeholder
-  dataAiHint: string; // Required for placeholder
+  dataAiHint: string; // Required for placeholder, 1-2 keywords
   description?: string; // Brief description of the deal or product
+  category?: DealCategory; 
 }
 
 export interface FindDealsOutput {

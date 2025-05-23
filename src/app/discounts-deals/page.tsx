@@ -3,14 +3,16 @@
 
 import { useState, useEffect, useActionState, startTransition } from 'react';
 import DealItemCard from '@/components/discounts-deals/DealItemCard';
-import type { DealItem } from '@/types';
+import type { DealItem, DealCategory } from '@/types';
+import { dealCategories } from '@/types';
 import { Card, CardDescription, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Percent, Search, Info, Loader2, RefreshCw, AlertCircle } from 'lucide-react';
+import { Percent, Search, Info, Loader2, RefreshCw, AlertCircle, Tag } from 'lucide-react';
 import type { FindDealsActionState } from '@/lib/actions';
 import { findAquariumDealsAction } from '@/lib/actions';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
+import { Separator } from '@/components/ui/separator';
 
 const initialActionState: FindDealsActionState = {
   message: null,
@@ -20,15 +22,15 @@ const initialActionState: FindDealsActionState = {
 };
 
 export default function DiscountsDealsPage() {
-  const [deals, setDeals] = useState<DealItem[] | null>(null);
+  const [allDeals, setAllDeals] = useState<DealItem[] | null>(null);
   const [aiMessage, setAiMessage] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<DealCategory | 'All'>('All');
   const { toast } = useToast();
 
   const [actionState, formAction, isActionPending] = useActionState(findAquariumDealsAction, initialActionState);
 
   const fetchDeals = () => {
-    // @ts-ignore // We are not passing formData, so prevState is the first arg by convention for useActionState.
-    // Calling formAction will set isActionPending to true and then false when the action completes.
+    // @ts-ignore
     formAction(); 
   };
 
@@ -44,7 +46,7 @@ export default function DiscountsDealsPage() {
       setAiMessage(actionState.aiMessage);
     }
     if (actionState.deals) {
-      setDeals(actionState.deals);
+      setAllDeals(actionState.deals);
     }
     if (actionState.message && actionState.message !== 'Deals search complete.') {
       toast({
@@ -55,6 +57,10 @@ export default function DiscountsDealsPage() {
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [actionState]);
+
+  const filteredDeals = allDeals && selectedCategory === 'All'
+    ? allDeals
+    : allDeals?.filter(deal => deal.category === selectedCategory);
 
 
   return (
@@ -79,7 +85,7 @@ export default function DiscountsDealsPage() {
         </CardHeader>
       </Card>
 
-      {isActionPending && !deals && (
+      {isActionPending && !allDeals && (
         <div className="flex justify-center items-center h-64">
           <Loader2 className="w-12 h-12 animate-spin text-primary" />
           <p className="ml-4 text-lg text-muted-foreground">Fetching today's deals...</p>
@@ -104,26 +110,64 @@ export default function DiscountsDealsPage() {
         </Alert>
       )}
 
+      {allDeals && (
+        <Card className="mb-8">
+            <CardHeader>
+                <CardTitle className="text-xl flex items-center">
+                    <Tag className="w-5 h-5 mr-2 text-primary" />
+                    Filter by Category
+                </CardTitle>
+            </CardHeader>
+            <CardContent>
+                <div className="flex flex-wrap gap-2">
+                    <Button 
+                        variant={selectedCategory === 'All' ? 'default' : 'outline'} 
+                        onClick={() => setSelectedCategory('All')}
+                        size="sm"
+                    >
+                        All Deals
+                    </Button>
+                    {dealCategories.map(cat => (
+                        <Button 
+                            key={cat} 
+                            variant={selectedCategory === cat ? 'default' : 'outline'} 
+                            onClick={() => setSelectedCategory(cat)}
+                            size="sm"
+                        >
+                            {cat}
+                        </Button>
+                    ))}
+                </div>
+            </CardContent>
+        </Card>
+      )}
 
-      {deals && deals.length > 0 && (
+      <Separator className="my-8" />
+
+      {filteredDeals && filteredDeals.length > 0 && (
         <div>
           <h2 className="text-2xl font-semibold mb-6 flex items-center">
             <Search className="w-6 h-6 mr-2 text-primary" />
-            Today's Top Deals
+            {selectedCategory === 'All' ? "Today's Top Deals" : `Deals for: ${selectedCategory}`}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {deals.map((deal) => (
+            {filteredDeals.map((deal) => (
               <DealItemCard key={deal.id} deal={deal} />
             ))}
           </div>
         </div>
       )}
 
-      {!isActionPending && deals && deals.length === 0 && !actionState.errors && (
+      {!isActionPending && filteredDeals && filteredDeals.length === 0 && !actionState.errors && (
          <Card className="mt-8">
             <CardContent className="pt-6 text-center text-muted-foreground">
                 <Search className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                <p>No special deals found by the AI at the moment, or an issue occurred. Try refreshing!</p>
+                <p>
+                    {selectedCategory === 'All' 
+                        ? "No special deals found by the AI at the moment, or an issue occurred. Try refreshing!"
+                        : `No deals found in the "${selectedCategory}" category. Try other categories or "All Deals".`
+                    }
+                </p>
             </CardContent>
         </Card>
       )}

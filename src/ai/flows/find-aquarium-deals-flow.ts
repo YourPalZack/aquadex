@@ -10,6 +10,7 @@
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 import type { FindDealsOutput, DealItem } from '@/types';
+import { dealCategories } from '@/types';
 
 // Define Zod schemas based on the TypeScript interfaces
 const DealItemSchema = z.object({
@@ -22,11 +23,12 @@ const DealItemSchema = z.object({
   url: z.string().describe("The direct URL to the product listing or a search URL on the source website. For Amazon, use 'https://www.amazon.com/s?k=ENCODED_PRODUCT_NAME&tag=YOUR_AMAZON_TAG-20' format, replacing ENCODED_PRODUCT_NAME and ensuring the placeholder tag is included."),
   imageUrl: z.string().describe("An image URL for the product. MUST use `https://placehold.co/300x200.png` format."),
   dataAiHint: z.string().describe("One or two keywords for Unsplash search if using a placeholder image (e.g., 'aquarium filter', 'fish food'). Max two words."),
-  description: z.string().optional().describe("A brief description of the product or why it's a good deal.")
+  description: z.string().optional().describe("A brief description of the product or why it's a good deal."),
+  category: z.nativeEnum(dealCategories).optional().describe(`The category of the product. Choose one from: ${dealCategories.join(', ')}. If unsure, it can be omitted.`),
 });
 
 const FindDealsOutputSchema = z.object({
-  deals: z.array(DealItemSchema).describe('A list of 3-5 simulated deals for popular aquarium products. If no deals are conceptualized, this array can be empty, though try to always find some.'),
+  deals: z.array(DealItemSchema).describe('A list of 7-10 simulated deals for popular aquarium products, covering various categories. If no deals are conceptualized, this array can be empty, though try to always find some.'),
   message: z.string().describe("A summary message about the deals, e.g., 'Here are today's top simulated deals for aquarists!' or 'Fresh deals checked daily - here's what we found!'."),
 });
 
@@ -40,7 +42,7 @@ const prompt = ai.definePrompt({
   output: { schema: FindDealsOutputSchema },
   prompt: `You are an assistant that finds the best (simulated) deals on aquarium supplies.
 
-Your task is to generate a list of 3-5 popular aquarium products that are currently "on sale". These are simulated deals for demonstration purposes.
+Your task is to generate a list of 7-10 popular aquarium products that are currently "on sale". These are simulated deals for demonstration purposes. Try to generate deals for a variety of product categories.
 
 For each product, provide:
 -   A unique \`id\` for the deal item (e.g., "amazon-heater-deal-001", "aquascapeco-light-deal-002").
@@ -48,19 +50,20 @@ For each product, provide:
 -   A simulated \`originalPrice\` (e.g., "$29.99", "$129.00").
 -   A simulated \`salePrice\` that is lower than the original price (e.g., "$22.50", "$99.99").
 -   Optionally, calculate and include a \`discountPercentage\` based on the original and sale prices (e.g., "25% off").
--   The \`sourceName\`. One or two should be "Amazon". Invent 1-2 other plausible-sounding "trusted online aquarium stores" (e.g., "AquaScape Deals Co.", "ReefBargains Online", "PetSupply Savers").
+-   The \`sourceName\`. Some should be "Amazon". Invent 1-2 other plausible-sounding "trusted online aquarium stores" (e.g., "AquaScape Deals Co.", "ReefBargains Online", "PetSupply Savers").
 -   A plausible \`url\`.
     -   For Amazon listings, construct a search URL like: \`https://www.amazon.com/s?k=REPLACE+WITH+URL+ENCODED+PRODUCT+NAME&tag=YOUR_AMAZON_TAG-20\` (ensure the YOUR_AMAZON_TAG-20 part is present).
     -   For invented stores, create a fictional product page URL (e.g., \`https://aquascapedeals.co/product/fluval-plant-led\`).
 -   An \`imageUrl\`. **You MUST use the format \`https://placehold.co/300x200.png\` for all images.**
 -   A \`dataAiHint\` (one or two keywords, max two words) relevant to the product for the placeholder image (e.g., "aquarium heater", "LED light", "water conditioner").
 -   A brief \`description\` of the product or why it's a good deal (e.g., "Popular and reliable heater, great for tanks up to 30 gallons.", "Save big on this top-rated LED light for planted tanks.").
+-   A \`category\` for the product from the following list: ${dealCategories.join(', ')}. This helps users filter deals.
 
-Try to vary the types of products (e.g., equipment, food, conditioners).
+Try to vary the types of products and assign them to appropriate categories.
 
 Finally, provide a general \`message\` for the user, like "Here are today's top simulated deals for aquarists!" or "Fresh deals checked daily - here's what we found!".
 
-Return the output as a JSON object matching the defined output schema. Ensure all URLs are valid-looking, image URLs are exactly \`https://placehold.co/300x200.png\`, and the structure is correct.
+Return the output as a JSON object matching the defined output schema. Ensure all URLs are valid-looking, image URLs are exactly \`https://placehold.co/300x200.png\`, dataAiHints are one or two words, and categories are correctly assigned. The structure must be correct.
 `,
 });
 
@@ -84,6 +87,7 @@ const findAquariumDealsFlow = ai.defineFlow(
       id: item.id || `${item.sourceName.replace(/\s+/g, '-').toLowerCase()}-deal-${index}-${Date.now()}`,
       imageUrl: `https://placehold.co/300x200.png`, // Enforce placeholder format
       dataAiHint: item.dataAiHint || item.productName.toLowerCase().split(' ').slice(0,2).join(' '),
+      category: item.category || undefined, // Ensure category is present or undefined
     }));
 
     return { ...output, deals: processedDeals };
