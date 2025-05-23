@@ -280,3 +280,51 @@ export interface FindDealsOutput {
   deals: DealItem[];
   message: string; // e.g., "Today's top simulated deals!"
 }
+
+
+// Marketplace Types
+export interface MarketplaceCategory {
+  slug: string;
+  name: string;
+  description: string;
+  icon?: React.ElementType; // e.g., Lucide icon component
+}
+
+export type MarketplaceItemCondition = 'new' | 'used-like-new' | 'used-good' | 'used-fair' | 'for-parts';
+
+export interface MarketplaceListing {
+  id: string;
+  slug: string; // For URL, e.g., "rare-l123-pleco-breeder-bob"
+  title: string;
+  description: string;
+  price: string; // e.g., "$25.00" or "Contact for price"
+  categorySlug: string;
+  sellerId: string; // Link to a conceptual SellerProfile
+  sellerName: string; // Denormalized for easy display
+  imageUrl: string; // Main image URL
+  imageHint?: string; // For Unsplash hint if using placeholder
+  condition: MarketplaceItemCondition;
+  location?: string; // e.g., "City, State" or "Local pickup only"
+  createdAt: Date;
+  isFeatured?: boolean;
+  tags?: string[];
+}
+
+// Conceptual seller profile
+export interface MarketplaceSeller {
+  id: string;
+  name: string;
+  // We'll assume a seller is "approved" for mock data if they have listings.
+  // In a real app, this would be a flag in their user profile.
+  // For now, we won't explicitly model seller approval in types beyond this.
+  avatarUrl?: string;
+  dataAiHint?: string;
+}
+
+export interface SellerApplicationFormValues {
+  storeName: string;
+  contactEmail: string;
+  reasonToSell: string;
+  productTypes: string;
+}
+

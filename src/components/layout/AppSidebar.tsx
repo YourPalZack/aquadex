@@ -36,7 +36,7 @@ import {
   Archive,
   Filter,
   Sun,
-  Percent // Added Percent icon for Discounts & Deals
+  Percent
 } from 'lucide-react';
 
 // Define navigation items with potential sub-items
@@ -67,7 +67,7 @@ const navItemsConfig = [
       { href: '/lighting-finder', label: 'Lighting Finder', icon: Sun },
     ]
   },
-  { href: '/discounts-deals', label: 'Discounts & Deals', icon: Percent }, // Added Discounts & Deals
+  { href: '/discounts-deals', label: 'Discounts & Deals', icon: Percent },
 ];
 
 const bottomNavItems = [
@@ -84,12 +84,21 @@ export default function AppSidebar() {
     
     const currentTopLevelPath = `/${pathname.split('/')[1]}`;
 
-    const parentConfig = navItemsConfig.find(item => item.href === href || (item.subItems && item.subItems.some(sub => currentTopLevelPath === sub.href || pathname.startsWith(sub.href))));
-    if (parentConfig) {
-        if (pathname.startsWith(parentConfig.href)) return true;
-        if (parentConfig.subItems && parentConfig.subItems.some(sub => pathname.startsWith(sub.href))) return true;
+    // Check if the current path starts with the item's href
+    if (pathname.startsWith(href)) return true;
+
+    // Check sub-items
+    const parentConfig = navItemsConfig.find(item => item.href === href);
+    if (parentConfig?.subItems) {
+      return parentConfig.subItems.some(sub => pathname.startsWith(sub.href));
     }
-    return pathname.startsWith(href);
+    
+    // Fallback for cases like /marketplace being active when on /marketplace/fish-finder
+    if (href === '/marketplace' && currentTopLevelPath === '/marketplace') return true;
+    if (href === '/marketplace' && navItemsConfig.find(i => i.href === '/marketplace')?.subItems?.some(si => pathname.startsWith(si.href))) return true;
+
+
+    return false;
   };
   
   return (
@@ -126,7 +135,7 @@ export default function AppSidebar() {
                         <Link href={subItem.href} passHref legacyBehavior>
                           <SidebarMenuSubButton
                             asChild
-                            isActive={pathname.startsWith(subItem.href)} // Sub-items check their own active state
+                            isActive={pathname.startsWith(subItem.href)} 
                             onClick={() => openMobile && setOpenMobile(false)}
                           >
                             <a>
