@@ -36,7 +36,7 @@ import {
   Filter,
   Sun,
   Percent,
-  Sparkles // Added Sparkles icon
+  Sparkles 
 } from 'lucide-react';
 
 // Define navigation items with potential sub-items
@@ -50,15 +50,21 @@ const navItemsConfig = [
       { href: '/history', label: 'Test History', icon: History }, // Child item
     ],
   },
-  { href: '/aquariums', label: 'My Aquariums', icon: Droplet },
+  { 
+    href: '/aquariums', 
+    label: 'My Aquariums', 
+    icon: Droplet,
+    subItems: [
+      { href: '/foods', label: 'Manage Foods', icon: PackageSearch },
+      { href: '/treatments', label: 'Manage Treatments', icon: FlaskConical },
+    ]
+  },
   { href: '/reminders', label: 'Reminders', icon: BellRing }, 
-  { href: '/foods', label: 'Manage Foods', icon: PackageSearch },
-  { href: '/treatments', label: 'Manage Treatments', icon: FlaskConical },
   { href: '/qa', label: 'Q&A', icon: MessageSquare },
   { 
-    href: '/fish-finder', // Parent link for AIQuarium Tools, points to the first sub-item
+    href: '/fish-finder', 
     label: 'AIQuarium Tools', 
-    icon: Sparkles, // New icon for AI tools
+    icon: Sparkles, 
     subItems: [
       { href: '/fish-finder', label: 'Fish Finder', icon: Fish },
       { href: '/plant-finder', label: 'Plant Finder', icon: Leaf },
@@ -88,19 +94,32 @@ export default function AppSidebar() {
   const { openMobile, setOpenMobile } = useSidebar();
 
   const isActiveRoute = (href: string) => {
-    if (!href) return false; // Handle items that might not have an href (though all current ones do)
+    if (!href) return false;
     if (href === '/') return pathname === href; 
     
-    // Check if the current path starts with the item's href
     if (pathname.startsWith(href)) return true;
 
-    // Check sub-items - if a sub-item is active, the parent should also be considered active for expansion
-    const parentConfig = navItemsConfig.find(item => item.href === href);
-    if (parentConfig?.subItems && parentConfig.subItems.length > 0) {
-      return parentConfig.subItems.some(sub => sub.href && pathname.startsWith(sub.href));
-    }
-    
-    return false;
+    const parentConfig = navItemsConfig.find(item => {
+        // Check if the current item's href is a base for the current pathname
+        if (item.href && pathname.startsWith(item.href)) {
+            // Now check if this item has subItems and if any subItem is the active one
+            if (item.subItems && item.subItems.length > 0) {
+                return item.subItems.some(sub => sub.href && pathname.startsWith(sub.href));
+            }
+            return true; // No subItems, but href matches base
+        }
+        // Fallback for items where their href itself might not be the direct start
+        // This is crucial for when a sub-item is active, the parent should also be active
+        if (item.subItems && item.subItems.length > 0) {
+          return item.subItems.some(sub => sub.href && pathname.startsWith(sub.href));
+        }
+        return false;
+    });
+     // If a parentConfig was found this way, and its main href matches the input href, it's active
+    if(parentConfig && parentConfig.href === href) return true;
+
+    // Final check for direct match if no complex parent/child logic found the match yet
+    return pathname.startsWith(href);
   };
   
   return (
@@ -188,3 +207,4 @@ export default function AppSidebar() {
     </Sidebar>
   );
 }
+
