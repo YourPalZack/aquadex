@@ -39,10 +39,11 @@ import {
   Sparkles,
   HeartHandshake,
   ChevronRight,
-  ChevronDown 
+  ChevronDown,
+  ListPlus // Added for Create Listing
 } from 'lucide-react';
-import { marketplaceCategoriesData, type MarketplaceCategory } from '@/types';
-import type { ReactElement } from 'react'; // Import ReactElement for icon typing
+import { marketplaceCategoriesData, type MarketplaceCategory, mockCurrentUser } from '@/types';
+import type { ReactElement, ElementType } from 'react';
 
 
 // Define navigation items with potential sub-items
@@ -84,6 +85,7 @@ const navItemsConfig = [
     label: 'Marketplace', 
     icon: ShoppingCart,
     subItems: [
+        ...(mockCurrentUser.isSellerApproved ? [{ href: '/marketplace/add-listing', label: 'Create Listing', icon: ListPlus }] : []),
         ...marketplaceCategoriesData.map((category: MarketplaceCategory) => ({
             href: `/marketplace/${category.slug}`,
             label: category.name,
@@ -121,12 +123,9 @@ export default function AppSidebar() {
         <SidebarMenu>
           {navItemsConfig.map((item) => {
             const hasSubItems = item.subItems && item.subItems.length > 0;
-            // A parent section is active if its own href matches, or if any of its subItems' href matches the current pathname.
-            // We also ensure that for parent-only links like /aiquarium-tools, it is considered active if the pathname *is* /aiquarium-tools,
-            // or if the pathname starts with one of its children's paths.
             const isParentSectionActive = 
               (item.href && pathname === item.href) || 
-              (item.href && pathname.startsWith(item.href) && item.href !== pathname && hasSubItems) || // Active if a sub-item is active
+              (item.href && pathname.startsWith(item.href) && item.href !== pathname && hasSubItems) || 
               (hasSubItems && item.subItems.some(sub => sub.href && pathname.startsWith(sub.href)));
 
 
@@ -135,7 +134,7 @@ export default function AppSidebar() {
                 <Link href={item.href || '#'} passHref legacyBehavior>
                   <SidebarMenuButton
                     asChild
-                    isActive={isActiveRoute(item.href) && !hasSubItems || (item.href === pathname && hasSubItems)} // Parent is active if it's the current page, even with sub-items
+                    isActive={isActiveRoute(item.href) && !hasSubItems || (item.href === pathname && hasSubItems)} 
                     tooltip={item.label}
                     onClick={() => {
                       if (openMobile && !hasSubItems) setOpenMobile(false);
@@ -155,7 +154,7 @@ export default function AppSidebar() {
                 {hasSubItems && isParentSectionActive && (
                   <SidebarMenuSub>
                     {item.subItems.map((subItem) => {
-                       const SubIcon = subItem.icon; 
+                       const SubIcon = subItem.icon as ElementType;
                        return (
                           <SidebarMenuSubItem key={subItem.label}>
                             <Link href={subItem.href} passHref legacyBehavior>
@@ -202,7 +201,7 @@ export default function AppSidebar() {
           <SidebarMenuItem>
              <SidebarMenuButton tooltip="Log Out" onClick={() => {
                 openMobile && setOpenMobile(false);
-                console.log("Logout clicked"); // Placeholder
+                console.log("Logout clicked"); 
              }}>
                 <LogOut className="h-5 w-5" />
                 <span>Log Out</span>
@@ -213,4 +212,3 @@ export default function AppSidebar() {
     </Sidebar>
   );
 }
-
