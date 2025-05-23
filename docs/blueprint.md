@@ -1,4 +1,4 @@
-# **App Name**: AquaStrip Analyzer
+# **App Name**: AquaManager
 
 ## Core Features:
 

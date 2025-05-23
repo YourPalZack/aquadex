@@ -29,7 +29,8 @@ import {
   FileScan,
   MessageSquare,
   PackageSearch,
-  FlaskConical // Added FlaskConical
+  FlaskConical,
+  Fish // Added Fish icon
 } from 'lucide-react';
 
 // Define navigation items with potential sub-items
@@ -46,6 +47,7 @@ const navItemsConfig = [
   { href: '/aquariums', label: 'My Aquariums', icon: Droplet },
   { href: '/foods', label: 'Manage Foods', icon: PackageSearch },
   { href: '/treatments', label: 'Manage Treatments', icon: FlaskConical },
+  { href: '/fish-finder', label: 'Fish Finder', icon: Fish }, // New Fish Finder link
   { href: '/qa', label: 'Q&A', icon: MessageSquare },
   { href: '/marketplace', label: 'Marketplace', icon: ShoppingCart }, // Assuming marketplace is a future page
 ];

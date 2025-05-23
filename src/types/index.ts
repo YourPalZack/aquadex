@@ -81,6 +81,8 @@ export const questionCategories: Category[] = [
 // Re-export AI flow types for easier access if needed
 export type { AnalyzeTestStripInput, AnalyzeTestStripOutput } from '@/ai/flows';
 export type { RecommendTreatmentProductsInput, RecommendTreatmentProductsOutput } from '@/ai/flows/recommend-treatment-products';
+export type { GetFoodPurchaseLinksInput, GetFoodPurchaseLinksOutput } from '@/ai/flows/get-food-purchase-links';
+
 
 export type { AquariumFormValues } from '@/components/aquariums/AquariumForm';
 export type { QuestionFormValues } from '@/components/qa/QuestionForm';
@@ -124,3 +126,22 @@ export interface WaterTreatmentProductFormValues {
   notes?: string;
 }
 
+// Fish Finder Types
+export interface FishListing {
+  id: string; // Added for unique key in React lists
+  sourceName: string; // e.g., "Ebay", "AquaBid", "Dan's Fish", "Simulated Trusted Source"
+  listingTitle: string;
+  price?: string; // e.g., "$15.99", "Bidding starts at $5"
+  url: string; // Direct link or search link
+  imageUrl?: string; // Optional image for the listing
+  dataAiHint?: string; // For placeholder image
+}
+
+export interface FindFishInput {
+  speciesName: string;
+}
+
+export interface FindFishOutput {
+  searchResults: FishListing[];
+  message: string; // e.g., "Here are some listings...", "No current listings found."
+}

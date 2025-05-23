@@ -4,7 +4,8 @@
 import { 
     analyzeTestStrip as analyzeTestStripFlow, 
     recommendTreatmentProducts as recommendTreatmentProductsFlow,
-    getFoodPurchaseLinks as getFoodPurchaseLinksFlow
+    getFoodPurchaseLinks as getFoodPurchaseLinksFlow,
+    findFish as findFishFlow // Added findFishFlow
 } from '@/ai/flows';
 import type { 
     AnalyzeTestStripInput, 
@@ -14,8 +15,10 @@ import type {
     GetFoodPurchaseLinksInput,
     GetFoodPurchaseLinksOutput,
     FishFood,
-    WaterTreatmentProduct // Added WaterTreatmentProduct
-} from '@/ai/flows'; // Assuming FishFood type might be re-exported from ai/flows if defined there too, or import from @/types
+    WaterTreatmentProduct,
+    FindFishInput, // Added FindFishInput
+    FindFishOutput // Added FindFishOutput
+} from '@/types'; 
 import { z } from 'zod';
 
 const analyzeStripSchema = z.object({
@@ -201,7 +204,8 @@ export async function addWaterTreatmentProductAction(prevState: AddWaterTreatmen
 
     const { name, brand, type, notes } = validatedFields.data;
 
-    const genkitInput: GetFoodPurchaseLinksInput = { foodName: name, brand };
+    // Re-using GetFoodPurchaseLinksInput for treatments as the structure is similar
+    const genkitInput: GetFoodPurchaseLinksInput = { foodName: name, brand }; 
     const purchaseLinksOutput: GetFoodPurchaseLinksOutput = await getFoodPurchaseLinksFlow(genkitInput);
 
     const newProductItem: WaterTreatmentProduct = {
@@ -227,6 +231,54 @@ export async function addWaterTreatmentProductAction(prevState: AddWaterTreatmen
       message: `Failed to add water treatment product: ${errorMessage}`,
       errors: { _form: [errorMessage] },
       newProductItem: null,
+    };
+  }
+}
+
+// Fish Finder Action
+const findFishSchema = z.object({
+  speciesName: z.string().min(2, { message: 'Species name must be at least 2 characters.' }),
+});
+
+export interface FindFishActionState {
+    message: string | null;
+    errors: Record<string, string[]> | null;
+    searchResults: FishListing[] | null;
+    aiMessage: string | null;
+}
+
+export async function findFishAction(prevState: FindFishActionState, formData: FormData): Promise<FindFishActionState> {
+  try {
+    const validatedFields = findFishSchema.safeParse({
+      speciesName: formData.get('speciesName'),
+    });
+
+    if (!validatedFields.success) {
+      return {
+        message: 'Validation failed. Please enter a valid species name.',
+        errors: validatedFields.error.flatten().fieldErrors,
+        searchResults: null,
+        aiMessage: null,
+      };
+    }
+
+    const input: FindFishInput = { speciesName: validatedFields.data.speciesName };
+    const result: FindFishOutput = await findFishFlow(input);
+
+    return {
+      message: 'Search complete.',
+      errors: null,
+      searchResults: result.searchResults,
+      aiMessage: result.message,
+    };
+  } catch (error) {
+    console.error('Error in findFishAction:', error);
+    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred while searching for fish.';
+    return {
+      message: `Search failed: ${errorMessage}`,
+      errors: { _form: [errorMessage] },
+      searchResults: null,
+      aiMessage: null,
     };
   }
 }
