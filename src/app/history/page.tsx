@@ -20,10 +20,11 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from '@/components/ui/button';
 
-const mockTestResults: TestResult[] = [
+export const mockTestResults: TestResult[] = [
   {
     id: 'tr1',
     userId: 'user123',
+    aquariumId: 'aqua1', // Linked to Living Room Reef
     timestamp: new Date('2024-07-20T10:00:00Z'),
     parameters: 'pH: 7.2, Ammonia: 0 ppm, Nitrite: 0 ppm, Nitrate: 10 ppm, GH: 6 dGH, KH: 4 dKH',
     recommendations: {
@@ -36,6 +37,7 @@ const mockTestResults: TestResult[] = [
   {
     id: 'tr2',
     userId: 'user123',
+    aquariumId: 'aqua2', // Linked to Betta Paradise
     timestamp: new Date('2024-07-15T18:30:00Z'),
     parameters: 'pH: 6.8, Ammonia: 0.25 ppm, Nitrite: 0 ppm, Nitrate: 5 ppm',
     recommendations: {
@@ -47,6 +49,7 @@ const mockTestResults: TestResult[] = [
   {
     id: 'tr3',
     userId: 'user123',
+    aquariumId: 'aqua1', // Linked to Living Room Reef
     timestamp: new Date('2024-07-10T09:15:00Z'),
     parameters: 'pH: 7.0, Ammonia: 0 ppm, Nitrite: 0 ppm, Nitrate: 20 ppm, Chlorine: 0.02 ppm',
     recommendations: {
@@ -58,6 +61,7 @@ const mockTestResults: TestResult[] = [
     {
     id: 'tr4',
     userId: 'user123',
+    // aquariumId: 'aquaUnassigned', // Example of a test not linked
     timestamp: new Date('2024-06-25T12:00:00Z'),
     parameters: 'pH: 7.5, Ammonia: 0 ppm, Nitrite: 0.1 ppm, Nitrate: 40 ppm, GH: 8 dGH, KH: 5 dKH',
     recommendations: {

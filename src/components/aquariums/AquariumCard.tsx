@@ -13,6 +13,7 @@ import { cn } from '@/lib/utils';
 import { format, differenceInDays, isPast, isToday, isFuture } from 'date-fns';
 import { Separator } from '@/components/ui/separator';
 import Image from 'next/image';
+import Link from 'next/link'; // Added Link import
 
 interface AquariumCardProps {
   aquarium: Aquarium;
@@ -88,10 +89,14 @@ export default function AquariumCard({ aquarium, onEdit, onDelete }: AquariumCar
     <Card className="w-full shadow-lg flex flex-col h-full bg-card hover:shadow-xl transition-shadow duration-300">
       <CardHeader className="pb-4">
         <div className="flex justify-between items-start">
-          <CardTitle className="text-xl flex items-center">
-            <Droplet className="w-6 h-6 mr-2 text-primary" />
-            {aquarium.name}
-          </CardTitle>
+          <Link href={`/aquariums/${aquarium.id}`} passHref legacyBehavior>
+            <a className="group">
+              <CardTitle className="text-xl flex items-center group-hover:text-primary/80 transition-colors">
+                <Droplet className="w-6 h-6 mr-2 text-primary" />
+                {aquarium.name}
+              </CardTitle>
+            </a>
+          </Link>
           <Badge variant={aquarium.type === 'freshwater' ? 'secondary' : aquarium.type === 'saltwater' ? 'default' : 'outline' } className="capitalize">
             {aquarium.type}
           </Badge>
@@ -103,16 +108,18 @@ export default function AquariumCard({ aquarium, onEdit, onDelete }: AquariumCar
       
       {aquarium.imageUrl && (
         <div className="px-6 pb-0 -mt-2 mb-4">
-          <div className="aspect-video relative rounded-md overflow-hidden border">
-            <Image 
-                src={aquarium.imageUrl} 
-                alt={`Image of ${aquarium.name}`} 
-                layout="fill" 
-                objectFit="cover"
-                data-ai-hint="aquarium fish tank"
-                className="bg-muted"
-             />
-          </div>
+         <Link href={`/aquariums/${aquarium.id}`} passHref legacyBehavior>
+            <a className="block aspect-video relative rounded-md overflow-hidden border group">
+                <Image 
+                    src={aquarium.imageUrl} 
+                    alt={`Image of ${aquarium.name}`} 
+                    layout="fill" 
+                    objectFit="cover"
+                    data-ai-hint="aquarium fish tank"
+                    className="bg-muted group-hover:opacity-90 transition-opacity"
+                />
+            </a>
+          </Link>
         </div>
       )}
       

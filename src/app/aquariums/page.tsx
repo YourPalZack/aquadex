@@ -22,10 +22,11 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
+import { useSearchParams } from 'next/navigation'; // Import useSearchParams
 // import { addAquarium as addAquariumAction } from '@/lib/actions'; // Assuming a similar action exists or will be created
 
-// Mock Data
-const mockAquariumsData: Aquarium[] = [
+// Mock Data - Make it exportable
+export const mockAquariumsData: Aquarium[] = [
   {
     id: 'aqua1',
     userId: 'user123',
@@ -100,13 +101,26 @@ export default function AquariumsPage() {
   const [editingAquarium, setEditingAquarium] = useState<Aquarium | null>(null);
   const [isLoading, setIsLoading] = useState(true); 
   const { toast } = useToast();
+  const searchParams = useSearchParams(); // Get search params
 
   useEffect(() => {
+    setIsLoading(true);
     setTimeout(() => {
         setAquariums(mockAquariumsData);
         setIsLoading(false);
+
+        // Check for edit query parameter after data is loaded
+        const editAquariumId = searchParams.get('edit');
+        if (editAquariumId && !isLoading) { // Ensure data is loaded before trying to edit
+            const aquariumToEdit = mockAquariumsData.find(aq => aq.id === editAquariumId);
+            if (aquariumToEdit) {
+                setEditingAquarium(aquariumToEdit);
+                setIsDialogOpen(true);
+            }
+        }
     }, 500);
-  }, []);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]); // Add searchParams.isLoading to dependency array
 
   const handleAddAquarium = () => {
     setEditingAquarium(null);

@@ -9,6 +9,7 @@ export interface TestResult {
   parameters: AnalyzeTestStripOutput['waterParameters'];
   recommendations?: RecommendTreatmentProductsOutput;
   notes?: string;
+  aquariumId?: string; // Added for linking tests to aquariums
 }
 
 export type AquariumType = 'freshwater' | 'saltwater' | 'brackish' | 'reef';
