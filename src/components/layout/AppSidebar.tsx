@@ -37,7 +37,9 @@ import {
   Sun,
   Percent,
   Sparkles,
-  HeartHandshake // Added for Items Wanted
+  HeartHandshake,
+  ChevronRight, // Added
+  ChevronDown // Added
 } from 'lucide-react';
 import { marketplaceCategoriesData, type MarketplaceCategory } from '@/types';
 
@@ -86,7 +88,7 @@ const navItemsConfig = [
             label: category.name,
             icon: category.icon || Leaf, 
         })),
-        { href: '/items-wanted', label: 'Items Wanted', icon: HeartHandshake }, // Added Items Wanted link
+        { href: '/items-wanted', label: 'Items Wanted', icon: HeartHandshake },
     ]
   },
   { href: '/discounts-deals', label: 'Discounts & Deals', icon: Percent },
@@ -102,17 +104,11 @@ export default function AppSidebar() {
   const { openMobile, setOpenMobile } = useSidebar();
 
   const isActiveRoute = (href: string) => {
+    // For grouped items like AIQuarium Tools or Marketplace, don't activate the parent itself as "active"
     if (!href || href === '/aiquarium-tools' || href === '/marketplace') return false; 
     if (href === '/') return pathname === href; 
     
-    // Check if the current path starts with the item's href
-    if (pathname.startsWith(href)) return true;
-    
-    // Check if any sub-item of a parent is active
-    const parentConfig = navItemsConfig.find(item => 
-        item.subItems && item.subItems.some(sub => sub.href && pathname.startsWith(sub.href))
-    );
-    return parentConfig?.href === href;
+    return pathname.startsWith(href);
   };
   
   return (
@@ -125,26 +121,34 @@ export default function AppSidebar() {
       <SidebarContent className="flex-grow p-2">
         <SidebarMenu>
           {navItemsConfig.map((item) => {
-            const isParentSectionActive = (item.href && (pathname.startsWith(item.href) && item.href !== '/aiquarium-tools')) || 
-                                          (item.subItems && item.subItems.some(sub => sub.href && pathname.startsWith(sub.href)));
-
+            const hasSubItems = item.subItems && item.subItems.length > 0;
+            const isParentSectionActive = (item.href && pathname.startsWith(item.href)) || 
+                                          (hasSubItems && item.subItems.some(sub => sub.href && pathname.startsWith(sub.href)));
 
             return (
               <SidebarMenuItem key={item.label}>
                 <Link href={item.href || '#'} passHref legacyBehavior>
                   <SidebarMenuButton
                     asChild
-                    isActive={isParentSectionActive && item.href !== '/aiquarium-tools' && item.href !== '/marketplace'} // Don't activate parent for group label itself unless it's a direct page
+                    isActive={isActiveRoute(item.href || '')}
                     tooltip={item.label}
-                    onClick={() => openMobile && setOpenMobile(false)}
+                    onClick={() => {
+                      if (openMobile && !hasSubItems) setOpenMobile(false);
+                      // For parent items with sub-items, clicking might not close mobile if it's just expanding
+                    }}
                   >
                     <a>
                       <item.icon className="h-5 w-5" />
-                      <span>{item.label}</span>
+                      <span className="flex-grow">{item.label}</span>
+                      {hasSubItems && (
+                        isParentSectionActive ? 
+                        <ChevronDown className="h-4 w-4 shrink-0" /> : 
+                        <ChevronRight className="h-4 w-4 shrink-0" />
+                      )}
                     </a>
                   </SidebarMenuButton>
                 </Link>
-                {item.subItems && item.subItems.length > 0 && isParentSectionActive && (
+                {hasSubItems && isParentSectionActive && (
                   <SidebarMenuSub>
                     {item.subItems.map((subItem) => {
                        const SubIcon = subItem.icon; 
@@ -179,7 +183,7 @@ export default function AppSidebar() {
               <Link href={item.href} passHref legacyBehavior>
                 <SidebarMenuButton
                   asChild
-                  isActive={isActiveRoute(item.href)} // Uses the refined isActiveRoute
+                  isActive={isActiveRoute(item.href)}
                   tooltip={item.label}
                   onClick={() => openMobile && setOpenMobile(false)}
                 >
