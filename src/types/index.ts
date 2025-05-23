@@ -1,7 +1,7 @@
 
 import type { AnalyzeTestStripOutput, RecommendTreatmentProductsOutput } from '@/ai/flows';
 import type { LucideProps } from 'lucide-react';
-import { Fish, Leaf, Package as PackageIcon, HardHat, HeartHandshake, Gift, type ElementType, ShoppingCart, SearchCheck } from 'lucide-react';
+import { Fish, Leaf, Package as PackageIcon, HardHat, HeartHandshake, Gift, type ElementType, ShoppingCart, SearchCheck, Store as StoreIcon } from 'lucide-react';
 
 
 export interface TestResult {
@@ -382,4 +382,40 @@ export interface WantedItemFormValues {
   description: string;
   categorySlug?: string;
   tags?: string[]; // Kept as string[] for display, will be converted from comma-separated input
+}
+
+// New types for Local Fish Stores
+export interface Coordinates {
+  lat: number;
+  lng: number;
+}
+
+export interface OperatingHours {
+  monday?: string;
+  tuesday?: string;
+  wednesday?: string;
+  thursday?: string;
+  friday?: string;
+  saturday?: string;
+  sunday?: string;
+}
+
+export interface LocalFishStore {
+  id: string;
+  name: string;
+  slug: string; // For the URL, e.g., "aqua-world-springfield"
+  address: string;
+  city: string;
+  state: string;
+  zipCode: string;
+  phone?: string;
+  website?: string;
+  description?: string;
+  imageUrl?: string;
+  imageHint?: string; // For AI placeholder image generation
+  coordinates?: Coordinates; // For future map integration
+  operatingHours?: OperatingHours;
+  services?: string[]; // e.g., ["Freshwater Fish", "Saltwater Fish", "Aquarium Maintenance", "Pond Supplies"]
+  isVerified?: boolean; // If the store profile is claimed/verified by the owner
+  // Placeholder for future: associatedMarketplaceSellerId?: string; 
 }

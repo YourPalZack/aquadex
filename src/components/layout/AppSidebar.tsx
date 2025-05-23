@@ -40,7 +40,8 @@ import {
   HeartHandshake,
   ChevronRight,
   ChevronDown,
-  ListPlus // Added for Create Listing
+  ListPlus, // Added for Create Listing
+  Store as StoreIcon // Added for Local Fish Stores
 } from 'lucide-react';
 import { marketplaceCategoriesData, type MarketplaceCategory, mockCurrentUser } from '@/types';
 import type { ReactElement, ElementType } from 'react';
@@ -95,6 +96,7 @@ const navItemsConfig = [
         { href: '/items-wanted', label: 'Items Wanted', icon: HeartHandshake },
     ]
   },
+  { href: '/local-fish-stores', label: 'Local Fish Stores', icon: StoreIcon },
   { href: '/discounts-deals', label: 'Discounts & Deals', icon: Percent },
 ];
 
