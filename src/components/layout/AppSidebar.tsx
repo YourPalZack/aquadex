@@ -31,7 +31,8 @@ import {
   PackageSearch,
   FlaskConical,
   Fish,
-  BellRing 
+  BellRing,
+  Leaf // Added Leaf icon
 } from 'lucide-react';
 
 // Define navigation items with potential sub-items
@@ -55,7 +56,8 @@ const navItemsConfig = [
     label: 'Marketplace', 
     icon: ShoppingCart,
     subItems: [
-      { href: '/fish-finder', label: 'Fish Finder', icon: Fish }, // Fish Finder nested here
+      { href: '/fish-finder', label: 'Fish Finder', icon: Fish },
+      { href: '/plant-finder', label: 'Plant Finder', icon: Leaf }, // Added Plant Finder
     ]
   },
 ];
@@ -69,14 +71,15 @@ export default function AppSidebar() {
   const pathname = usePathname();
   const { openMobile, setOpenMobile } = useSidebar();
 
-  // General isActive check for items without sub-items, or for sub-items themselves
   const isActiveRoute = (href: string) => {
-    if (href === '/') return pathname === href; // Handle home explicitly if needed
-    // For parent items with sub-items, we want them to be active if any sub-item is active OR if the parent href itself is active.
-    // For direct links or sub-items, a simple startsWith is usually fine.
-    const parentConfig = navItemsConfig.find(item => item.href === href && item.subItems && item.subItems.length > 0);
+    if (href === '/') return pathname === href; 
+    
+    const currentTopLevelPath = `/${pathname.split('/')[1]}`;
+
+    const parentConfig = navItemsConfig.find(item => item.href === href || (item.subItems && item.subItems.some(sub => currentTopLevelPath === sub.href || pathname.startsWith(sub.href))));
     if (parentConfig) {
-        return pathname.startsWith(href) || parentConfig.subItems.some(sub => pathname.startsWith(sub.href));
+        if (pathname.startsWith(parentConfig.href)) return true;
+        if (parentConfig.subItems && parentConfig.subItems.some(sub => pathname.startsWith(sub.href))) return true;
     }
     return pathname.startsWith(href);
   };
@@ -115,7 +118,7 @@ export default function AppSidebar() {
                         <Link href={subItem.href} passHref legacyBehavior>
                           <SidebarMenuSubButton
                             asChild
-                            isActive={isActiveRoute(subItem.href)} // Sub-items check their own active state
+                            isActive={pathname.startsWith(subItem.href)} // Sub-items check their own active state
                             onClick={() => openMobile && setOpenMobile(false)}
                           >
                             <a>
@@ -155,7 +158,7 @@ export default function AppSidebar() {
           <SidebarMenuItem>
              <SidebarMenuButton tooltip="Log Out" onClick={() => {
                 openMobile && setOpenMobile(false);
-                console.log("Logout clicked");
+                console.log("Logout clicked"); // Placeholder
              }}>
                 <LogOut className="h-5 w-5" />
                 <span>Log Out</span>

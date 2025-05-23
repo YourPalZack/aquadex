@@ -156,3 +156,23 @@ export interface FindFishOutput {
   searchResults: FishListing[];
   message: string; // e.g., "Here are some listings...", "No current listings found."
 }
+
+// Plant Finder Types
+export interface PlantListing {
+  id: string;
+  sourceName: string; // e.g., "Ebay", "Etsy", "Amazon", "Aquarium Co-Op"
+  listingTitle: string;
+  price?: string;
+  url: string;
+  imageUrl?: string;
+  dataAiHint?: string;
+}
+
+export interface FindPlantInput {
+  speciesName: string;
+}
+
+export interface FindPlantOutput {
+  searchResults: PlantListing[];
+  message: string;
+}

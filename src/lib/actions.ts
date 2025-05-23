@@ -5,7 +5,8 @@ import {
     analyzeTestStrip as analyzeTestStripFlow, 
     recommendTreatmentProducts as recommendTreatmentProductsFlow,
     getFoodPurchaseLinks as getFoodPurchaseLinksFlow,
-    findFish as findFishFlow // Added findFishFlow
+    findFish as findFishFlow,
+    findPlant as findPlantFlow // Added findPlantFlow
 } from '@/ai/flows';
 import type { 
     AnalyzeTestStripInput, 
@@ -16,8 +17,12 @@ import type {
     GetFoodPurchaseLinksOutput,
     FishFood,
     WaterTreatmentProduct,
-    FindFishInput, // Added FindFishInput
-    FindFishOutput // Added FindFishOutput
+    FindFishInput,
+    FindFishOutput,
+    FishListing,
+    FindPlantInput, // Added FindPlantInput
+    FindPlantOutput, // Added FindPlantOutput
+    PlantListing // Added PlantListing
 } from '@/types'; 
 import { z } from 'zod';
 
@@ -204,7 +209,6 @@ export async function addWaterTreatmentProductAction(prevState: AddWaterTreatmen
 
     const { name, brand, type, notes } = validatedFields.data;
 
-    // Re-using GetFoodPurchaseLinksInput for treatments as the structure is similar
     const genkitInput: GetFoodPurchaseLinksInput = { foodName: name, brand }; 
     const purchaseLinksOutput: GetFoodPurchaseLinksOutput = await getFoodPurchaseLinksFlow(genkitInput);
 
@@ -274,6 +278,54 @@ export async function findFishAction(prevState: FindFishActionState, formData: F
   } catch (error) {
     console.error('Error in findFishAction:', error);
     const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred while searching for fish.';
+    return {
+      message: `Search failed: ${errorMessage}`,
+      errors: { _form: [errorMessage] },
+      searchResults: null,
+      aiMessage: null,
+    };
+  }
+}
+
+// Plant Finder Action
+const findPlantSchema = z.object({
+  speciesName: z.string().min(2, { message: 'Plant species name must be at least 2 characters.' }),
+});
+
+export interface FindPlantActionState {
+    message: string | null;
+    errors: Record<string, string[]> | null;
+    searchResults: PlantListing[] | null;
+    aiMessage: string | null;
+}
+
+export async function findPlantAction(prevState: FindPlantActionState, formData: FormData): Promise<FindPlantActionState> {
+  try {
+    const validatedFields = findPlantSchema.safeParse({
+      speciesName: formData.get('speciesName'),
+    });
+
+    if (!validatedFields.success) {
+      return {
+        message: 'Validation failed. Please enter a valid plant species name.',
+        errors: validatedFields.error.flatten().fieldErrors,
+        searchResults: null,
+        aiMessage: null,
+      };
+    }
+
+    const input: FindPlantInput = { speciesName: validatedFields.data.speciesName };
+    const result: FindPlantOutput = await findPlantFlow(input);
+
+    return {
+      message: 'Search complete.',
+      errors: null,
+      searchResults: result.searchResults,
+      aiMessage: result.message,
+    };
+  } catch (error) {
+    console.error('Error in findPlantAction:', error);
+    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred while searching for plants.';
     return {
       message: `Search failed: ${errorMessage}`,
       errors: { _form: [errorMessage] },
