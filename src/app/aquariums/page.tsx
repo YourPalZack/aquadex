@@ -23,8 +23,10 @@ import {
 } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 import { useSearchParams } from 'next/navigation'; 
+import { subDays, addDays, set } from 'date-fns'; // Import date-fns helpers
 
 // Mock Data - Make it exportable
+const today = new Date();
 export const mockAquariumsData: Aquarium[] = [
   {
     id: 'aqua1',
@@ -32,16 +34,16 @@ export const mockAquariumsData: Aquarium[] = [
     name: 'Living Room Reef',
     volumeGallons: 75,
     type: 'saltwater',
-    imageUrl: 'https://placehold.co/600x400.png?text=Living+Room+Reef',
-    lastWaterChange: new Date('2024-07-15'),
-    nextWaterChangeReminder: new Date('2024-07-29'),
+    imageUrl: 'https://placehold.co/600x400.png',
+    lastWaterChange: subDays(today, 14), // 2 weeks ago
+    nextWaterChangeReminder: subDays(today, 3), // Overdue by 3 days
     notes: 'Keeping an eye on SPS coral growth. Clownfish are active.',
     fishSpecies: 'Clownfish, Royal Gramma, Yellow Tang',
     fishCount: 5,
     co2Injection: false,
     filterDetails: 'Sump with Protein Skimmer & Refugium',
     foodDetails: 'NLS Pellets, Rods Food, Mysis Shrimp',
-    nextFeedingReminder: new Date(new Date().setDate(new Date().getDate() + 0)), 
+    nextFeedingReminder: subDays(today, 1), // Feeding overdue by 1 day
     sourceWaterType: 'premixed_saltwater',
     sourceWaterParameters: 'Using Tropic Marin Pro Reef salt mix.',
   },
@@ -51,16 +53,16 @@ export const mockAquariumsData: Aquarium[] = [
     name: 'Betta Paradise',
     volumeGallons: 5,
     type: 'freshwater',
-    imageUrl: 'https://placehold.co/600x400.png?text=Betta+Paradise',
-    lastWaterChange: new Date('2024-07-20'),
-    nextWaterChangeReminder: new Date('2024-07-27'),
+    imageUrl: 'https://placehold.co/600x400.png',
+    lastWaterChange: subDays(today, 5), // 5 days ago
+    nextWaterChangeReminder: today, // Water change due today
     notes: 'Betta seems happy. Plants are growing well. Added some shrimp.',
     fishSpecies: 'Betta Splendens, Amano Shrimp',
     fishCount: 6, 
     co2Injection: false,
     filterDetails: 'Small HOB Filter',
     foodDetails: 'Betta Pellets, Bloodworms (treat)',
-    nextFeedingReminder: new Date(new Date().setDate(new Date().getDate() - 1)), 
+    nextFeedingReminder: addDays(today, 1), // Feeding due tomorrow
     sourceWaterType: 'tap',
     sourceWaterParameters: 'Tap water treated with Seachem Prime. pH: 7.2, GH: 5 dGH',
   },
@@ -70,15 +72,16 @@ export const mockAquariumsData: Aquarium[] = [
     name: 'Planted Community',
     volumeGallons: 29,
     type: 'freshwater',
-    lastWaterChange: new Date('2024-07-22'),
-    nextWaterChangeReminder: new Date('2024-08-05'),
+    imageUrl: 'https://placehold.co/600x400.png',
+    lastWaterChange: subDays(today, 2), // 2 days ago
+    nextWaterChangeReminder: addDays(today, 2), // Water change due in 2 days
     notes: 'New guppies added last week. CO2 running smoothly.',
     fishSpecies: 'Guppy, Neon Tetra, Corydora, Otocinclus',
     fishCount: 20,
     co2Injection: true,
     filterDetails: 'Canister Filter - Eheim Classic 250',
     foodDetails: 'Community Flakes, Algae Wafers',
-    nextFeedingReminder: new Date(new Date().setDate(new Date().getDate() + 1)), 
+    nextFeedingReminder: addDays(today, 7), // Next feeding in a week
     sourceWaterType: 'ro',
     sourceWaterParameters: 'RO water remineralized with Seachem Equilibrium.',
   },
@@ -88,14 +91,16 @@ export const mockAquariumsData: Aquarium[] = [
     name: 'Office Nano Reef',
     volumeGallons: 10,
     type: 'reef',
-    imageUrl: 'https://placehold.co/600x400.png?text=Nano+Reef',
-    lastWaterChange: new Date('2024-07-18'),
+    imageUrl: 'https://placehold.co/600x400.png',
+    lastWaterChange: subDays(today, 10),
+    nextWaterChangeReminder: addDays(today, 4), // Due in 4 days (won't show "soon" badge)
     notes: 'Small zoa garden and a single ricordea. Skimmer running fine.',
     fishSpecies: 'Tailspot Blenny, Sexy Shrimp',
     fishCount: 3,
     co2Injection: false,
     filterDetails: 'HOB Skimmer, Small Powerhead',
     foodDetails: 'Reef Roids, Small Pellets',
+    nextFeedingReminder: addDays(today, 0), // Feeding due today
     sourceWaterType: 'ro',
   },
 ];
