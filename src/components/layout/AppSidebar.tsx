@@ -40,10 +40,11 @@ import {
   HeartHandshake,
   ChevronRight,
   ChevronDown,
-  ListPlus, // Added for Create Listing
-  Store as StoreIcon // Added for Local Fish Stores
+  ListPlus,
+  Store as StoreIcon,
+  Map as MapIcon // Added MapIcon for Sitemap
 } from 'lucide-react';
-import { marketplaceCategoriesData, type MarketplaceCategory, mockCurrentUser } from '@/types';
+import { marketplaceCategoriesData, type MarketplaceCategory, mockCurrentUser, questionCategories } from '@/types';
 import type { ReactElement, ElementType } from 'react';
 import { cn } from '@/lib/utils';
 
@@ -69,7 +70,16 @@ const navItemsConfig = [
     ]
   },
   { href: '/reminders', label: 'Reminders', icon: BellRing }, 
-  { href: '/qa', label: 'Q&A', icon: MessageSquare },
+  { 
+    href: '/qa', 
+    label: 'Q&A', 
+    icon: MessageSquare,
+    subItems: questionCategories.map(cat => ({
+      href: `/qa/${cat.slug}`,
+      label: cat.name,
+      icon: cat.icon || ChevronRight, // Use category icon or default
+    }))
+  },
   { 
     href: '/aiquarium-tools', 
     label: 'AIQuarium Tools', 
@@ -87,7 +97,7 @@ const navItemsConfig = [
     label: 'Marketplace', 
     icon: ShoppingCart,
     subItems: [
-        ...(mockCurrentUser.isSellerApproved ? [{ href: '/marketplace/add-listing', label: 'Create Listing', icon: ListPlus }] : []),
+        ...(mockCurrentUser.isSellerApproved ? [{ href: '/marketplace/add-listing', label: 'Create Listing', icon: ListPlus, className: 'text-primary font-semibold' }] : []),
         ...marketplaceCategoriesData.map((category: MarketplaceCategory) => ({
             href: `/marketplace/${category.slug}`,
             label: category.name,
@@ -103,6 +113,7 @@ const navItemsConfig = [
 const bottomNavItems = [
     { href: '/settings', label: 'Settings', icon: Settings },
     { href: '/help', label: 'Help & Support', icon: HelpCircle },
+    { href: '/sitemap', label: 'Sitemap', icon: MapIcon }, // Added Sitemap link
 ];
 
 export default function AppSidebar() {
@@ -165,9 +176,7 @@ export default function AppSidebar() {
                                 asChild
                                 isActive={subItem.href && pathname.startsWith(subItem.href)} 
                                 onClick={() => openMobile && setOpenMobile(false)}
-                                className={cn(
-                                  subItem.href === '/marketplace/add-listing' && 'text-primary font-semibold'
-                                )}
+                                className={cn(subItem.className)}
                               >
                                 <a>
                                   {SubIcon && <SubIcon className="h-4 w-4" />}
@@ -218,4 +227,3 @@ export default function AppSidebar() {
     </Sidebar>
   );
 }
-
