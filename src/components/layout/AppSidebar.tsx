@@ -17,12 +17,12 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar';
 import Logo from './Logo';
-import { 
-  LayoutDashboard, 
-  History, 
-  Droplet, 
-  ShoppingCart, 
-  Settings, 
+import {
+  LayoutDashboard,
+  History,
+  Droplet,
+  ShoppingCart,
+  Settings,
   LogOut,
   HelpCircle,
   FileScan,
@@ -42,7 +42,8 @@ import {
   ChevronDown,
   ListPlus,
   Store as StoreIcon,
-  Map as MapIcon // Added MapIcon for Sitemap
+  Map as MapIcon,
+  Star
 } from 'lucide-react';
 import { marketplaceCategoriesData, type MarketplaceCategory, mockCurrentUser, questionCategories } from '@/types';
 import type { ReactElement, ElementType } from 'react';
@@ -53,37 +54,37 @@ import { cn } from '@/lib/utils';
 const navItemsConfig = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   {
-    href: '/analyze', 
+    href: '/analyze',
     label: 'Water Test',
     icon: FileScan,
     subItems: [
-      { href: '/history', label: 'Test History', icon: History }, 
+      { href: '/history', label: 'Test History', icon: History },
     ],
   },
-  { 
-    href: '/aquariums', 
-    label: 'My Aquariums', 
+  {
+    href: '/aquariums',
+    label: 'My Aquariums',
     icon: Droplet,
     subItems: [
       { href: '/foods', label: 'Manage Foods', icon: PackageSearch },
       { href: '/treatments', label: 'Manage Treatments', icon: FlaskConical },
     ]
   },
-  { href: '/reminders', label: 'Reminders', icon: BellRing }, 
-  { 
-    href: '/qa', 
-    label: 'Q&A', 
+  { href: '/reminders', label: 'Reminders', icon: BellRing },
+  {
+    href: '/qa',
+    label: 'Q&A',
     icon: MessageSquare,
     subItems: questionCategories.map(cat => ({
       href: `/qa/${cat.slug}`,
       label: cat.name,
-      icon: cat.icon || ChevronRight, // Use category icon or default
+      icon: cat.icon || ChevronRight,
     }))
   },
-  { 
-    href: '/aiquarium-tools', 
-    label: 'AIQuarium Tools', 
-    icon: Sparkles, 
+  {
+    href: '/aiquarium-tools',
+    label: 'AIQuarium Tools',
+    icon: Sparkles,
     subItems: [
       { href: '/fish-finder', label: 'Fish Finder', icon: Fish },
       { href: '/plant-finder', label: 'Plant Finder', icon: Leaf },
@@ -92,16 +93,20 @@ const navItemsConfig = [
       { href: '/lighting-finder', label: 'Lighting Finder', icon: Sun },
     ]
   },
-  { 
-    href: '/marketplace', 
-    label: 'Marketplace', 
+  {
+    href: '/marketplace',
+    label: 'Marketplace',
     icon: ShoppingCart,
     subItems: [
-        ...(mockCurrentUser.isSellerApproved ? [{ href: '/marketplace/add-listing', label: 'Create Listing', icon: ListPlus, className: 'text-primary font-semibold' }] : []),
+        { href: '/marketplace/featured', label: 'Featured', icon: Star, className: 'text-amber-500 font-semibold' },
+        ...(mockCurrentUser.isSellerApproved ? [
+            { href: '/marketplace/add-listing', label: 'Create Listing', icon: ListPlus, className: 'text-primary font-semibold' },
+            { href: '/marketplace/purchase-featured-listing', label: 'Purchase Feature', icon: Star, className: 'text-amber-500 font-semibold' }
+        ] : []),
         ...marketplaceCategoriesData.map((category: MarketplaceCategory) => ({
             href: `/marketplace/${category.slug}`,
             label: category.name,
-            icon: category.icon || Leaf, 
+            icon: category.icon || ChevronRight,
         })),
         { href: '/items-wanted', label: 'Items Wanted', icon: HeartHandshake },
     ]
@@ -113,7 +118,7 @@ const navItemsConfig = [
 const bottomNavItems = [
     { href: '/settings', label: 'Settings', icon: Settings },
     { href: '/help', label: 'Help & Support', icon: HelpCircle },
-    { href: '/sitemap', label: 'Sitemap', icon: MapIcon }, // Added Sitemap link
+    { href: '/sitemap', label: 'Sitemap', icon: MapIcon },
 ];
 
 export default function AppSidebar() {
@@ -122,10 +127,32 @@ export default function AppSidebar() {
 
   const isActiveRoute = (href: string | undefined) => {
     if (!href) return false;
-    if (href === '/') return pathname === href; 
+    // For parent items, only activate if it's an exact match,
+    // or if a sub-item is active and the current path starts with the parent's href.
+    // This prevents the parent from staying "more active" than a specific child.
+    if (href === '/') return pathname === href;
+
+    const parentItem = navItemsConfig.find(item => item.href === href && item.subItems && item.subItems.length > 0);
+    if (parentItem) {
+        // If any sub-item is active, parent is "section active" but not "direct active"
+        const isSubItemActive = parentItem.subItems.some(sub => sub.href && pathname.startsWith(sub.href));
+        if (isSubItemActive) {
+            return pathname === href; // Only true if current page is exactly the parent link
+        }
+    }
     return pathname.startsWith(href);
   };
   
+  const isSectionActive = (item: typeof navItemsConfig[0]) => {
+    if (!item.href) return false;
+    if (pathname.startsWith(item.href)) return true;
+    if (item.subItems) {
+        return item.subItems.some(sub => sub.href && pathname.startsWith(sub.href));
+    }
+    return false;
+  };
+
+
   return (
     <Sidebar collapsible="icon" side="left" variant="sidebar">
       <SidebarHeader className="border-b">
@@ -137,10 +164,11 @@ export default function AppSidebar() {
         <SidebarMenu>
           {navItemsConfig.map((item) => {
             const hasSubItems = item.subItems && item.subItems.length > 0;
-            const isParentSectionActive = 
-              (item.href && pathname === item.href) || 
-              (item.href && pathname.startsWith(item.href) && item.href !== pathname && hasSubItems) || 
-              (hasSubItems && item.subItems.some(sub => sub.href && pathname.startsWith(sub.href)));
+            // const isParentSectionActive =
+            //   (item.href && pathname === item.href) || // Exact match for parent
+            //   (item.href && pathname.startsWith(item.href) && item.href !== pathname && hasSubItems) || // Path starts with parent href and has subitems (but not exact match)
+            //   (hasSubItems && item.subItems.some(sub => sub.href && pathname.startsWith(sub.href))); // A subitem is active
+            const currentSectionActive = isSectionActive(item);
 
 
             return (
@@ -148,7 +176,7 @@ export default function AppSidebar() {
                 <Link href={item.href || '#'} passHref legacyBehavior>
                   <SidebarMenuButton
                     asChild
-                    isActive={isActiveRoute(item.href) && !hasSubItems || (item.href === pathname && hasSubItems)} 
+                    isActive={isActiveRoute(item.href) && (!hasSubItems || item.href === pathname)}
                     tooltip={item.label}
                     onClick={() => {
                       if (openMobile && !hasSubItems) setOpenMobile(false);
@@ -158,14 +186,14 @@ export default function AppSidebar() {
                       <item.icon className="h-5 w-5" />
                       <span className="flex-grow">{item.label}</span>
                       {hasSubItems && (
-                        isParentSectionActive ? 
-                        <ChevronDown className="h-4 w-4 shrink-0" /> : 
+                        currentSectionActive ?
+                        <ChevronDown className="h-4 w-4 shrink-0" /> :
                         <ChevronRight className="h-4 w-4 shrink-0" />
                       )}
                     </a>
                   </SidebarMenuButton>
                 </Link>
-                {hasSubItems && isParentSectionActive && (
+                {hasSubItems && currentSectionActive && (
                   <SidebarMenuSub>
                     {item.subItems.map((subItem) => {
                        const SubIcon = subItem.icon as ElementType;
@@ -174,7 +202,7 @@ export default function AppSidebar() {
                             <Link href={subItem.href} passHref legacyBehavior>
                               <SidebarMenuSubButton
                                 asChild
-                                isActive={subItem.href && pathname.startsWith(subItem.href)} 
+                                isActive={subItem.href && pathname.startsWith(subItem.href)}
                                 onClick={() => openMobile && setOpenMobile(false)}
                                 className={cn(subItem.className)}
                               >
@@ -216,7 +244,7 @@ export default function AppSidebar() {
           <SidebarMenuItem>
              <SidebarMenuButton tooltip="Log Out" onClick={() => {
                 openMobile && setOpenMobile(false);
-                console.log("Logout clicked"); 
+                console.log("Logout clicked");
              }}>
                 <LogOut className="h-5 w-5" />
                 <span>Log Out</span>

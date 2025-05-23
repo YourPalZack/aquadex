@@ -1,7 +1,20 @@
 
 import type { AnalyzeTestStripOutput, RecommendTreatmentProductsOutput } from '@/ai/flows';
 import type { LucideProps } from 'lucide-react';
-import { Fish, Leaf, Package as PackageIcon, HardHat, HeartHandshake, Gift, type ElementType, ShoppingCart, SearchCheck, Store as StoreIcon } from 'lucide-react';
+import { 
+    Fish, 
+    Leaf, 
+    Package as PackageIcon, 
+    HardHat, 
+    HeartHandshake, 
+    Gift, 
+    MessageSquare, // Ensured MessageSquare is imported
+    type ElementType, 
+    ShoppingCart, 
+    SearchCheck, 
+    Store as StoreIcon, 
+    Star 
+} from 'lucide-react';
 
 
 export interface TestResult {
@@ -41,12 +54,13 @@ export interface Aquarium {
 export interface UserProfile {
   id: string;
   name: string;
-  email?: string; 
+  email?: string;
   avatarUrl?: string;
   dataAiHint?: string;
-  isSellerApproved?: boolean; 
-  bio?: string; 
-  location?: string; 
+  isSellerApproved?: boolean;
+  bio?: string;
+  location?: string;
+  isFeatured?: boolean; // Added for featured sellers
 }
 
 export const mockCurrentUser: UserProfile = {
@@ -55,10 +69,19 @@ export const mockCurrentUser: UserProfile = {
   email: 'aqua.user@example.com',
   avatarUrl: 'https://placehold.co/100x100.png?text=AU',
   dataAiHint: 'user avatar',
-  isSellerApproved: true, // Set to true for demo purposes to see the "Add Listing" button
+  isSellerApproved: true,
   bio: 'Passionate aquarist with 5 years of experience in freshwater and planted tanks. Always learning!',
   location: 'Springfield, USA',
+  isFeatured: true, // Make current user featured for demo
 };
+
+// Used in Q&A and potentially for seller profiles if we simplify
+export const mockUsers: UserProfile[] = [
+  { id: 'user1', name: 'Alice Aqua', avatarUrl: 'https://placehold.co/40x40.png?text=AA', dataAiHint: 'female avatar', isFeatured: true },
+  { id: 'user2', name: 'Bob Fishman', avatarUrl: 'https://placehold.co/40x40.png?text=BF', dataAiHint: 'male avatar' },
+  { id: 'user3', name: 'Charlie Coral', avatarUrl: 'https://placehold.co/40x40.png?text=CC', dataAiHint: 'person avatar', isFeatured: true },
+  { id: 'user4', name: 'Diana Driftwood', avatarUrl: 'https://placehold.co/40x40.png?text=DD', dataAiHint: 'avatar' },
+];
 
 
 export interface Answer {
@@ -87,28 +110,28 @@ export interface Category {
   name: string;
   slug: string;
   description?: string;
-  icon?: IconType; 
+  icon?: IconType;
 }
 
 export const questionCategories: Category[] = [
-  { name: 'Freshwater', slug: 'freshwater', description: 'Discussions about freshwater aquariums, fish, and plants.' },
-  { name: 'Saltwater', slug: 'saltwater', description: 'All about saltwater tanks, marine fish, and invertebrates.' },
-  { name: 'Reef Tanks', slug: 'reef-tanks', description: 'Focus on coral care, reef ecosystems, and advanced setups.' },
-  { name: 'Fish Health', slug: 'fish-health', description: 'Diagnosing and treating fish diseases and health issues.' },
-  { name: 'Aquascaping & Plants', slug: 'aquascaping-plants', description: 'The art of aquarium design and live plant care.' },
-  { name: 'Equipment & Setup', slug: 'equipment-setup', description: 'Filters, lighting, heaters, and setting up new tanks.' },
-  { name: 'General Discussion', slug: 'general-discussion', description: 'For everything else related to the aquarium hobby.' },
+  { name: 'Freshwater', slug: 'freshwater', description: 'Discussions about freshwater aquariums, fish, and plants.', icon: Fish },
+  { name: 'Saltwater', slug: 'saltwater', description: 'All about saltwater tanks, marine fish, and invertebrates.', icon: Fish }, 
+  { name: 'Reef Tanks', slug: 'reef-tanks', description: 'Focus on coral care, reef ecosystems, and advanced setups.', icon: Leaf }, 
+  { name: 'Fish Health', slug: 'fish-health', description: 'Diagnosing and treating fish diseases and health issues.', icon: HeartHandshake },
+  { name: 'Aquascaping & Plants', slug: 'aquascaping-plants', description: 'The art of aquarium design and live plant care.', icon: Leaf },
+  { name: 'Equipment & Setup', slug: 'equipment-setup', description: 'Filters, lighting, heaters, and setting up new tanks.', icon: PackageIcon },
+  { name: 'General Discussion', slug: 'general-discussion', description: 'For everything else related to the aquarium hobby.', icon: MessageSquare },
 ];
 
 export interface ReminderItem {
-  id: string; 
+  id: string;
   aquariumId: string;
   aquariumName: string;
   type: 'Water Change' | 'Feeding';
   dueDate: Date;
   status: 'Overdue' | 'Due Today' | 'Due Soon' | 'Upcoming';
-  message: string; 
-  daysDiff: number; 
+  message: string;
+  daysDiff: number;
 }
 
 
@@ -127,10 +150,10 @@ export interface AmazonLink {
 }
 export interface FishFood {
   id: string;
-  userId: string; 
+  userId: string;
   name: string;
   brand?: string;
-  variant?: string; 
+  variant?: string;
   notes?: string;
   amazonLinks?: AmazonLink[];
 }
@@ -147,7 +170,7 @@ export interface WaterTreatmentProduct {
   userId: string;
   name: string;
   brand?: string;
-  type?: string; 
+  type?: string;
   notes?: string;
   amazonLinks?: AmazonLink[];
 }
@@ -160,13 +183,13 @@ export interface WaterTreatmentProductFormValues {
 }
 
 export interface FishListing {
-  id: string; 
-  sourceName: string; 
+  id: string;
+  sourceName: string;
   listingTitle: string;
-  price?: string; 
-  url: string; 
-  imageUrl?: string; 
-  dataAiHint?: string; 
+  price?: string;
+  url: string;
+  imageUrl?: string;
+  dataAiHint?: string;
 }
 
 export interface FindFishInput {
@@ -175,12 +198,12 @@ export interface FindFishInput {
 
 export interface FindFishOutput {
   searchResults: FishListing[];
-  message: string; 
+  message: string;
 }
 
 export interface PlantListing {
   id: string;
-  sourceName: string; 
+  sourceName: string;
   listingTitle: string;
   price?: string;
   url: string;
@@ -199,22 +222,22 @@ export interface FindPlantOutput {
 
 export interface TankListing {
   id: string;
-  sourceName: string; 
+  sourceName: string;
   listingTitle: string;
   price?: string;
   url: string;
   imageUrl?: string;
   dataAiHint?: string;
-  capacity?: string; 
-  dimensions?: string; 
+  capacity?: string;
+  dimensions?: string;
   brand?: string;
 }
 
 export interface FindTankInput {
-  tankType?: string; 
-  capacity?: string; 
-  brand?: string; 
-  keywords?: string; 
+  tankType?: string;
+  capacity?: string;
+  brand?: string;
+  keywords?: string;
 }
 
 export interface FindTankOutput {
@@ -224,22 +247,22 @@ export interface FindTankOutput {
 
 export interface FilterListing {
   id: string;
-  sourceName: string; 
+  sourceName: string;
   listingTitle: string;
   price?: string;
   url: string;
   imageUrl?: string;
   dataAiHint?: string;
-  filterType?: string; 
-  flowRate?: string; 
-  suitableTankSize?: string; 
+  filterType?: string;
+  flowRate?: string;
+  suitableTankSize?: string;
   brand?: string;
 }
 
 export interface FindFilterInput {
   filterType?: string;
   brand?: string;
-  tankSizeGallons?: string; 
+  tankSizeGallons?: string;
   keywords?: string;
 }
 
@@ -256,18 +279,18 @@ export interface LightingListing {
   url: string;
   imageUrl?: string;
   dataAiHint?: string;
-  lightType?: string; 
-  wattageOrPAR?: string; 
-  coverageArea?: string; 
+  lightType?: string;
+  wattageOrPAR?: string;
+  coverageArea?: string;
   brand?: string;
-  isRecommended?: boolean; 
+  isRecommended?: boolean;
 }
 
 export interface FindLightingInput {
   lightType?: string;
   brand?: string;
-  tankSizeOrCoverage?: string; 
-  keywords?: string; 
+  tankSizeOrCoverage?: string;
+  keywords?: string;
 }
 
 export interface FindLightingOutput {
@@ -286,22 +309,22 @@ export interface DealItem {
   discountPercentage?: string;
   sourceName: string;
   url: string;
-  imageUrl: string; 
-  dataAiHint: string; 
-  description?: string; 
+  imageUrl: string;
+  dataAiHint: string;
+  description?: string;
   category?: DealCategory;
 }
 
 export interface FindDealsOutput {
   deals: DealItem[];
-  message: string; 
+  message: string;
 }
 
 export interface MarketplaceCategory {
   slug: string;
   name: string;
   description: string;
-  icon?: IconType;
+  icon?: ElementType<LucideProps>; 
 }
 
 export const marketplaceCategoriesData: MarketplaceCategory[] = [
@@ -319,17 +342,17 @@ export type MarketplaceItemCondition = typeof marketplaceItemConditions[number];
 
 export interface MarketplaceListing {
   id: string;
-  slug: string; 
+  slug: string;
   title: string;
   description: string;
-  price: string; 
+  price: string;
   categorySlug: string;
-  sellerId: string; 
-  sellerName: string; 
-  imageUrl: string; 
-  imageHint?: string; 
+  sellerId: string;
+  sellerName: string;
+  imageUrl: string;
+  imageHint?: string;
   condition: MarketplaceItemCondition;
-  location?: string; 
+  location?: string;
   createdAt: Date;
   isFeatured?: boolean;
   tags?: string[];
@@ -347,13 +370,6 @@ export interface MarketplaceListingFormValues {
   tags?: string[];
 }
 
-export interface MarketplaceSeller {
-  id: string;
-  name: string;
-  avatarUrl?: string;
-  dataAiHint?: string;
-}
-
 export interface SellerApplicationFormValues {
   storeName: string;
   contactEmail: string;
@@ -367,13 +383,13 @@ export interface WantedItem {
   id: string;
   title: string;
   description: string;
-  categorySlug?: string; 
-  userId: string; 
-  userName: string; 
+  categorySlug?: string;
+  userId: string;
+  userName: string;
   userAvatarUrl?: string;
   userAvatarHint?: string;
   createdAt: Date;
-  status: WantedItemStatus; 
+  status: WantedItemStatus;
   tags?: string[];
 }
 
@@ -381,7 +397,7 @@ export interface WantedItemFormValues {
   title: string;
   description: string;
   categorySlug?: string;
-  tags?: string[]; // Kept as string[] for display, will be converted from comma-separated input
+  tags?: string[];
 }
 
 // New types for Local Fish Stores
@@ -417,5 +433,5 @@ export interface LocalFishStore {
   operatingHours?: OperatingHours;
   services?: string[]; // e.g., ["Freshwater Fish", "Saltwater Fish", "Aquarium Maintenance", "Pond Supplies"]
   isVerified?: boolean; // If the store profile is claimed/verified by the owner
-  // Placeholder for future: associatedMarketplaceSellerId?: string; 
+  isFeatured?: boolean; // Added for featured stores
 }

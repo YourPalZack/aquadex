@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { 
-    User, Mail, MapPin, Edit3, Droplet, History, MessageSquare, ShoppingCart, PlusCircle, CheckCircle, AlertCircle, FileText, HeartHandshake 
+    User, Mail, MapPin, Edit3, Droplet, History, MessageSquare, ShoppingCart, PlusCircle, CheckCircle, AlertCircle, FileText, HeartHandshake, Star 
 } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
@@ -108,25 +108,34 @@ export default function ProfilePage() {
                             )}
                         </CardTitle>
                     </CardHeader>
-                    <CardContent>
+                    <CardContent className="flex flex-col sm:flex-row sm:items-center gap-3">
                         {user.isSellerApproved ? (
-                        <p className="text-sm text-muted-foreground">You can list items for sale on the AquaDex Marketplace.</p>
+                        <p className="text-sm text-muted-foreground flex-grow">You can list items for sale and purchase featured slots.</p>
                         ) : (
-                        <p className="text-sm text-muted-foreground mb-3">
+                        <p className="text-sm text-muted-foreground mb-3 sm:mb-0 flex-grow">
                             Interested in selling your aquarium-related items? Apply to become a seller.
                         </p>
                         )}
-                         <Button variant="outline" asChild className="mt-2">
-                            <Link href={user.isSellerApproved ? "/marketplace/my-listings" : "/marketplace/apply-to-sell"}>
-                                {user.isSellerApproved ? <ShoppingCart className="w-4 h-4 mr-2" /> : <PlusCircle className="w-4 h-4 mr-2" />}
-                                {user.isSellerApproved ? "Manage My Listings (Placeholder)" : "Apply to Sell"}
-                            </Link>
-                        </Button>
+                         <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                            <Button variant="outline" asChild className="w-full sm:w-auto">
+                                <Link href={user.isSellerApproved ? "/marketplace/my-listings" : "/marketplace/apply-to-sell"}>
+                                    {user.isSellerApproved ? <ShoppingCart className="w-4 h-4 mr-2" /> : <PlusCircle className="w-4 h-4 mr-2" />}
+                                    {user.isSellerApproved ? "Manage Listings" : "Apply to Sell"}
+                                </Link>
+                            </Button>
+                            {user.isSellerApproved && (
+                                <Button variant="default" asChild className="w-full sm:w-auto bg-amber-500 hover:bg-amber-600 text-white">
+                                    <Link href="/marketplace/purchase-featured-listing">
+                                        <Star className="w-4 h-4 mr-2" /> Purchase Feature
+                                    </Link>
+                                </Button>
+                            )}
+                         </div>
                     </CardContent>
                 </Card>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <Link href="/marketplace" passHref>
+                    <Link href="/marketplace/my-listings" passHref>
                         <Card className="hover:shadow-md transition-shadow cursor-pointer h-full">
                         <CardHeader>
                             <CardTitle className="text-lg flex items-center"><ShoppingCart className="w-5 h-5 mr-2 text-primary" />My Listings</CardTitle>
@@ -154,4 +163,3 @@ export default function ProfilePage() {
     </div>
   );
 }
-

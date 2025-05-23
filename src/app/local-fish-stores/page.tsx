@@ -37,6 +37,7 @@ export const mockLocalFishStoresData: LocalFishStore[] = [
     },
     services: ['Freshwater Fish', 'Saltwater Fish', 'Corals', 'Live Plants', 'Aquarium Supplies', 'Water Testing'],
     isVerified: true,
+    isFeatured: true, // Make this one featured
   },
   {
     id: 'lfs2',
@@ -81,6 +82,7 @@ export const mockLocalFishStoresData: LocalFishStore[] = [
     },
     services: ['Aquatic Plants', 'Nano Fish', 'Shrimp', 'Aquascaping Supplies', 'Hardscape'],
     isVerified: true,
+    isFeatured: false,
   },
 ];
 
@@ -131,8 +133,8 @@ export default function LocalFishStoresPage() {
           <div className="mt-6 flex flex-col sm:flex-row gap-4">
             <div className="relative flex-grow">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-              <Input 
-                type="search" 
+              <Input
+                type="search"
                 placeholder="Search stores by name, city, zip, or service..."
                 className="pl-10 w-full"
                 value={searchTerm}
@@ -163,7 +165,7 @@ export default function LocalFishStoresPage() {
             <Info className="w-12 h-12 mx-auto mb-3 opacity-50" />
             <p className="text-xl font-semibold mb-2">No Stores Found</p>
             <p>
-              {searchTerm 
+              {searchTerm
                 ? `No stores match your search criteria "${searchTerm}".`
                 : "There are currently no fish stores listed."
               }
@@ -182,4 +184,3 @@ export default function LocalFishStoresPage() {
     </div>
   );
 }
-
