@@ -40,6 +40,8 @@ const mockAquariumsData: Aquarium[] = [
     fishCount: 5,
     co2Injection: false,
     filterDetails: 'Sump with Protein Skimmer & Refugium',
+    foodDetails: 'NLS Pellets, Rods Food, Mysis Shrimp',
+    nextFeedingReminder: new Date(new Date().setDate(new Date().getDate() + 0)), // Today
   },
   {
     id: 'aqua2',
@@ -55,6 +57,8 @@ const mockAquariumsData: Aquarium[] = [
     fishCount: 6, // 1 betta, 5 shrimp
     co2Injection: false,
     filterDetails: 'Small HOB Filter',
+    foodDetails: 'Betta Pellets, Bloodworms (treat)',
+    nextFeedingReminder: new Date(new Date().setDate(new Date().getDate() - 1)), // Yesterday (Overdue)
   },
   {
     id: 'aqua3',
@@ -69,6 +73,8 @@ const mockAquariumsData: Aquarium[] = [
     fishCount: 20,
     co2Injection: true,
     filterDetails: 'Canister Filter - Eheim Classic 250',
+    foodDetails: 'Community Flakes, Algae Wafers',
+    nextFeedingReminder: new Date(new Date().setDate(new Date().getDate() + 1)), // Tomorrow
   },
   {
     id: 'aqua4',
@@ -83,6 +89,8 @@ const mockAquariumsData: Aquarium[] = [
     fishCount: 3,
     co2Injection: false,
     filterDetails: 'HOB Skimmer, Small Powerhead',
+    foodDetails: 'Reef Roids, Small Pellets',
+    // No feeding reminder set for this one
   },
 ];
 
@@ -90,11 +98,10 @@ export default function AquariumsPage() {
   const [aquariums, setAquariums] = useState<Aquarium[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingAquarium, setEditingAquarium] = useState<Aquarium | null>(null);
-  const [isLoading, setIsLoading] = useState(true); // Start true for initial load
+  const [isLoading, setIsLoading] = useState(true); 
   const { toast } = useToast();
 
   useEffect(() => {
-    // Simulate loading data
     setTimeout(() => {
         setAquariums(mockAquariumsData);
         setIsLoading(false);
@@ -115,25 +122,20 @@ export default function AquariumsPage() {
   };
 
   const handleDeleteAquarium = (aquariumId: string) => {
-    // Add confirmation dialog here in a real app
     setAquariums(prevAquariums => prevAquariums.filter(aq => aq.id !== aquariumId));
     toast({
       title: "Aquarium Deleted",
       description: `Aquarium has been removed.`,
       variant: 'destructive'
     });
-    // In a real app, call an API to delete from backend:
-    // e.g., deleteAquariumAction(aquariumId);
   };
 
   const handleFormSubmit = async (data: AquariumFormData) => {
     setIsLoading(true);
-    // Simulate API call delay
     await new Promise(resolve => setTimeout(resolve, 1000));
 
     try {
       if (editingAquarium) {
-        // Update existing aquarium
         const updatedAquarium: Aquarium = { 
             ...editingAquarium, 
             ...data,
@@ -141,30 +143,24 @@ export default function AquariumsPage() {
             fishCount: data.fishCount ? Number(data.fishCount) : undefined,
             co2Injection: data.co2Injection || false,
             imageUrl: data.imageUrl || undefined,
+            foodDetails: data.foodDetails || undefined,
+            nextFeedingReminder: data.nextFeedingReminder,
          };
         setAquariums(prev => prev.map(aq => aq.id === editingAquarium.id ? updatedAquarium : aq));
         toast({ title: "Aquarium Updated", description: `${updatedAquarium.name} has been updated.` });
-        // In a real app: await updateAquariumAction(updatedAquarium);
       } else {
-        // Add new aquarium
         const newAquariumData: Aquarium = {
-          id: `aqua${Date.now()}`, // Simple mock ID
-          userId: 'user123', // Mock user ID
+          id: `aqua${Date.now()}`, 
+          userId: 'user123', 
           ...data,
           volumeGallons: data.volumeGallons ? Number(data.volumeGallons) : undefined,
           fishCount: data.fishCount ? Number(data.fishCount) : undefined,
           co2Injection: data.co2Injection || false,
           imageUrl: data.imageUrl || undefined,
+          foodDetails: data.foodDetails || undefined,
+          nextFeedingReminder: data.nextFeedingReminder,
         };
-        // Simulate calling a server action
-        // const result = await addAquariumAction(newAquariumData);
-        // if (result.success) {
-        //   setAquariums(prev => [newAquariumData, ...prev]); // Add to start for visibility
-        //   toast({ title: "Aquarium Added", description: `${newAquariumData.name} has been added.` });
-        // } else {
-        //   toast({ title: "Error", description: result.message || "Could not add aquarium.", variant: "destructive" });
-        // }
-        setAquariums(prev => [newAquariumData, ...prev]); // Optimistic update for now
+        setAquariums(prev => [newAquariumData, ...prev]); 
         toast({ title: "Aquarium Added", description: `${newAquariumData.name} has been added.` });
       }
       setIsDialogOpen(false);
@@ -232,7 +228,7 @@ export default function AquariumsPage() {
 
       <Dialog open={isDialogOpen} onOpenChange={(open) => {
           if (!open) {
-            setEditingAquarium(null); // Reset editing state when dialog closes
+            setEditingAquarium(null); 
           }
           setIsDialogOpen(open);
         }}>
@@ -243,7 +239,7 @@ export default function AquariumsPage() {
               {editingAquarium ? 'Update the details of your aquarium.' : 'Fill in the details to add a new aquarium.'}
             </DialogDescription>
           </DialogHeader>
-          <div className="p-6 max-h-[calc(90vh-120px)] overflow-y-auto"> {/* Adjust max-height as needed */}
+          <div className="p-6 max-h-[calc(90vh-120px)] overflow-y-auto"> 
             <AquariumForm
                 onSubmit={handleFormSubmit}
                 onCancel={() => {

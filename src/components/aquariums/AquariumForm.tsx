@@ -46,6 +46,8 @@ const aquariumFormSchema = z.object({
   fishCount: z.coerce.number().int().nonnegative({ message: 'Number of fish must be a whole non-negative number.' }).optional().or(z.literal('')),
   co2Injection: z.boolean().optional(),
   filterDetails: z.string().max(100, { message: 'Filter details cannot exceed 100 characters.' }).optional(),
+  foodDetails: z.string().max(200, { message: "Food details cannot exceed 200 characters."}).optional(),
+  nextFeedingReminder: z.date().optional(),
   notes: z.string().max(500, { message: 'Notes cannot exceed 500 characters.' }).optional(),
 });
 
@@ -72,6 +74,8 @@ export default function AquariumForm({ onSubmit, onCancel, defaultValues, isLoad
       fishCount: defaultValues?.fishCount || undefined,
       co2Injection: defaultValues?.co2Injection || false,
       filterDetails: defaultValues?.filterDetails || '',
+      foodDetails: defaultValues?.foodDetails || '',
+      nextFeedingReminder: defaultValues?.nextFeedingReminder ? new Date(defaultValues.nextFeedingReminder) : undefined,
       notes: defaultValues?.notes || '',
     },
   });
@@ -81,8 +85,9 @@ export default function AquariumForm({ onSubmit, onCancel, defaultValues, isLoad
       ...values,
       volumeGallons: values.volumeGallons ? Number(values.volumeGallons) : undefined,
       fishCount: values.fishCount ? Number(values.fishCount) : undefined,
-      co2Injection: values.co2Injection || false, // Ensure boolean
-      imageUrl: values.imageUrl === '' ? undefined : values.imageUrl, // Set to undefined if empty string
+      co2Injection: values.co2Injection || false, 
+      imageUrl: values.imageUrl === '' ? undefined : values.imageUrl,
+      foodDetails: values.foodDetails === '' ? undefined : values.foodDetails,
     };
     onSubmit(processedValues);
   };
@@ -224,6 +229,21 @@ export default function AquariumForm({ onSubmit, onCancel, defaultValues, isLoad
             </FormItem>
           )}
         />
+
+        <FormField
+          control={form.control}
+          name="foodDetails"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Food Type/Brand</FormLabel>
+              <FormControl>
+                <Input placeholder="E.g., Hikari Pellets, Fluval Flakes" {...field} />
+              </FormControl>
+              <FormDescription>Optional. Specify the food used.</FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <FormField
@@ -304,6 +324,47 @@ export default function AquariumForm({ onSubmit, onCancel, defaultValues, isLoad
             )}
             />
         </div>
+
+        <FormField
+            control={form.control}
+            name="nextFeedingReminder"
+            render={({ field }) => (
+                <FormItem className="flex flex-col">
+                <FormLabel>Next Feeding Reminder</FormLabel>
+                <Popover>
+                    <PopoverTrigger asChild>
+                    <FormControl>
+                        <Button
+                        variant={'outline'}
+                        className={cn(
+                            'w-full pl-3 text-left font-normal',
+                            !field.value && 'text-muted-foreground'
+                        )}
+                        >
+                        {field.value ? (
+                            format(field.value, 'PPP') // Date only for now
+                        ) : (
+                            <span>Pick a date</span>
+                        )}
+                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                        </Button>
+                    </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                        mode="single"
+                        selected={field.value}
+                        onSelect={field.onChange}
+                        initialFocus
+                    />
+                    </PopoverContent>
+                </Popover>
+                <FormDescription>Optional. Set a reminder for the next feeding date.</FormDescription>
+                <FormMessage />
+                </FormItem>
+            )}
+            />
+
         <FormField
           control={form.control}
           name="notes"

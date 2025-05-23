@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from '@/components/ui/button';
 import { 
     Droplet, CalendarDays, Pencil, Trash2, Edit3, AlertTriangle, BellRing, CalendarClock,
-    FishSymbol, Users, Leaf, Filter, Info, Image as ImageIcon
+    FishSymbol, Users, Leaf, Filter, Info, Image as ImageIcon, Utensils, Timer
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
@@ -32,15 +32,17 @@ const DetailItem: React.FC<{ icon: React.ReactNode; label?: string; value: React
 
 
 export default function AquariumCard({ aquarium, onEdit, onDelete }: AquariumCardProps) {
-  const getReminderStatus = (reminderDate?: Date): { text: string; icon: React.ReactNode; className: string } | null => {
+  const getWaterChangeReminderStatus = (reminderDate?: Date): { text: string; icon: React.ReactNode; className: string } | null => {
     if (!reminderDate) return null;
 
     const today = new Date();
+    today.setHours(0,0,0,0);
     const reminder = new Date(reminderDate);
+    reminder.setHours(0,0,0,0);
     const daysDiff = differenceInDays(reminder, today);
 
     if (isPast(reminder) && !isToday(reminder)) {
-      return { text: `Overdue by ${Math.abs(daysDiff)} day(s) (was ${format(reminder, 'MMM d')})`, icon: <AlertTriangle className="w-4 h-4 mr-1" />, className: 'text-destructive font-semibold' };
+      return { text: `Water Change Overdue by ${Math.abs(daysDiff)} day(s) (was ${format(reminder, 'MMM d')})`, icon: <AlertTriangle className="w-4 h-4 mr-1" />, className: 'text-destructive font-semibold' };
     }
     if (isToday(reminder)) {
       return { text: 'Water Change Due Today!', icon: <BellRing className="w-4 h-4 mr-1" />, className: 'text-amber-600 dark:text-amber-500 font-semibold' };
@@ -54,7 +56,33 @@ export default function AquariumCard({ aquarium, onEdit, onDelete }: AquariumCar
     return null;
   };
 
-  const reminderStatus = getReminderStatus(aquarium.nextWaterChangeReminder);
+  const getFeedingReminderStatus = (reminderDate?: Date): { text: string; icon: React.ReactNode; className: string } | null => {
+    if (!reminderDate) return null;
+
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    const reminder = new Date(reminderDate);
+    reminder.setHours(0,0,0,0);
+    const daysDiff = differenceInDays(reminder, today);
+
+    if (isPast(reminder) && !isToday(reminder)) {
+      return { text: `Feeding Overdue (was ${format(reminder, 'MMM d')})`, icon: <AlertTriangle className="w-4 h-4 mr-1" />, className: 'text-destructive font-semibold' };
+    }
+    if (isToday(reminder)) {
+      return { text: 'Feeding Due Today!', icon: <Timer className="w-4 h-4 mr-1" />, className: 'text-amber-600 dark:text-amber-500 font-semibold' };
+    }
+    // Shorter window for feeding reminder, e.g., 1 day in advance
+    if (daysDiff === 0 ) { // This case is covered by isToday
+        return { text: `Feeding Due Today! (${format(reminder, 'MMM d')})`, icon: <Timer className="w-4 h-4 mr-1" />, className: 'text-amber-600 dark:text-amber-500' };
+    }
+    if (isFuture(reminder)) {
+      return { text: `Next Feeding: ${format(reminder, 'MMM d, yyyy')}`, icon: <Timer className="w-4 h-4 mr-1" />, className: 'text-muted-foreground' };
+    }
+    return null;
+  };
+
+  const waterChangeReminderStatus = getWaterChangeReminderStatus(aquarium.nextWaterChangeReminder);
+  const feedingReminderStatus = getFeedingReminderStatus(aquarium.nextFeedingReminder);
 
   return (
     <Card className="w-full shadow-lg flex flex-col h-full bg-card hover:shadow-xl transition-shadow duration-300">
@@ -89,20 +117,31 @@ export default function AquariumCard({ aquarium, onEdit, onDelete }: AquariumCar
       )}
       
       <CardContent className="space-y-3 flex-grow pb-4">
-        {reminderStatus && (
+        {waterChangeReminderStatus && (
             <div className={cn("flex items-center text-sm p-2 rounded-md", 
-                reminderStatus.className.includes('destructive') ? 'bg-destructive/10 border border-destructive/30' : 
-                reminderStatus.className.includes('amber') ? 'bg-amber-500/10 border border-amber-500/30' : 'bg-muted/50 border border-border'
+                waterChangeReminderStatus.className.includes('destructive') ? 'bg-destructive/10 border border-destructive/30' : 
+                waterChangeReminderStatus.className.includes('amber') ? 'bg-amber-500/10 border border-amber-500/30' : 'bg-muted/50 border border-border'
             )}>
-            {reminderStatus.icon}
-            <span className="ml-1">{reminderStatus.text}</span>
+            {waterChangeReminderStatus.icon}
+            <span className="ml-1">{waterChangeReminderStatus.text}</span>
             </div>
         )}
-         {aquarium.lastWaterChange && (!reminderStatus || (reminderStatus && (isFuture(new Date(aquarium.nextWaterChangeReminder!)) && differenceInDays(new Date(aquarium.nextWaterChangeReminder!), new Date()) > 3))) && (
+         {aquarium.lastWaterChange && (!waterChangeReminderStatus || (waterChangeReminderStatus && (isFuture(new Date(aquarium.nextWaterChangeReminder!)) && differenceInDays(new Date(aquarium.nextWaterChangeReminder!), new Date()) > 3))) && (
           <DetailItem icon={<CalendarDays />} value={`Last Change: ${format(new Date(aquarium.lastWaterChange), 'MMM d, yyyy')}`} />
         )}
 
-        {(aquarium.fishSpecies || aquarium.fishCount !== undefined || typeof aquarium.co2Injection === 'boolean' || aquarium.filterDetails) && (
+        {feedingReminderStatus && (
+            <div className={cn("flex items-center text-sm p-2 rounded-md mt-2", 
+                feedingReminderStatus.className.includes('destructive') ? 'bg-destructive/10 border border-destructive/30' : 
+                feedingReminderStatus.className.includes('amber') ? 'bg-amber-500/10 border border-amber-500/30' : 'bg-muted/50 border border-border'
+            )}>
+            {feedingReminderStatus.icon}
+            <span className="ml-1">{feedingReminderStatus.text}</span>
+            </div>
+        )}
+
+
+        {(aquarium.fishSpecies || aquarium.fishCount !== undefined || typeof aquarium.co2Injection === 'boolean' || aquarium.filterDetails || aquarium.foodDetails) && (
             <Separator className="my-3" />
         )}
         
@@ -110,6 +149,8 @@ export default function AquariumCard({ aquarium, onEdit, onDelete }: AquariumCar
         {aquarium.fishCount !== undefined && <DetailItem icon={<Users />} label="Count" value={aquarium.fishCount.toString()} />}
         {typeof aquarium.co2Injection === 'boolean' && <DetailItem icon={<Leaf />} label="CO2" value={aquarium.co2Injection ? 'Yes' : 'No'} />}
         {aquarium.filterDetails && <DetailItem icon={<Filter />} label="Filter" value={aquarium.filterDetails} />}
+        {aquarium.foodDetails && <DetailItem icon={<Utensils />} label="Food" value={aquarium.foodDetails} />}
+
 
         {aquarium.notes && (
           <>

@@ -19,14 +19,16 @@ export interface Aquarium {
   name: string;
   volumeGallons?: number;
   type: AquariumType;
-  imageUrl?: string; // New field for aquarium image
+  imageUrl?: string;
   lastWaterChange?: Date;
   nextWaterChangeReminder?: Date;
   notes?: string;
-  fishSpecies?: string; // e.g., "Neon Tetra, Guppy, Corydora"
+  fishSpecies?: string; 
   fishCount?: number;
   co2Injection?: boolean;
-  filterDetails?: string; // e.g., "Fluval 307 Canister"
+  filterDetails?: string;
+  foodDetails?: string; // New field for food type/brand
+  nextFeedingReminder?: Date; // New field for feeding reminder
 }
 
 export interface UserProfile {
