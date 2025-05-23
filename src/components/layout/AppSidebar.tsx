@@ -27,7 +27,8 @@ import {
   LogOut,
   HelpCircle,
   FileScan,
-  MessageSquare
+  MessageSquare,
+  PackageSearch
 } from 'lucide-react';
 
 // Define navigation items with potential sub-items
@@ -42,6 +43,7 @@ const navItemsConfig = [
     ],
   },
   { href: '/aquariums', label: 'My Aquariums', icon: Droplet },
+  { href: '/foods', label: 'Manage Foods', icon: PackageSearch },
   { href: '/qa', label: 'Q&A', icon: MessageSquare },
   { href: '/marketplace', label: 'Marketplace', icon: ShoppingCart }, // Assuming marketplace is a future page
 ];

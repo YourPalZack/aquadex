@@ -1,7 +1,20 @@
+
 'use server';
 
-import { analyzeTestStrip as analyzeTestStripFlow, recommendTreatmentProducts as recommendTreatmentProductsFlow } from '@/ai/flows';
-import type { AnalyzeTestStripInput, AnalyzeTestStripOutput, RecommendTreatmentProductsInput, RecommendTreatmentProductsOutput } from '@/ai/flows';
+import { 
+    analyzeTestStrip as analyzeTestStripFlow, 
+    recommendTreatmentProducts as recommendTreatmentProductsFlow,
+    getFoodPurchaseLinks as getFoodPurchaseLinksFlow
+} from '@/ai/flows';
+import type { 
+    AnalyzeTestStripInput, 
+    AnalyzeTestStripOutput, 
+    RecommendTreatmentProductsInput, 
+    RecommendTreatmentProductsOutput,
+    GetFoodPurchaseLinksInput,
+    GetFoodPurchaseLinksOutput,
+    FishFood
+} from '@/ai/flows'; // Assuming FishFood type might be re-exported from ai/flows if defined there too, or import from @/types
 import { z } from 'zod';
 
 const analyzeStripSchema = z.object({
@@ -91,6 +104,73 @@ export async function getRecommendations(prevState: any, formData: FormData) {
     };
   }
 }
+
+
+const addFishFoodFormSchema = z.object({
+  name: z.string().min(2, { message: 'Food name must be at least 2 characters.' }),
+  brand: z.string().optional(),
+  variant: z.string().optional(),
+  notes: z.string().optional(),
+});
+
+export interface AddFishFoodActionState {
+    message: string | null;
+    errors: Record<string, string[]> | null;
+    newFoodItem: FishFood | null;
+}
+
+export async function addFishFoodAction(prevState: AddFishFoodActionState, formData: FormData): Promise<AddFishFoodActionState> {
+  try {
+    const validatedFields = addFishFoodFormSchema.safeParse({
+      name: formData.get('name'),
+      brand: formData.get('brand'),
+      variant: formData.get('variant'),
+      notes: formData.get('notes'),
+    });
+
+    if (!validatedFields.success) {
+      return {
+        message: 'Validation failed. Please check the form fields.',
+        errors: validatedFields.error.flatten().fieldErrors,
+        newFoodItem: null,
+      };
+    }
+
+    const { name, brand, variant, notes } = validatedFields.data;
+
+    const genkitInput: GetFoodPurchaseLinksInput = { foodName: name, brand };
+    const purchaseLinksOutput: GetFoodPurchaseLinksOutput = await getFoodPurchaseLinksFlow(genkitInput);
+
+    const newFoodItem: FishFood = {
+      id: `food-${Date.now()}`, // Temporary ID generation
+      userId: 'user123', // Placeholder user ID
+      name,
+      brand: brand || undefined,
+      variant: variant || undefined,
+      notes: notes || undefined,
+      amazonLinks: purchaseLinksOutput.amazonLinks || [],
+    };
+    
+    // In a real app, you would save newFoodItem to a database here.
+    // For this prototype, we return it to be managed in client-side state.
+
+    return {
+      message: 'Fish food added and links generated successfully!',
+      errors: null,
+      newFoodItem,
+    };
+
+  } catch (error) {
+    console.error('Error in addFishFoodAction:', error);
+    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred while adding fish food.';
+    return {
+      message: `Failed to add fish food: ${errorMessage}`,
+      errors: { _form: [errorMessage] },
+      newFoodItem: null,
+    };
+  }
+}
+
 
 // Placeholder for saving test results
 export async function saveTestResult(data: any) {

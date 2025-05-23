@@ -80,4 +80,26 @@ export type { AnalyzeTestStripInput, AnalyzeTestStripOutput } from '@/ai/flows';
 export type { RecommendTreatmentProductsInput, RecommendTreatmentProductsOutput } from '@/ai/flows/recommend-treatment-products';
 
 export type { AquariumFormValues } from '@/components/aquariums/AquariumForm';
+export type { QuestionFormValues } from '@/components/qa/QuestionForm';
 
+
+export interface AmazonLink {
+  storeName: string;
+  url: string;
+}
+export interface FishFood {
+  id: string;
+  userId: string; // For future user scoping
+  name: string;
+  brand?: string;
+  variant?: string; // e.g., "Medium Pellet", "50g", "Color Enhancing"
+  notes?: string;
+  amazonLinks?: AmazonLink[];
+}
+
+export interface FishFoodFormValues {
+  name: string;
+  brand?: string;
+  variant?: string;
+  notes?: string;
+}
