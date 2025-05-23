@@ -4,7 +4,8 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import type { MarketplaceListing, MarketplaceCategory } from '@/types';
-import { marketplaceCategoriesData, mockMarketplaceListingsData } from '@/app/marketplace/page'; // Assuming data is exported from here
+import { marketplaceCategoriesData } from '@/types'; // Corrected import path
+import { mockMarketplaceListingsData } from '@/app/marketplace/page'; 
 import MarketplaceListingCard from '@/components/marketplace/MarketplaceListingCard';
 import { Card, CardDescription, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';

@@ -1,5 +1,8 @@
 
 import type { AnalyzeTestStripOutput, RecommendTreatmentProductsOutput } from '@/ai/flows';
+import type { LucideIcon } from 'lucide-react';
+import { Fish, Leaf, Package as PackageIcon, HardHat } from 'lucide-react';
+
 
 export interface TestResult {
   id: string;
@@ -25,11 +28,11 @@ export interface Aquarium {
   lastWaterChange?: Date;
   nextWaterChangeReminder?: Date;
   notes?: string;
-  fishSpecies?: string; 
+  fishSpecies?: string;
   fishCount?: number;
   co2Injection?: boolean;
   filterDetails?: string;
-  foodDetails?: string; 
+  foodDetails?: string;
   nextFeedingReminder?: Date;
   sourceWaterType?: SourceWaterType;
   sourceWaterParameters?: string;
@@ -65,6 +68,7 @@ export interface Category {
   name: string;
   slug: string;
   description?: string;
+  icon?: LucideIcon; // Added for Q&A category icons
 }
 
 export const questionCategories: Category[] = [
@@ -273,7 +277,7 @@ export interface DealItem {
   imageUrl: string; // Required, will use placeholder
   dataAiHint: string; // Required for placeholder, 1-2 keywords
   description?: string; // Brief description of the deal or product
-  category?: DealCategory; 
+  category?: DealCategory;
 }
 
 export interface FindDealsOutput {
@@ -289,6 +293,15 @@ export interface MarketplaceCategory {
   description: string;
   icon?: React.ElementType; // e.g., Lucide icon component
 }
+
+// Moved from marketplace/page.tsx to be globally available
+export const marketplaceCategoriesData: MarketplaceCategory[] = [
+  { slug: 'live-fish', name: 'Live Fish', description: 'Freshwater and saltwater fish.', icon: Fish },
+  { slug: 'live-plants', name: 'Live Plants', description: 'Aquatic plants for all tank types.', icon: Leaf },
+  { slug: 'new-equipment', name: 'New Equipment', description: 'Brand new filters, lights, tanks, etc.', icon: PackageIcon },
+  { slug: 'used-equipment', name: 'Used Equipment', description: 'Pre-owned aquarium gear.', icon: HardHat },
+];
+
 
 export type MarketplaceItemCondition = 'new' | 'used-like-new' | 'used-good' | 'used-fair' | 'for-parts';
 
@@ -328,3 +341,5 @@ export interface SellerApplicationFormValues {
   productTypes: string;
 }
 
+
+    

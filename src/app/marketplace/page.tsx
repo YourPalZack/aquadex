@@ -1,7 +1,8 @@
 
 'use client';
 
-import type { MarketplaceCategory, MarketplaceListing } from '@/types';
+import type { MarketplaceListing } from '@/types'; // MarketplaceCategory removed from here
+import { marketplaceCategoriesData } from '@/types'; // Imported from types
 import MarketplaceCategoryCard from '@/components/marketplace/MarketplaceCategoryCard';
 import MarketplaceListingCard from '@/components/marketplace/MarketplaceListingCard';
 import { Card, CardDescription, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
@@ -10,14 +11,7 @@ import { ShoppingCart, PlusCircle, Tag, Edit, Search, Fish, Leaf, Package as Pac
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 
-// Mock Data
-export const marketplaceCategoriesData: MarketplaceCategory[] = [
-  { slug: 'live-fish', name: 'Live Fish', description: 'Freshwater and saltwater fish.', icon: Fish },
-  { slug: 'live-plants', name: 'Live Plants', description: 'Aquatic plants for all tank types.', icon: Leaf },
-  { slug: 'new-equipment', name: 'New Equipment', description: 'Brand new filters, lights, tanks, etc.', icon: PackageIcon },
-  { slug: 'used-equipment', name: 'Used Equipment', description: 'Pre-owned aquarium gear.', icon: HardHat },
-];
-
+// Mock Data for listings - categories data is now imported
 export const mockMarketplaceListingsData: MarketplaceListing[] = [
   {
     id: 'mf1',
@@ -165,3 +159,5 @@ export default function MarketplacePage() {
     </div>
   );
 }
+
+    

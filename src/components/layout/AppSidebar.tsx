@@ -38,6 +38,8 @@ import {
   Percent,
   Sparkles 
 } from 'lucide-react';
+import { marketplaceCategoriesData, type MarketplaceCategory } from '@/types'; // Import marketplace categories
+
 
 // Define navigation items with potential sub-items
 const navItemsConfig = [
@@ -62,7 +64,7 @@ const navItemsConfig = [
   { href: '/reminders', label: 'Reminders', icon: BellRing }, 
   { href: '/qa', label: 'Q&A', icon: MessageSquare },
   { 
-    href: '/fish-finder', 
+    href: '/aiquarium-tools', // Main link for the section (can be # or a dedicated overview page)
     label: 'AIQuarium Tools', 
     icon: Sparkles, 
     subItems: [
@@ -77,9 +79,11 @@ const navItemsConfig = [
     href: '/marketplace', 
     label: 'Marketplace', 
     icon: ShoppingCart,
-    subItems: [
-      // Finder items removed from here
-    ]
+    subItems: marketplaceCategoriesData.map((category: MarketplaceCategory) => ({
+        href: `/marketplace/${category.slug}`,
+        label: category.name,
+        icon: category.icon || Leaf, // Default to Leaf if no icon specified
+    }))
   },
   { href: '/discounts-deals', label: 'Discounts & Deals', icon: Percent },
 ];
@@ -94,32 +98,16 @@ export default function AppSidebar() {
   const { openMobile, setOpenMobile } = useSidebar();
 
   const isActiveRoute = (href: string) => {
-    if (!href) return false;
+    if (!href || href === '/aiquarium-tools') return false; // Don't activate parent for group label
     if (href === '/') return pathname === href; 
     
     if (pathname.startsWith(href)) return true;
 
-    const parentConfig = navItemsConfig.find(item => {
-        // Check if the current item's href is a base for the current pathname
-        if (item.href && pathname.startsWith(item.href)) {
-            // Now check if this item has subItems and if any subItem is the active one
-            if (item.subItems && item.subItems.length > 0) {
-                return item.subItems.some(sub => sub.href && pathname.startsWith(sub.href));
-            }
-            return true; // No subItems, but href matches base
-        }
-        // Fallback for items where their href itself might not be the direct start
-        // This is crucial for when a sub-item is active, the parent should also be active
-        if (item.subItems && item.subItems.length > 0) {
-          return item.subItems.some(sub => sub.href && pathname.startsWith(sub.href));
-        }
-        return false;
-    });
-     // If a parentConfig was found this way, and its main href matches the input href, it's active
-    if(parentConfig && parentConfig.href === href) return true;
-
-    // Final check for direct match if no complex parent/child logic found the match yet
-    return pathname.startsWith(href);
+    // Check if any sub-item of a parent is active
+    const parentConfig = navItemsConfig.find(item => 
+        item.subItems && item.subItems.some(sub => sub.href && pathname.startsWith(sub.href))
+    );
+    return parentConfig?.href === href;
   };
   
   return (
@@ -132,7 +120,7 @@ export default function AppSidebar() {
       <SidebarContent className="flex-grow p-2">
         <SidebarMenu>
           {navItemsConfig.map((item) => {
-            const isParentSectionActive = isActiveRoute(item.href);
+            const isParentSectionActive = item.href && pathname.startsWith(item.href) && item.href !== '/aiquarium-tools';
 
             return (
               <SidebarMenuItem key={item.label}>
@@ -151,22 +139,25 @@ export default function AppSidebar() {
                 </Link>
                 {item.subItems && item.subItems.length > 0 && isParentSectionActive && (
                   <SidebarMenuSub>
-                    {item.subItems.map((subItem) => (
-                      <SidebarMenuSubItem key={subItem.label}>
-                        <Link href={subItem.href} passHref legacyBehavior>
-                          <SidebarMenuSubButton
-                            asChild
-                            isActive={subItem.href && pathname.startsWith(subItem.href)} 
-                            onClick={() => openMobile && setOpenMobile(false)}
-                          >
-                            <a>
-                              {subItem.icon && <subItem.icon className="h-4 w-4" />}
-                              <span>{subItem.label}</span>
-                            </a>
-                          </SidebarMenuSubButton>
-                        </Link>
-                      </SidebarMenuSubItem>
-                    ))}
+                    {item.subItems.map((subItem) => {
+                       const SubIcon = subItem.icon; // Get icon component
+                       return (
+                          <SidebarMenuSubItem key={subItem.label}>
+                            <Link href={subItem.href} passHref legacyBehavior>
+                              <SidebarMenuSubButton
+                                asChild
+                                isActive={subItem.href && pathname.startsWith(subItem.href)} 
+                                onClick={() => openMobile && setOpenMobile(false)}
+                              >
+                                <a>
+                                  {SubIcon && <SubIcon className="h-4 w-4" />}
+                                  <span>{subItem.label}</span>
+                                </a>
+                              </SidebarMenuSubButton>
+                            </Link>
+                          </SidebarMenuSubItem>
+                       );
+                    })}
                   </SidebarMenuSub>
                 )}
               </SidebarMenuItem>
@@ -208,3 +199,5 @@ export default function AppSidebar() {
   );
 }
 
+
+    
