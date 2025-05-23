@@ -26,7 +26,8 @@ import {
   Settings, 
   LogOut,
   HelpCircle,
-  ImageUp
+  ImageUp,
+  MessageSquare
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -35,7 +36,7 @@ const navItems = [
   { href: '/analyze', label: 'New Analysis', icon: ImageUp },
   { href: '/history', label: 'Test History', icon: History },
   { href: '/aquariums', label: 'My Aquariums', icon: Droplet },
-  { href: '/forum', label: 'Community Forum', icon: Users },
+  { href: '/qa', label: 'Q&A', icon: MessageSquare },
   { href: '/marketplace', label: 'Marketplace', icon: ShoppingCart },
 ];
 
@@ -100,7 +101,11 @@ export default function AppSidebar() {
           ))}
           <SidebarMenuItem>
             {/* Placeholder for logout functionality */}
-             <SidebarMenuButton tooltip="Log Out" onClick={() => openMobile && setOpenMobile(false)}>
+             <SidebarMenuButton tooltip="Log Out" onClick={() => {
+                openMobile && setOpenMobile(false);
+                // Add actual logout logic here
+                console.log("Logout clicked");
+             }}>
                 <LogOut className="h-5 w-5" />
                 <span>Log Out</span>
             </SidebarMenuButton>
