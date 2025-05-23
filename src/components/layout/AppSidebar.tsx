@@ -31,7 +31,7 @@ import {
   PackageSearch,
   FlaskConical,
   Fish,
-  BellRing // Added BellRing icon
+  BellRing 
 } from 'lucide-react';
 
 // Define navigation items with potential sub-items
@@ -46,12 +46,18 @@ const navItemsConfig = [
     ],
   },
   { href: '/aquariums', label: 'My Aquariums', icon: Droplet },
-  { href: '/reminders', label: 'Reminders', icon: BellRing }, // New Reminders link
+  { href: '/reminders', label: 'Reminders', icon: BellRing }, 
   { href: '/foods', label: 'Manage Foods', icon: PackageSearch },
   { href: '/treatments', label: 'Manage Treatments', icon: FlaskConical },
-  { href: '/fish-finder', label: 'Fish Finder', icon: Fish },
   { href: '/qa', label: 'Q&A', icon: MessageSquare },
-  { href: '/marketplace', label: 'Marketplace', icon: ShoppingCart }, // Assuming marketplace is a future page
+  { 
+    href: '/marketplace', // Parent item for Marketplace
+    label: 'Marketplace', 
+    icon: ShoppingCart,
+    subItems: [
+      { href: '/fish-finder', label: 'Fish Finder', icon: Fish }, // Fish Finder nested here
+    ]
+  },
 ];
 
 const bottomNavItems = [
@@ -66,6 +72,12 @@ export default function AppSidebar() {
   // General isActive check for items without sub-items, or for sub-items themselves
   const isActiveRoute = (href: string) => {
     if (href === '/') return pathname === href; // Handle home explicitly if needed
+    // For parent items with sub-items, we want them to be active if any sub-item is active OR if the parent href itself is active.
+    // For direct links or sub-items, a simple startsWith is usually fine.
+    const parentConfig = navItemsConfig.find(item => item.href === href && item.subItems && item.subItems.length > 0);
+    if (parentConfig) {
+        return pathname.startsWith(href) || parentConfig.subItems.some(sub => pathname.startsWith(sub.href));
+    }
     return pathname.startsWith(href);
   };
   
@@ -79,10 +91,7 @@ export default function AppSidebar() {
       <SidebarContent className="flex-grow p-2">
         <SidebarMenu>
           {navItemsConfig.map((item) => {
-            // Determine if the parent item or any of its sub-items are active
-            const isParentSectionActive = item.subItems
-              ? isActiveRoute(item.href) || item.subItems.some(sub => isActiveRoute(sub.href))
-              : isActiveRoute(item.href);
+            const isParentSectionActive = isActiveRoute(item.href);
 
             return (
               <SidebarMenuItem key={item.label}>
@@ -99,7 +108,6 @@ export default function AppSidebar() {
                     </a>
                   </SidebarMenuButton>
                 </Link>
-                {/* Render sub-menu if there are sub-items and the parent section is active */}
                 {item.subItems && item.subItems.length > 0 && isParentSectionActive && (
                   <SidebarMenuSub>
                     {item.subItems.map((subItem) => (
@@ -107,12 +115,11 @@ export default function AppSidebar() {
                         <Link href={subItem.href} passHref legacyBehavior>
                           <SidebarMenuSubButton
                             asChild
-                            isActive={isActiveRoute(subItem.href)}
+                            isActive={isActiveRoute(subItem.href)} // Sub-items check their own active state
                             onClick={() => openMobile && setOpenMobile(false)}
                           >
                             <a>
-                              {/* Optional: Add icon for sub-item if desired */}
-                              {/* <subItem.icon className="h-4 w-4" /> */}
+                              {subItem.icon && <subItem.icon className="h-4 w-4" />}
                               <span>{subItem.label}</span>
                             </a>
                           </SidebarMenuSubButton>
