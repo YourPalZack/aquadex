@@ -24,7 +24,7 @@ import {
 } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 import { addFishFoodAction, type AddFishFoodActionState } from '@/lib/actions';
-import { useFormState } from 'react-dom';
+import { useActionState } from 'react'; // Changed from 'react-dom'
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircle } from 'lucide-react';
 
@@ -68,8 +68,8 @@ export default function ManageFoodsPage() {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const { toast } = useToast();
   
-  // useFormState for handling server action
-  const [formState, formAction] = useFormState(addFishFoodAction, initialFormState);
+  // useActionState for handling server action
+  const [formState, formAction] = useActionState(addFishFoodAction, initialFormState); // Renamed to useActionState
   const [isSubmitting, setIsSubmitting] = useState(false);
 
 
@@ -103,7 +103,7 @@ export default function ManageFoodsPage() {
     if (data.notes) formData.append('notes', data.notes);
     
     // `formAction` is called here, which is the server action `addFishFoodAction`
-    // The `useFormState` hook will update `formState` based on the server action's return
+    // The `useActionState` hook will update `formState` based on the server action's return
     await formAction(formData);
     // No need to call setIsSubmitting(false) here, useEffect will handle it
   };
@@ -213,3 +213,4 @@ export default function ManageFoodsPage() {
     </div>
   );
 }
+
