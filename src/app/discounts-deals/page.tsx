@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect, useActionState } from 'react';
+import { useState, useEffect, useActionState, startTransition } from 'react';
 import DealItemCard from '@/components/discounts-deals/DealItemCard';
 import type { DealItem } from '@/types';
 import { Card, CardDescription, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
@@ -33,7 +33,9 @@ export default function DiscountsDealsPage() {
   };
 
   useEffect(() => {
-    fetchDeals();
+    startTransition(() => {
+      fetchDeals();
+    });
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Fetch on initial load
 
@@ -69,7 +71,7 @@ export default function DiscountsDealsPage() {
                 Discover simulated deals on popular aquarium products. Deals are "updated daily" by our AI.
               </CardDescription>
             </div>
-            <Button onClick={fetchDeals} disabled={isActionPending}>
+            <Button onClick={() => startTransition(() => fetchDeals())} disabled={isActionPending}>
               {isActionPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <RefreshCw className="mr-2 h-4 w-4" />}
               {isActionPending ? 'Refreshing...' : 'Refresh Deals'}
             </Button>
