@@ -9,9 +9,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Store, Search, MapPin, Info, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 // Mock Data for Local Fish Stores
-const mockLocalFishStoresData: LocalFishStore[] = [
+export const mockLocalFishStoresData: LocalFishStore[] = [
   {
     id: 'lfs1',
     name: 'Aqua World Emporium',
@@ -181,3 +182,4 @@ export default function LocalFishStoresPage() {
     </div>
   );
 }
+
