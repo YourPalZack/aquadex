@@ -98,10 +98,9 @@ const navItemsConfig = [
     label: 'Marketplace',
     icon: ShoppingCart,
     subItems: [
-        { href: '/marketplace/featured', label: 'Featured', icon: Star, className: 'text-amber-500 font-semibold' },
+        { href: '/marketplace/featured', label: 'Featured', icon: Star, className: 'text-amber-500 dark:text-amber-400 font-semibold' },
         ...(mockCurrentUser.isSellerApproved ? [
             { href: '/marketplace/add-listing', label: 'Create Listing', icon: ListPlus, className: 'text-primary font-semibold' },
-            { href: '/marketplace/purchase-featured-listing', label: 'Purchase Feature', icon: Star, className: 'text-amber-500 font-semibold' }
         ] : []),
         ...marketplaceCategoriesData.map((category: MarketplaceCategory) => ({
             href: `/marketplace/${category.slug}`,
@@ -111,6 +110,15 @@ const navItemsConfig = [
         { href: '/items-wanted', label: 'Items Wanted', icon: HeartHandshake },
     ]
   },
+  ...(mockCurrentUser.isSellerApproved ? [
+    { 
+      href: '/marketplace/purchase-featured-listing', 
+      label: 'Feature Your Listing', 
+      icon: Star, 
+      className: 'text-green-600 dark:text-green-500 bg-green-500/10 hover:bg-green-500/20 dark:hover:bg-green-500/30 font-semibold',
+      iconClassName: 'text-green-600 dark:text-green-500' 
+    }
+  ] : []),
   { href: '/local-fish-stores', label: 'Local Fish Stores', icon: StoreIcon },
   { href: '/discounts-deals', label: 'Discounts & Deals', icon: Percent },
 ];
@@ -164,10 +172,6 @@ export default function AppSidebar() {
         <SidebarMenu>
           {navItemsConfig.map((item) => {
             const hasSubItems = item.subItems && item.subItems.length > 0;
-            // const isParentSectionActive =
-            //   (item.href && pathname === item.href) || // Exact match for parent
-            //   (item.href && pathname.startsWith(item.href) && item.href !== pathname && hasSubItems) || // Path starts with parent href and has subitems (but not exact match)
-            //   (hasSubItems && item.subItems.some(sub => sub.href && pathname.startsWith(sub.href))); // A subitem is active
             const currentSectionActive = isSectionActive(item);
 
 
@@ -181,9 +185,10 @@ export default function AppSidebar() {
                     onClick={() => {
                       if (openMobile && !hasSubItems) setOpenMobile(false);
                     }}
+                    className={cn(item.className)}
                   >
                     <a>
-                      <item.icon className="h-5 w-5" />
+                      <item.icon className={cn("h-5 w-5", item.iconClassName)} />
                       <span className="flex-grow">{item.label}</span>
                       {hasSubItems && (
                         currentSectionActive ?
@@ -207,7 +212,7 @@ export default function AppSidebar() {
                                 className={cn(subItem.className)}
                               >
                                 <a>
-                                  {SubIcon && <SubIcon className="h-4 w-4" />}
+                                  {SubIcon && <SubIcon className={cn("h-4 w-4", subItem.iconClassName)} />}
                                   <span>{subItem.label}</span>
                                 </a>
                               </SidebarMenuSubButton>
