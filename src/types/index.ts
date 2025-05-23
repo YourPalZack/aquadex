@@ -1,7 +1,7 @@
 
 import type { AnalyzeTestStripOutput, RecommendTreatmentProductsOutput } from '@/ai/flows';
-import type { LucideIcon, LucideProps } from 'lucide-react';
-import { Fish, Leaf, Package as PackageIcon, HardHat, HeartHandshake, type ForwardRefExoticComponent, type RefAttributes } from 'lucide-react'; // Added ForwardRefExoticComponent for icon typing
+import type { LucideProps } from 'lucide-react';
+import { Fish, Leaf, Package as PackageIcon, HardHat, HeartHandshake, Gift, type ForwardRefExoticComponent, type RefAttributes, type ReactElement, type ElementType } from 'lucide-react';
 
 
 export interface TestResult {
@@ -82,7 +82,7 @@ export interface Question {
 }
 
 // Using a more generic type for Lucide icons
-type IconType = ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>;
+export type IconType = ElementType;
 
 
 export interface Category {
@@ -320,6 +320,7 @@ export const marketplaceCategoriesData: MarketplaceCategory[] = [
   { slug: 'live-plants', name: 'Live Plants', description: 'Aquatic plants for all tank types.', icon: Leaf },
   { slug: 'new-equipment', name: 'New Equipment', description: 'Brand new filters, lights, tanks, etc.', icon: PackageIcon },
   { slug: 'used-equipment', name: 'Used Equipment', description: 'Pre-owned aquarium gear.', icon: HardHat },
+  { slug: 'free-items', name: 'Free Items', description: 'Items being given away by hobbyists.', icon: Gift },
 ];
 
 
@@ -381,3 +382,6 @@ export interface WantedItemFormValues {
   categorySlug?: string;
   tags?: string[];
 }
+
+
+    

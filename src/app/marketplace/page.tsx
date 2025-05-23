@@ -74,6 +74,23 @@ export const mockMarketplaceListingsData: MarketplaceListing[] = [
     imageHint: 'aquarium heater',
     condition: 'new',
     createdAt: new Date('2024-07-21T11:00:00Z'),
+  },
+  {
+    id: 'free1',
+    slug: 'free-java-moss-starter-culture',
+    title: 'Free Java Moss Starter Culture',
+    description: 'Giving away a golfball-sized portion of healthy Java Moss. Great for shrimp tanks or low-tech setups. Local pickup only.',
+    price: 'Free',
+    categorySlug: 'free-items',
+    sellerId: 'sellerAlice123',
+    sellerName: 'Alice\'s Aquatics',
+    imageUrl: 'https://placehold.co/600x400.png',
+    imageHint: 'java moss aquarium',
+    condition: 'new', // For plants/livestock, "new" means healthy
+    location: 'Oakland, CA',
+    createdAt: new Date('2024-07-28T10:00:00Z'),
+    isFeatured: false,
+    tags: ['java moss', 'free', 'beginner plant', 'local pickup']
   }
 ];
 
@@ -159,5 +176,7 @@ export default function MarketplacePage() {
     </div>
   );
 }
+
+    
 
     
