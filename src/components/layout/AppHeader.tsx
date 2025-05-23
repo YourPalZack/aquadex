@@ -14,12 +14,18 @@ import {
 import { LogOut, Settings, User, SidebarOpenIcon, LayoutGrid } from 'lucide-react';
 import Logo from './Logo';
 import { SidebarTrigger, useSidebar } from '@/components/ui/sidebar';
-import { mockCurrentUser } from '@/types'; // Import the mock current user
+import { mockCurrentUser } from '@/types'; 
+import React from 'react';
 
 
 export default function AppHeader() {
-  const { isMobile } = useSidebar();
-  // Use the mockCurrentUser to simulate an authenticated user
+  const { isMobile, openMobile, setOpenMobile } = useSidebar();
+  const [mounted, setMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
+  
   const isAuthenticated = true; 
   const user = mockCurrentUser;
 
@@ -28,7 +34,7 @@ export default function AppHeader() {
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between">
         <div className="flex items-center gap-4">
-          {isMobile && <SidebarTrigger className="md:hidden"><SidebarOpenIcon /></SidebarTrigger>}
+          {mounted && isMobile && <SidebarTrigger className="md:hidden"><SidebarOpenIcon /></SidebarTrigger>}
           <Link href="/dashboard" passHref>
             <Logo size="sm" />
           </Link>
