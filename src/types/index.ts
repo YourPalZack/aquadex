@@ -1,7 +1,7 @@
 
 import type { AnalyzeTestStripOutput, RecommendTreatmentProductsOutput } from '@/ai/flows';
-import type { LucideIcon } from 'lucide-react';
-import { Fish, Leaf, Package as PackageIcon, HardHat, HeartHandshake } from 'lucide-react';
+import type { LucideIcon, LucideProps } from 'lucide-react';
+import { Fish, Leaf, Package as PackageIcon, HardHat, HeartHandshake, type ForwardRefExoticComponent, type RefAttributes } from 'lucide-react'; // Added ForwardRefExoticComponent for icon typing
 
 
 export interface TestResult {
@@ -41,9 +41,26 @@ export interface Aquarium {
 export interface UserProfile {
   id: string;
   name: string;
+  email?: string; // Added email
   avatarUrl?: string;
   dataAiHint?: string;
+  isSellerApproved?: boolean; // Added for marketplace
+  bio?: string; // Optional bio
+  location?: string; // Optional location
 }
+
+// Mock Current User (for demonstration without actual auth)
+export const mockCurrentUser: UserProfile = {
+  id: 'currentUser123',
+  name: 'Aqua User',
+  email: 'aqua.user@example.com',
+  avatarUrl: 'https://placehold.co/100x100.png?text=AU',
+  dataAiHint: 'user avatar',
+  isSellerApproved: false, // Example, can be true
+  bio: 'Passionate aquarist with 5 years of experience in freshwater and planted tanks. Always learning!',
+  location: 'Springfield, USA',
+};
+
 
 export interface Answer {
   id: string;
@@ -64,11 +81,15 @@ export interface Question {
   answers: Answer[];
 }
 
+// Using a more generic type for Lucide icons
+type IconType = ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>;
+
+
 export interface Category {
   name: string;
   slug: string;
   description?: string;
-  icon?: LucideIcon; // Added for Q&A category icons
+  icon?: IconType; 
 }
 
 export const questionCategories: Category[] = [
@@ -291,7 +312,7 @@ export interface MarketplaceCategory {
   slug: string;
   name: string;
   description: string;
-  icon?: LucideIcon; // e.g., Lucide icon component
+  icon?: IconType;
 }
 
 export const marketplaceCategoriesData: MarketplaceCategory[] = [

@@ -1,3 +1,4 @@
+
 "use client";
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
@@ -10,16 +11,17 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { LogOut, Settings, User, SidebarOpenIcon } from 'lucide-react';
+import { LogOut, Settings, User, SidebarOpenIcon, LayoutGrid } from 'lucide-react';
 import Logo from './Logo';
 import { SidebarTrigger, useSidebar } from '@/components/ui/sidebar';
+import { mockCurrentUser } from '@/types'; // Import the mock current user
 
 
 export default function AppHeader() {
   const { isMobile } = useSidebar();
-  // Placeholder for authentication state
+  // Use the mockCurrentUser to simulate an authenticated user
   const isAuthenticated = true; 
-  const user = { name: 'Aqua User', email: 'user@aquastrip.com', image: '' };
+  const user = mockCurrentUser;
 
 
   return (
@@ -38,7 +40,7 @@ export default function AppHeader() {
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-10 w-10 rounded-full">
                   <Avatar className="h-10 w-10">
-                    <AvatarImage src={user.image || `https://avatar.vercel.sh/${user.email}.png`} alt={user.name} />
+                    <AvatarImage src={user.avatarUrl || `https://avatar.vercel.sh/${user.email}.png`} alt={user.name} data-ai-hint={user.dataAiHint} />
                     <AvatarFallback>{user.name?.charAt(0).toUpperCase() || 'U'}</AvatarFallback>
                   </Avatar>
                 </Button>
@@ -47,15 +49,25 @@ export default function AppHeader() {
                 <DropdownMenuLabel className="font-normal">
                   <div className="flex flex-col space-y-1">
                     <p className="text-sm font-medium leading-none">{user.name}</p>
-                    <p className="text-xs leading-none text-muted-foreground">
-                      {user.email}
-                    </p>
+                    {user.email && (
+                        <p className="text-xs leading-none text-muted-foreground">
+                        {user.email}
+                        </p>
+                    )}
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>
-                  <User className="mr-2 h-4 w-4" />
-                  <span>Profile</span>
+                <DropdownMenuItem asChild>
+                    <Link href="/dashboard">
+                        <LayoutGrid className="mr-2 h-4 w-4" />
+                        <span>Dashboard</span>
+                    </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/profile">
+                    <User className="mr-2 h-4 w-4" />
+                    <span>Profile</span>
+                  </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
                   <Settings className="mr-2 h-4 w-4" />
@@ -69,7 +81,7 @@ export default function AppHeader() {
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
-            <Link href="/auth/signin" passHref>
+            <Link href="/auth/signin" passHref> {/* Assuming you'll have an auth route */}
               <Button>Sign In</Button>
             </Link>
           )}
