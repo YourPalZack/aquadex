@@ -20,11 +20,11 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
+  // DialogTrigger, // No longer needed here if Dialog is manually controlled by state
 } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 import { addFishFoodAction, type AddFishFoodActionState } from '@/lib/actions';
-import { useActionState } from 'react'; // Changed from 'react-dom'
+import { useActionState } from 'react'; 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircle } from 'lucide-react';
 
@@ -68,8 +68,7 @@ export default function ManageFoodsPage() {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const { toast } = useToast();
   
-  // useActionState for handling server action
-  const [formState, formAction] = useActionState(addFishFoodAction, initialFormState); // Renamed to useActionState
+  const [formState, formAction] = useActionState(addFishFoodAction, initialFormState);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
 
@@ -90,9 +89,9 @@ export default function ManageFoodsPage() {
         setIsFormOpen(false); // Close dialog on success
       }
     }
-    setIsSubmitting(false); // Reset submitting state regardless of outcome
+    setIsSubmitting(false); 
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [formState]); // formState includes message, errors, newFoodItem
+  }, [formState]); 
 
   const handleFormSubmit = async (data: FishFoodFormValues) => {
     setIsSubmitting(true);
@@ -102,10 +101,7 @@ export default function ManageFoodsPage() {
     if (data.variant) formData.append('variant', data.variant);
     if (data.notes) formData.append('notes', data.notes);
     
-    // `formAction` is called here, which is the server action `addFishFoodAction`
-    // The `useActionState` hook will update `formState` based on the server action's return
     await formAction(formData);
-    // No need to call setIsSubmitting(false) here, useEffect will handle it
   };
 
   const handleDeleteFood = (foodId: string) => {
@@ -131,17 +127,16 @@ export default function ManageFoodsPage() {
                 Add your commonly used fish foods to get quick purchase links. Links use a placeholder referral tag.
               </CardDescription>
             </div>
-            <DialogTrigger asChild>
-                 <Button size="lg" onClick={() => setIsFormOpen(true)}>
-                    <PlusCircle className="w-5 h-5 mr-2" />
-                    Add New Food
-                 </Button>
-            </DialogTrigger>
+            {/* Removed DialogTrigger wrapper here, Button's onClick handles opening the Dialog */}
+            <Button size="lg" onClick={() => setIsFormOpen(true)}>
+              <PlusCircle className="w-5 h-5 mr-2" />
+              Add New Food
+            </Button>
           </div>
         </CardHeader>
       </Card>
 
-      {isSubmitting && fishFoods.length === 0 && ( // Show loader if submitting and no foods yet
+      {isSubmitting && fishFoods.length === 0 && ( 
          <div className="flex justify-center items-center h-64">
             <Loader2 className="w-12 h-12 animate-spin text-primary" />
          </div>
@@ -203,7 +198,6 @@ export default function ManageFoodsPage() {
                     <AlertDescription>
                         {formState.message}
                         {formState.errors._form && <p>{formState.errors._form.join(', ')}</p>}
-                        {/* You can iterate over other field errors if needed */}
                     </AlertDescription>
                 </Alert>
             )}
