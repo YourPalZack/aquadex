@@ -39,6 +39,7 @@ const aquariumFormSchema = z.object({
   type: z.enum(aquariumTypes, {
     required_error: 'You need to select an aquarium type.',
   }),
+  imageUrl: z.string().url({ message: 'Please enter a valid URL.' }).optional().or(z.literal('')),
   lastWaterChange: z.date().optional(),
   nextWaterChangeReminder: z.date().optional(),
   fishSpecies: z.string().max(200, { message: 'Fish species list cannot exceed 200 characters.' }).optional(),
@@ -64,6 +65,7 @@ export default function AquariumForm({ onSubmit, onCancel, defaultValues, isLoad
       name: defaultValues?.name || '',
       volumeGallons: defaultValues?.volumeGallons || undefined,
       type: defaultValues?.type || undefined,
+      imageUrl: defaultValues?.imageUrl || '',
       lastWaterChange: defaultValues?.lastWaterChange ? new Date(defaultValues.lastWaterChange) : undefined,
       nextWaterChangeReminder: defaultValues?.nextWaterChangeReminder ? new Date(defaultValues.nextWaterChangeReminder) : undefined,
       fishSpecies: defaultValues?.fishSpecies || '',
@@ -80,6 +82,7 @@ export default function AquariumForm({ onSubmit, onCancel, defaultValues, isLoad
       volumeGallons: values.volumeGallons ? Number(values.volumeGallons) : undefined,
       fishCount: values.fishCount ? Number(values.fishCount) : undefined,
       co2Injection: values.co2Injection || false, // Ensure boolean
+      imageUrl: values.imageUrl === '' ? undefined : values.imageUrl, // Set to undefined if empty string
     };
     onSubmit(processedValues);
   };
@@ -140,6 +143,21 @@ export default function AquariumForm({ onSubmit, onCancel, defaultValues, isLoad
             )}
             />
         </div>
+
+        <FormField
+          control={form.control}
+          name="imageUrl"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Image URL (Optional)</FormLabel>
+              <FormControl>
+                <Input type="url" placeholder="https://example.com/your-aquarium.jpg" {...field} />
+              </FormControl>
+              <FormDescription>Link to an image of your aquarium.</FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
         <FormField
           control={form.control}
@@ -309,7 +327,7 @@ export default function AquariumForm({ onSubmit, onCancel, defaultValues, isLoad
             Cancel
             </Button>
             <Button type="submit" disabled={isLoading}>
-            {isLoading ? <Loader2 className="animate-spin" /> : null}
+            {isLoading ? <Loader2 className="animate-spin mr-2" /> : null}
             {isLoading ? 'Saving...' : 'Save Aquarium'}
             </Button>
         </div>

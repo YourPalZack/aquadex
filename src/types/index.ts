@@ -19,6 +19,7 @@ export interface Aquarium {
   name: string;
   volumeGallons?: number;
   type: AquariumType;
+  imageUrl?: string; // New field for aquarium image
   lastWaterChange?: Date;
   nextWaterChangeReminder?: Date;
   notes?: string;

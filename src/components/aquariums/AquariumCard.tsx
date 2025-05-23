@@ -6,12 +6,13 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from '@/components/ui/button';
 import { 
     Droplet, CalendarDays, Pencil, Trash2, Edit3, AlertTriangle, BellRing, CalendarClock,
-    FishSymbol, Users, Leaf, Filter, Info
+    FishSymbol, Users, Leaf, Filter, Info, Image as ImageIcon
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { format, differenceInDays, isPast, isToday, isFuture } from 'date-fns';
 import { Separator } from '@/components/ui/separator';
+import Image from 'next/image';
 
 interface AquariumCardProps {
   aquarium: Aquarium;
@@ -39,16 +40,16 @@ export default function AquariumCard({ aquarium, onEdit, onDelete }: AquariumCar
     const daysDiff = differenceInDays(reminder, today);
 
     if (isPast(reminder) && !isToday(reminder)) {
-      return { text: `Overdue since ${format(reminder, 'MMM d')}`, icon: <AlertTriangle className="w-4 h-4 mr-1" />, className: 'text-destructive font-semibold' };
+      return { text: `Overdue by ${Math.abs(daysDiff)} day(s) (was ${format(reminder, 'MMM d')})`, icon: <AlertTriangle className="w-4 h-4 mr-1" />, className: 'text-destructive font-semibold' };
     }
     if (isToday(reminder)) {
-      return { text: 'Due Today!', icon: <BellRing className="w-4 h-4 mr-1" />, className: 'text-amber-600 dark:text-amber-500 font-semibold' };
+      return { text: 'Water Change Due Today!', icon: <BellRing className="w-4 h-4 mr-1" />, className: 'text-amber-600 dark:text-amber-500 font-semibold' };
     }
     if (daysDiff >= 0 && daysDiff <= 3) {
-      return { text: `Due in ${daysDiff + 1} day(s) (${format(reminder, 'MMM d')})`, icon: <BellRing className="w-4 h-4 mr-1" />, className: 'text-amber-600 dark:text-amber-500' };
+      return { text: `Water Change Due in ${daysDiff + 1} day(s) (${format(reminder, 'MMM d')})`, icon: <BellRing className="w-4 h-4 mr-1" />, className: 'text-amber-600 dark:text-amber-500' };
     }
     if (isFuture(reminder)) {
-      return { text: `Next: ${format(reminder, 'MMM d, yyyy')}`, icon: <CalendarClock className="w-4 h-4 mr-1" />, className: 'text-muted-foreground' };
+      return { text: `Next Water Change: ${format(reminder, 'MMM d, yyyy')}`, icon: <CalendarClock className="w-4 h-4 mr-1" />, className: 'text-muted-foreground' };
     }
     return null;
   };
@@ -71,21 +72,34 @@ export default function AquariumCard({ aquarium, onEdit, onDelete }: AquariumCar
           <CardDescription>{aquarium.volumeGallons} Gallons</CardDescription>
         )}
       </CardHeader>
+      
+      {aquarium.imageUrl && (
+        <div className="px-6 pb-0 -mt-2 mb-4">
+          <div className="aspect-video relative rounded-md overflow-hidden border">
+            <Image 
+                src={aquarium.imageUrl} 
+                alt={`Image of ${aquarium.name}`} 
+                layout="fill" 
+                objectFit="cover"
+                data-ai-hint="aquarium fish tank"
+                className="bg-muted"
+             />
+          </div>
+        </div>
+      )}
+      
       <CardContent className="space-y-3 flex-grow pb-4">
         {reminderStatus && (
             <div className={cn("flex items-center text-sm p-2 rounded-md", 
-                reminderStatus.className.includes('destructive') ? 'bg-destructive/10' : 
-                reminderStatus.className.includes('amber') ? 'bg-amber-500/10' : 'bg-muted/50'
+                reminderStatus.className.includes('destructive') ? 'bg-destructive/10 border border-destructive/30' : 
+                reminderStatus.className.includes('amber') ? 'bg-amber-500/10 border border-amber-500/30' : 'bg-muted/50 border border-border'
             )}>
             {reminderStatus.icon}
             <span className="ml-1">{reminderStatus.text}</span>
             </div>
         )}
-         {aquarium.lastWaterChange && !reminderStatus && (
+         {aquarium.lastWaterChange && (!reminderStatus || (reminderStatus && (isFuture(new Date(aquarium.nextWaterChangeReminder!)) && differenceInDays(new Date(aquarium.nextWaterChangeReminder!), new Date()) > 3))) && (
           <DetailItem icon={<CalendarDays />} value={`Last Change: ${format(new Date(aquarium.lastWaterChange), 'MMM d, yyyy')}`} />
-        )}
-         {!reminderStatus && aquarium.nextWaterChangeReminder && (
-            <DetailItem icon={<CalendarClock />} value={`Next Reminder: ${format(new Date(aquarium.nextWaterChangeReminder), 'MMM d, yyyy')}`} />
         )}
 
         {(aquarium.fishSpecies || aquarium.fishCount !== undefined || typeof aquarium.co2Injection === 'boolean' || aquarium.filterDetails) && (

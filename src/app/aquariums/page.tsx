@@ -32,6 +32,7 @@ const mockAquariumsData: Aquarium[] = [
     name: 'Living Room Reef',
     volumeGallons: 75,
     type: 'saltwater',
+    imageUrl: 'https://placehold.co/600x400.png?text=Living+Room+Reef',
     lastWaterChange: new Date('2024-07-15'),
     nextWaterChangeReminder: new Date('2024-07-29'),
     notes: 'Keeping an eye on SPS coral growth. Clownfish are active.',
@@ -46,6 +47,7 @@ const mockAquariumsData: Aquarium[] = [
     name: 'Betta Paradise',
     volumeGallons: 5,
     type: 'freshwater',
+    imageUrl: 'https://placehold.co/600x400.png?text=Betta+Paradise',
     lastWaterChange: new Date('2024-07-20'),
     nextWaterChangeReminder: new Date('2024-07-27'),
     notes: 'Betta seems happy. Plants are growing well. Added some shrimp.',
@@ -74,6 +76,7 @@ const mockAquariumsData: Aquarium[] = [
     name: 'Office Nano Reef',
     volumeGallons: 10,
     type: 'reef',
+    imageUrl: 'https://placehold.co/600x400.png?text=Nano+Reef',
     lastWaterChange: new Date('2024-07-18'),
     notes: 'Small zoa garden and a single ricordea. Skimmer running fine.',
     fishSpecies: 'Tailspot Blenny, Sexy Shrimp',
@@ -137,6 +140,7 @@ export default function AquariumsPage() {
             volumeGallons: data.volumeGallons ? Number(data.volumeGallons) : undefined,
             fishCount: data.fishCount ? Number(data.fishCount) : undefined,
             co2Injection: data.co2Injection || false,
+            imageUrl: data.imageUrl || undefined,
          };
         setAquariums(prev => prev.map(aq => aq.id === editingAquarium.id ? updatedAquarium : aq));
         toast({ title: "Aquarium Updated", description: `${updatedAquarium.name} has been updated.` });
@@ -150,6 +154,7 @@ export default function AquariumsPage() {
           volumeGallons: data.volumeGallons ? Number(data.volumeGallons) : undefined,
           fishCount: data.fishCount ? Number(data.fishCount) : undefined,
           co2Injection: data.co2Injection || false,
+          imageUrl: data.imageUrl || undefined,
         };
         // Simulate calling a server action
         // const result = await addAquariumAction(newAquariumData);
