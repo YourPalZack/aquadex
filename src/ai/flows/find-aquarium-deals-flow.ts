@@ -19,8 +19,8 @@ const DealItemSchema = z.object({
   salePrice: z.string().describe("The simulated sale price (e.g., '$39.99')."),
   discountPercentage: z.string().optional().describe("The calculated or estimated discount percentage (e.g., '20% off')."),
   sourceName: z.string().describe("The name of the source where the deal was found (e.g., 'Amazon', 'AquaScape Deals Co.', 'ReefBargains Online')."),
-  url: z.string().url().describe("The direct URL to the product listing or a search URL on the source website. For Amazon, use 'https://www.amazon.com/s?k=ENCODED_PRODUCT_NAME&tag=YOUR_AMAZON_TAG-20' format, replacing ENCODED_PRODUCT_NAME and ensuring the placeholder tag is included."),
-  imageUrl: z.string().url().describe("An image URL for the product. MUST use `https://placehold.co/300x200.png` format."),
+  url: z.string().describe("The direct URL to the product listing or a search URL on the source website. For Amazon, use 'https://www.amazon.com/s?k=ENCODED_PRODUCT_NAME&tag=YOUR_AMAZON_TAG-20' format, replacing ENCODED_PRODUCT_NAME and ensuring the placeholder tag is included."),
+  imageUrl: z.string().describe("An image URL for the product. MUST use `https://placehold.co/300x200.png` format."),
   dataAiHint: z.string().describe("One or two keywords for Unsplash search if using a placeholder image (e.g., 'aquarium filter', 'fish food'). Max two words."),
   description: z.string().optional().describe("A brief description of the product or why it's a good deal.")
 });
@@ -89,3 +89,4 @@ const findAquariumDealsFlow = ai.defineFlow(
     return { ...output, deals: processedDeals };
   }
 );
+
