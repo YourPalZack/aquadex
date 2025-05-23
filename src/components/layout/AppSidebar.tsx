@@ -44,6 +44,7 @@ import {
 } from 'lucide-react';
 import { marketplaceCategoriesData, type MarketplaceCategory, mockCurrentUser } from '@/types';
 import type { ReactElement, ElementType } from 'react';
+import { cn } from '@/lib/utils';
 
 
 // Define navigation items with potential sub-items
@@ -162,6 +163,9 @@ export default function AppSidebar() {
                                 asChild
                                 isActive={subItem.href && pathname.startsWith(subItem.href)} 
                                 onClick={() => openMobile && setOpenMobile(false)}
+                                className={cn(
+                                  subItem.href === '/marketplace/add-listing' && 'text-primary font-semibold'
+                                )}
                               >
                                 <a>
                                   {SubIcon && <SubIcon className="h-4 w-4" />}
@@ -212,3 +216,4 @@ export default function AppSidebar() {
     </Sidebar>
   );
 }
+
