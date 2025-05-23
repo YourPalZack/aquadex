@@ -1,7 +1,8 @@
 
 'use client';
 
-import { useFormState, useFormStatus } from 'react-dom';
+import React from 'react'; // Import React for useActionState
+import { useActionState, useFormStatus } from 'react'; // Corrected import
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -33,7 +34,7 @@ function SubmitButton() {
 }
 
 export default function FishFinderForm({ onSearchComplete }: FishFinderFormProps) {
-  const [state, formAction] = useFormState(findFishAction, initialState);
+  const [state, formAction] = useActionState(findFishAction, initialState); // Corrected hook usage
 
   React.useEffect(() => {
     if (state.message === 'Search complete.' || (state.message && state.message.startsWith('Search failed:'))) {
@@ -81,3 +82,4 @@ export default function FishFinderForm({ onSearchComplete }: FishFinderFormProps
     </Card>
   );
 }
+
