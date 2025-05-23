@@ -77,6 +77,17 @@ export const questionCategories: Category[] = [
   { name: 'General Discussion', slug: 'general-discussion', description: 'For everything else related to the aquarium hobby.' },
 ];
 
+export interface ReminderItem {
+  id: string; // e.g., aquariumId-waterchange
+  aquariumId: string;
+  aquariumName: string;
+  type: 'Water Change' | 'Feeding';
+  dueDate: Date;
+  status: 'Overdue' | 'Due Today' | 'Due Soon' | 'Upcoming';
+  message: string; // Full descriptive message, e.g., "Living Room Reef: Water Change Overdue by 3 days"
+  daysDiff: number; // e.g., -3 for 3 days overdue, 0 for today, 2 for due in 2 days
+}
+
 
 // Re-export AI flow types for easier access if needed
 export type { AnalyzeTestStripInput, AnalyzeTestStripOutput } from '@/ai/flows';
