@@ -5,15 +5,17 @@ import { useState, useEffect } from 'react';
 import ImageUploadForm from '@/components/dashboard/ImageUploadForm';
 import AnalysisResults from '@/components/dashboard/AnalysisResults';
 import TreatmentRecommendations from '@/components/dashboard/TreatmentRecommendations';
-import type { Aquarium, AnalyzeTestStripOutput, RecommendTreatmentProductsOutput } from '@/types';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Lightbulb, Droplet, CalendarDays, Timer, AlertTriangle, BellRing, Eye, Info } from 'lucide-react';
+import type { Aquarium, AnalyzeTestStripOutput, RecommendTreatmentProductsOutput, TestResult } from '@/types';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
+import { Lightbulb, Droplet, CalendarDays, Timer, AlertTriangle, BellRing, Eye, Info, History as HistoryIcon } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { mockAquariumsData } from '@/app/aquariums/page'; // Import mock data
+import { mockAquariumsData } from '@/app/aquariums/page'; 
+import { mockTestResults } from '@/app/history/page';
 import { format, differenceInDays, isPast, isToday, isFuture } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
 
 const ReminderStatus: React.FC<{ reminderDate?: Date; type: 'Water Change' | 'Feeding'; className?: string }> = ({ reminderDate, type, className }) => {
   if (!reminderDate) return null;
@@ -37,16 +39,15 @@ const ReminderStatus: React.FC<{ reminderDate?: Date; type: 'Water Change' | 'Fe
     specificClassName = 'text-amber-600 dark:text-amber-500 bg-amber-500/10 border border-amber-500/30 font-semibold';
   } else if (isFuture(reminder)) {
     const daysUntil = differenceInDays(reminder, today);
-     if (daysUntil <= 3) { // Due in 3 days or less (daysUntil is 0 for tomorrow, 1 for day after etc.)
+     if (daysUntil <= 3) { 
         text = `${type} Due in ${daysUntil +1}d (${format(reminder, 'MMM d')})`;
         icon = <BellRing className="w-4 h-4 mr-1 text-amber-600 dark:text-amber-500" />;
         specificClassName = 'text-amber-600 dark:text-amber-500 bg-amber-500/10 border border-amber-500/30';
     } else {
-        // Don't show if more than 3 days away for dashboard brevity
         return null; 
     }
   } else {
-    return null; // Should not happen if date is valid
+    return null; 
   }
   
   return (
@@ -56,20 +57,37 @@ const ReminderStatus: React.FC<{ reminderDate?: Date; type: 'Water Change' | 'Fe
   );
 };
 
+interface RecentTestResult extends TestResult {
+  aquariumName?: string;
+}
 
 export default function DashboardPage() {
   const [analysisResult, setAnalysisResult] = useState<AnalyzeTestStripOutput | null>(null);
   const [recommendations, setRecommendations] = useState<RecommendTreatmentProductsOutput | null>(null);
   const [aquariums, setAquariums] = useState<Aquarium[]>([]);
+  const [recentTests, setRecentTests] = useState<RecentTestResult[]>([]);
 
   useEffect(() => {
-    // Simulate fetching aquariums
     setAquariums(mockAquariumsData);
+
+    const allTests = [...mockTestResults]; 
+    const sortedTests = allTests.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+    const top5Tests = sortedTests.slice(0, 5).map(test => {
+      const aquarium = mockAquariumsData.find(aq => aq.id === test.aquariumId);
+      return { ...test, aquariumName: aquarium?.name || 'Unassigned Tank' };
+    });
+    setRecentTests(top5Tests);
   }, []);
 
   const handleAnalysisComplete = (data: { analysis: AnalyzeTestStripOutput; recommendations: RecommendTreatmentProductsOutput | null }) => {
     setAnalysisResult(data.analysis);
     setRecommendations(data.recommendations);
+  };
+
+  const truncateText = (text: string | undefined, maxLength: number): string => {
+    if (!text) return 'N/A';
+    if (text.length <= maxLength) return text;
+    return text.substring(0, maxLength) + '...';
   };
 
   return (
@@ -152,6 +170,62 @@ export default function DashboardPage() {
           <div className="lg:col-span-2 space-y-8">
             <AnalysisResults analysis={analysisResult} />
             <TreatmentRecommendations recommendations={recommendations} />
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-xl md:text-2xl flex items-center">
+                  <HistoryIcon className="w-6 h-6 mr-3 text-primary" />
+                  Recent Test History
+                </CardTitle>
+                <CardDescription>
+                  A quick look at your last five water tests.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {recentTests.length > 0 ? (
+                  <ul className="space-y-3">
+                    {recentTests.map((test, index) => (
+                      <li key={test.id}>
+                        <div className="p-3 border rounded-md bg-card hover:bg-muted/50 transition-colors">
+                            <div className="flex justify-between items-center mb-1">
+                                <span className="text-sm font-semibold text-foreground/90">
+                                    {format(new Date(test.timestamp), 'MMM d, yyyy - p')}
+                                </span>
+                                <Badge variant="secondary" className="text-xs">{test.aquariumName}</Badge>
+                            </div>
+                            <p className="text-xs text-muted-foreground mb-2">
+                                Parameters: {truncateText(test.parameters, 60)}
+                            </p>
+                            <Link href={`/history#${test.id}`} passHref>
+                                <Button variant="link" size="sm" className="p-0 h-auto text-xs text-primary hover:underline">
+                                    View Full Details <Eye className="w-3 h-3 ml-1" />
+                                </Button>
+                            </Link>
+                        </div>
+                        {index < recentTests.length - 1 && <Separator className="my-3" />}
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <div className="text-center text-muted-foreground py-6">
+                    <Info className="w-10 h-10 mx-auto mb-2 opacity-70" />
+                    <p>No recent test results found.</p>
+                    <Button variant="link" asChild className="mt-1">
+                        <Link href="/analyze">Analyze your first test strip</Link>
+                    </Button>
+                  </div>
+                )}
+              </CardContent>
+              {recentTests.length > 0 && (
+                 <CardFooter>
+                    <Link href="/history" passHref>
+                        <Button variant="outline" size="sm" className="w-full">
+                            View All Test History
+                        </Button>
+                    </Link>
+                 </CardFooter>
+              )}
+            </Card>
           </div>
         </div>
         
@@ -191,4 +265,3 @@ export default function DashboardPage() {
     </div>
   );
 }
-

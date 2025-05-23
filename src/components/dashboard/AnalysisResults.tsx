@@ -1,9 +1,10 @@
+
 'use client';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import type { AnalyzeTestStripOutput } from '@/types';
-import { CheckCircle, AlertTriangle, Info, Share2 } from 'lucide-react';
+import { CheckCircle, AlertTriangle, Info, Share2, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ShareButton } from '@/components/shared/ShareButton';
 
@@ -62,7 +63,10 @@ export default function AnalysisResults({ analysis }: AnalysisResultsProps) {
     return (
       <Card className="w-full">
         <CardHeader>
-          <CardTitle>Analysis Results</CardTitle>
+          <CardTitle className="flex items-center">
+            <FileText className="w-6 h-6 mr-2 text-primary" />
+            Water Test Result
+          </CardTitle>
           <CardDescription>Upload an image to see your water parameters.</CardDescription>
         </CardHeader>
         <CardContent>
@@ -84,8 +88,11 @@ export default function AnalysisResults({ analysis }: AnalysisResultsProps) {
       <CardHeader>
         <div className="flex justify-between items-start">
           <div>
-            <CardTitle className="text-2xl">Water Parameter Analysis</CardTitle>
-            <CardDescription>Here are the results from your test strip.</CardDescription>
+            <CardTitle className="text-2xl flex items-center">
+                <FileText className="w-7 h-7 mr-3 text-primary" />
+                Water Test Result
+            </CardTitle>
+            <CardDescription>Here are the results from your most recent test strip.</CardDescription>
           </div>
           <ShareButton title="Share Water Analysis" text={shareText} />
         </div>
