@@ -103,3 +103,20 @@ export interface FishFoodFormValues {
   variant?: string;
   notes?: string;
 }
+
+export interface WaterTreatmentProduct {
+  id: string;
+  userId: string;
+  name: string;
+  brand?: string;
+  type?: string; // e.g., "Dechlorinator", "Beneficial Bacteria", "pH Up"
+  notes?: string;
+  amazonLinks?: AmazonLink[];
+}
+
+export interface WaterTreatmentProductFormValues {
+  name: string;
+  brand?: string;
+  type?: string;
+  notes?: string;
+}

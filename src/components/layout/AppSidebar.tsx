@@ -28,7 +28,8 @@ import {
   HelpCircle,
   FileScan,
   MessageSquare,
-  PackageSearch
+  PackageSearch,
+  FlaskConical // Added FlaskConical
 } from 'lucide-react';
 
 // Define navigation items with potential sub-items
@@ -44,6 +45,7 @@ const navItemsConfig = [
   },
   { href: '/aquariums', label: 'My Aquariums', icon: Droplet },
   { href: '/foods', label: 'Manage Foods', icon: PackageSearch },
+  { href: '/treatments', label: 'Manage Treatments', icon: FlaskConical },
   { href: '/qa', label: 'Q&A', icon: MessageSquare },
   { href: '/marketplace', label: 'Marketplace', icon: ShoppingCart }, // Assuming marketplace is a future page
 ];

@@ -13,7 +13,8 @@ import type {
     RecommendTreatmentProductsOutput,
     GetFoodPurchaseLinksInput,
     GetFoodPurchaseLinksOutput,
-    FishFood
+    FishFood,
+    WaterTreatmentProduct // Added WaterTreatmentProduct
 } from '@/ai/flows'; // Assuming FishFood type might be re-exported from ai/flows if defined there too, or import from @/types
 import { z } from 'zod';
 
@@ -151,9 +152,6 @@ export async function addFishFoodAction(prevState: AddFishFoodActionState, formD
       amazonLinks: purchaseLinksOutput.amazonLinks || [],
     };
     
-    // In a real app, you would save newFoodItem to a database here.
-    // For this prototype, we return it to be managed in client-side state.
-
     return {
       message: 'Fish food added and links generated successfully!',
       errors: null,
@@ -167,6 +165,68 @@ export async function addFishFoodAction(prevState: AddFishFoodActionState, formD
       message: `Failed to add fish food: ${errorMessage}`,
       errors: { _form: [errorMessage] },
       newFoodItem: null,
+    };
+  }
+}
+
+const addWaterTreatmentProductFormSchema = z.object({
+  name: z.string().min(2, { message: 'Product name must be at least 2 characters.' }).max(100, { message: 'Product name cannot exceed 100 characters.' }),
+  brand: z.string().max(50, {message: 'Brand cannot exceed 50 characters.'}).optional(),
+  type: z.string().max(50, {message: 'Type cannot exceed 50 characters.'}).optional(),
+  notes: z.string().max(300, {message: 'Notes cannot exceed 300 characters.'}).optional(),
+});
+
+export interface AddWaterTreatmentProductActionState {
+    message: string | null;
+    errors: Record<string, string[]> | null;
+    newProductItem: WaterTreatmentProduct | null;
+}
+
+export async function addWaterTreatmentProductAction(prevState: AddWaterTreatmentProductActionState, formData: FormData): Promise<AddWaterTreatmentProductActionState> {
+  try {
+    const validatedFields = addWaterTreatmentProductFormSchema.safeParse({
+      name: formData.get('name'),
+      brand: formData.get('brand'),
+      type: formData.get('type'),
+      notes: formData.get('notes'),
+    });
+
+    if (!validatedFields.success) {
+      return {
+        message: 'Validation failed. Please check the form fields.',
+        errors: validatedFields.error.flatten().fieldErrors,
+        newProductItem: null,
+      };
+    }
+
+    const { name, brand, type, notes } = validatedFields.data;
+
+    const genkitInput: GetFoodPurchaseLinksInput = { foodName: name, brand };
+    const purchaseLinksOutput: GetFoodPurchaseLinksOutput = await getFoodPurchaseLinksFlow(genkitInput);
+
+    const newProductItem: WaterTreatmentProduct = {
+      id: `treatment-${Date.now()}`, 
+      userId: 'user123', 
+      name,
+      brand: brand || undefined,
+      type: type || undefined,
+      notes: notes || undefined,
+      amazonLinks: purchaseLinksOutput.amazonLinks || [],
+    };
+    
+    return {
+      message: 'Water treatment product added and links generated successfully!',
+      errors: null,
+      newProductItem,
+    };
+
+  } catch (error) {
+    console.error('Error in addWaterTreatmentProductAction:', error);
+    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred while adding water treatment product.';
+    return {
+      message: `Failed to add water treatment product: ${errorMessage}`,
+      errors: { _form: [errorMessage] },
+      newProductItem: null,
     };
   }
 }
