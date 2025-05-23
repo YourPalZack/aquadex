@@ -33,26 +33,27 @@ import {
   BellRing,
   Leaf,
   Archive,
-  Filter,
+  Filter as FilterIcon,
   Sun,
   Percent,
   Sparkles,
   HeartHandshake,
-  ChevronRight, // Added
-  ChevronDown // Added
+  ChevronRight,
+  ChevronDown 
 } from 'lucide-react';
 import { marketplaceCategoriesData, type MarketplaceCategory } from '@/types';
+import type { ReactElement } from 'react'; // Import ReactElement for icon typing
 
 
 // Define navigation items with potential sub-items
 const navItemsConfig = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   {
-    href: '/analyze', // Parent item
+    href: '/analyze', 
     label: 'Water Test',
     icon: FileScan,
     subItems: [
-      { href: '/history', label: 'Test History', icon: History }, // Child item
+      { href: '/history', label: 'Test History', icon: History }, 
     ],
   },
   { 
@@ -74,7 +75,7 @@ const navItemsConfig = [
       { href: '/fish-finder', label: 'Fish Finder', icon: Fish },
       { href: '/plant-finder', label: 'Plant Finder', icon: Leaf },
       { href: '/tank-finder', label: 'Tank Finder', icon: Archive },
-      { href: '/filtration-finder', label: 'Filtration Finder', icon: Filter },
+      { href: '/filtration-finder', label: 'Filtration Finder', icon: FilterIcon },
       { href: '/lighting-finder', label: 'Lighting Finder', icon: Sun },
     ]
   },
@@ -103,11 +104,9 @@ export default function AppSidebar() {
   const pathname = usePathname();
   const { openMobile, setOpenMobile } = useSidebar();
 
-  const isActiveRoute = (href: string) => {
-    // For grouped items like AIQuarium Tools or Marketplace, don't activate the parent itself as "active"
-    if (!href || href === '/aiquarium-tools' || href === '/marketplace') return false; 
+  const isActiveRoute = (href: string | undefined) => {
+    if (!href) return false;
     if (href === '/') return pathname === href; 
-    
     return pathname.startsWith(href);
   };
   
@@ -122,19 +121,24 @@ export default function AppSidebar() {
         <SidebarMenu>
           {navItemsConfig.map((item) => {
             const hasSubItems = item.subItems && item.subItems.length > 0;
-            const isParentSectionActive = (item.href && pathname.startsWith(item.href)) || 
-                                          (hasSubItems && item.subItems.some(sub => sub.href && pathname.startsWith(sub.href)));
+            // A parent section is active if its own href matches, or if any of its subItems' href matches the current pathname.
+            // We also ensure that for parent-only links like /aiquarium-tools, it is considered active if the pathname *is* /aiquarium-tools,
+            // or if the pathname starts with one of its children's paths.
+            const isParentSectionActive = 
+              (item.href && pathname === item.href) || 
+              (item.href && pathname.startsWith(item.href) && item.href !== pathname && hasSubItems) || // Active if a sub-item is active
+              (hasSubItems && item.subItems.some(sub => sub.href && pathname.startsWith(sub.href)));
+
 
             return (
               <SidebarMenuItem key={item.label}>
                 <Link href={item.href || '#'} passHref legacyBehavior>
                   <SidebarMenuButton
                     asChild
-                    isActive={isActiveRoute(item.href || '')}
+                    isActive={isActiveRoute(item.href) && !hasSubItems || (item.href === pathname && hasSubItems)} // Parent is active if it's the current page, even with sub-items
                     tooltip={item.label}
                     onClick={() => {
                       if (openMobile && !hasSubItems) setOpenMobile(false);
-                      // For parent items with sub-items, clicking might not close mobile if it's just expanding
                     }}
                   >
                     <a>
@@ -209,3 +213,4 @@ export default function AppSidebar() {
     </Sidebar>
   );
 }
+
