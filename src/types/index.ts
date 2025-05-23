@@ -256,6 +256,23 @@ export interface FindLightingInput {
 export interface FindLightingOutput {
   searchResults: LightingListing[];
   message: string;
-  // recommendedListing?: LightingListing; // Decided to integrate recommendation into searchResults with a flag
 }
 
+// Discounts & Deals Types
+export interface DealItem {
+  id: string;
+  productName: string;
+  originalPrice?: string;
+  salePrice: string;
+  discountPercentage?: string;
+  sourceName: string;
+  url: string;
+  imageUrl: string; // Required, will use placeholder
+  dataAiHint: string; // Required for placeholder
+  description?: string; // Brief description of the deal or product
+}
+
+export interface FindDealsOutput {
+  deals: DealItem[];
+  message: string; // e.g., "Today's top simulated deals!"
+}

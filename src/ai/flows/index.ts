@@ -7,4 +7,5 @@ export * from './find-fish-flow';
 export * from './find-plant-flow';
 export * from './find-tank-flow';
 export * from './find-filter-flow';
-export * from './find-lighting-flow'; // Added new lighting flow
+export * from './find-lighting-flow';
+export * from './find-aquarium-deals-flow'; // Added new deals flow

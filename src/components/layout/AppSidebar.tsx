@@ -35,7 +35,8 @@ import {
   Leaf,
   Archive,
   Filter,
-  Sun // Added Sun icon for Lighting
+  Sun,
+  Percent // Added Percent icon for Discounts & Deals
 } from 'lucide-react';
 
 // Define navigation items with potential sub-items
@@ -63,9 +64,10 @@ const navItemsConfig = [
       { href: '/plant-finder', label: 'Plant Finder', icon: Leaf },
       { href: '/tank-finder', label: 'Tank Finder', icon: Archive },
       { href: '/filtration-finder', label: 'Filtration Finder', icon: Filter },
-      { href: '/lighting-finder', label: 'Lighting Finder', icon: Sun }, // Added Lighting Finder
+      { href: '/lighting-finder', label: 'Lighting Finder', icon: Sun },
     ]
   },
+  { href: '/discounts-deals', label: 'Discounts & Deals', icon: Percent }, // Added Discounts & Deals
 ];
 
 const bottomNavItems = [

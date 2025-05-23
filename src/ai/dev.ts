@@ -10,5 +10,5 @@ import '@/ai/flows/find-fish-flow.ts';
 import '@/ai/flows/find-plant-flow.ts';
 import '@/ai/flows/find-tank-flow.ts';
 import '@/ai/flows/find-filter-flow.ts'; 
-import '@/ai/flows/find-lighting-flow.ts'; // Added new lighting flow
-
+import '@/ai/flows/find-lighting-flow.ts';
+import '@/ai/flows/find-aquarium-deals-flow.ts'; // Added new deals flow

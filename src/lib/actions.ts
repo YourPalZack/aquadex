@@ -9,7 +9,8 @@ import {
     findPlant as findPlantFlow,
     findTank as findTankFlow,
     findFilter as findFilterFlow,
-    findLighting as findLightingFlow // Added findLightingFlow
+    findLighting as findLightingFlow,
+    findAquariumDeals as findAquariumDealsFlow // Added findAquariumDealsFlow
 } from '@/ai/flows';
 import type { 
     AnalyzeTestStripInput, 
@@ -32,9 +33,11 @@ import type {
     FindFilterInput, 
     FindFilterOutput, 
     FilterListing,
-    FindLightingInput, // Added FindLightingInput
-    FindLightingOutput, // Added FindLightingOutput
-    LightingListing // Added LightingListing
+    FindLightingInput,
+    FindLightingOutput,
+    LightingListing,
+    FindDealsOutput, // Added FindDealsOutput
+    DealItem // Added DealItem
 } from '@/types'; 
 import { z } from 'zod';
 
@@ -221,6 +224,7 @@ export async function addWaterTreatmentProductAction(prevState: AddWaterTreatmen
 
     const { name, brand, type, notes } = validatedFields.data;
 
+    // Re-using the food purchase links flow as it's general enough for product name + brand
     const genkitInput: GetFoodPurchaseLinksInput = { foodName: name, brand }; 
     const purchaseLinksOutput: GetFoodPurchaseLinksOutput = await getFoodPurchaseLinksFlow(genkitInput);
 
@@ -479,7 +483,6 @@ export interface FindLightingActionState {
     errors: Record<string, string[]> | null;
     searchResults: LightingListing[] | null;
     aiMessage: string | null;
-    // recommendedListing: LightingListing | null; // Keeping it simple, recommendation is part of searchResults
 }
 
 export async function findLightingAction(prevState: FindLightingActionState, formData: FormData): Promise<FindLightingActionState> {
@@ -517,6 +520,37 @@ export async function findLightingAction(prevState: FindLightingActionState, for
       message: `Search failed: ${errorMessage}`,
       errors: { _form: [errorMessage] },
       searchResults: null,
+      aiMessage: null,
+    };
+  }
+}
+
+// Discounts & Deals Action
+export interface FindDealsActionState {
+    message: string | null;
+    errors: Record<string, string[]> | null; // For potential future input validation
+    deals: DealItem[] | null;
+    aiMessage: string | null;
+}
+
+export async function findAquariumDealsAction(prevState: FindDealsActionState): Promise<FindDealsActionState> {
+  try {
+    // This action currently doesn't take form input, it just fetches general deals
+    const result: FindDealsOutput = await findAquariumDealsFlow();
+
+    return {
+      message: 'Deals search complete.',
+      errors: null,
+      deals: result.deals,
+      aiMessage: result.message,
+    };
+  } catch (error) {
+    console.error('Error in findAquariumDealsAction:', error);
+    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred while fetching deals.';
+    return {
+      message: `Deals search failed: ${errorMessage}`,
+      errors: { _form: [errorMessage] },
+      deals: null,
       aiMessage: null,
     };
   }
