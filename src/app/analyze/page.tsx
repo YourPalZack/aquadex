@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -24,7 +25,7 @@ export default function AnalyzePage() {
             <CardHeader>
                 <CardTitle className="text-3xl flex items-center">
                     <FileScan className="w-8 h-8 mr-3 text-primary" />
-                    New Water Test Analysis
+                    Water Test
                 </CardTitle>
                 <CardDescription className="text-base">
                     Upload a clear photo of your aquarium test strip. Our AI will analyze the colors and provide you with your water parameters and treatment suggestions.

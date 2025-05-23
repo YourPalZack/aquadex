@@ -27,13 +27,14 @@ import {
   LogOut,
   HelpCircle,
   ImageUp,
-  MessageSquare
+  MessageSquare,
+  FileScan // Added FileScan as it's used on the analyze page, could be ImageUp too
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const navItems = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/analyze', label: 'New Analysis', icon: ImageUp },
+  { href: '/analyze', label: 'Water Test', icon: FileScan }, // Changed label and icon
   { href: '/history', label: 'Test History', icon: History },
   { href: '/aquariums', label: 'My Aquariums', icon: Droplet },
   { href: '/qa', label: 'Q&A', icon: MessageSquare },
