@@ -21,7 +21,6 @@ import {
   LayoutDashboard, 
   History, 
   Droplet, 
-  Users, 
   ShoppingCart, 
   Settings, 
   LogOut,
@@ -36,7 +35,8 @@ import {
   Archive,
   Filter,
   Sun,
-  Percent
+  Percent,
+  Sparkles // Added Sparkles icon
 } from 'lucide-react';
 
 // Define navigation items with potential sub-items
@@ -56,15 +56,23 @@ const navItemsConfig = [
   { href: '/treatments', label: 'Manage Treatments', icon: FlaskConical },
   { href: '/qa', label: 'Q&A', icon: MessageSquare },
   { 
-    href: '/marketplace', // Parent item for Marketplace
-    label: 'Marketplace', 
-    icon: ShoppingCart,
+    href: '/fish-finder', // Parent link for AIQuarium Tools, points to the first sub-item
+    label: 'AIQuarium Tools', 
+    icon: Sparkles, // New icon for AI tools
     subItems: [
       { href: '/fish-finder', label: 'Fish Finder', icon: Fish },
       { href: '/plant-finder', label: 'Plant Finder', icon: Leaf },
       { href: '/tank-finder', label: 'Tank Finder', icon: Archive },
       { href: '/filtration-finder', label: 'Filtration Finder', icon: Filter },
       { href: '/lighting-finder', label: 'Lighting Finder', icon: Sun },
+    ]
+  },
+  { 
+    href: '/marketplace', 
+    label: 'Marketplace', 
+    icon: ShoppingCart,
+    subItems: [
+      // Finder items removed from here
     ]
   },
   { href: '/discounts-deals', label: 'Discounts & Deals', icon: Percent },
@@ -80,24 +88,18 @@ export default function AppSidebar() {
   const { openMobile, setOpenMobile } = useSidebar();
 
   const isActiveRoute = (href: string) => {
+    if (!href) return false; // Handle items that might not have an href (though all current ones do)
     if (href === '/') return pathname === href; 
     
-    const currentTopLevelPath = `/${pathname.split('/')[1]}`;
-
     // Check if the current path starts with the item's href
     if (pathname.startsWith(href)) return true;
 
-    // Check sub-items
+    // Check sub-items - if a sub-item is active, the parent should also be considered active for expansion
     const parentConfig = navItemsConfig.find(item => item.href === href);
-    if (parentConfig?.subItems) {
-      return parentConfig.subItems.some(sub => pathname.startsWith(sub.href));
+    if (parentConfig?.subItems && parentConfig.subItems.length > 0) {
+      return parentConfig.subItems.some(sub => sub.href && pathname.startsWith(sub.href));
     }
     
-    // Fallback for cases like /marketplace being active when on /marketplace/fish-finder
-    if (href === '/marketplace' && currentTopLevelPath === '/marketplace') return true;
-    if (href === '/marketplace' && navItemsConfig.find(i => i.href === '/marketplace')?.subItems?.some(si => pathname.startsWith(si.href))) return true;
-
-
     return false;
   };
   
@@ -115,7 +117,7 @@ export default function AppSidebar() {
 
             return (
               <SidebarMenuItem key={item.label}>
-                <Link href={item.href} passHref legacyBehavior>
+                <Link href={item.href || '#'} passHref legacyBehavior>
                   <SidebarMenuButton
                     asChild
                     isActive={isParentSectionActive}
@@ -135,7 +137,7 @@ export default function AppSidebar() {
                         <Link href={subItem.href} passHref legacyBehavior>
                           <SidebarMenuSubButton
                             asChild
-                            isActive={pathname.startsWith(subItem.href)} 
+                            isActive={subItem.href && pathname.startsWith(subItem.href)} 
                             onClick={() => openMobile && setOpenMobile(false)}
                           >
                             <a>
