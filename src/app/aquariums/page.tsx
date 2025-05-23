@@ -1,13 +1,30 @@
 
 'use client';
 
-import { useState } from 'react';
-import type { Aquarium } from '@/types';
+import { useState, useEffect } from 'react';
+import type { Aquarium, AquariumFormValues as AquariumFormData } from '@/types';
 import AquariumCard from '@/components/aquariums/AquariumCard';
+import AquariumForm from '@/components/aquariums/AquariumForm';
 import { Button } from '@/components/ui/button';
-import { PlusCircle, Droplets } from 'lucide-react';
-import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { PlusCircle, Droplets, Loader2 } from 'lucide-react';
+import { 
+  Card, 
+  CardContent, 
+  CardDescription, 
+  CardHeader, 
+  CardTitle 
+} from '@/components/ui/card';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogClose,
+} from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
+import { addAquarium as addAquariumAction } from '@/lib/actions'; // Assuming a similar action exists or will be created
 
 // Mock Data
 const mockAquariumsData: Aquarium[] = [
@@ -51,38 +68,83 @@ const mockAquariumsData: Aquarium[] = [
 ];
 
 export default function AquariumsPage() {
-  const [aquariums, setAquariums] = useState<Aquarium[]>(mockAquariumsData);
+  const [aquariums, setAquariums] = useState<Aquarium[]>([]);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [editingAquarium, setEditingAquarium] = useState<Aquarium | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
-  // Placeholder functions for edit/delete
+  // Simulate loading data
+  useEffect(() => {
+    setAquariums(mockAquariumsData);
+  }, []);
+
+  const handleAddAquarium = () => {
+    setEditingAquarium(null);
+    setIsDialogOpen(true);
+  };
+
   const handleEditAquarium = (aquariumId: string) => {
-    toast({
-      title: "Edit Aquarium",
-      description: `Editing aquarium with ID: ${aquariumId} (Not implemented yet).`,
-    });
-    console.log('Edit aquarium:', aquariumId);
-    // Here you would typically open a modal or navigate to an edit page
+    const aquariumToEdit = aquariums.find(aq => aq.id === aquariumId);
+    if (aquariumToEdit) {
+      setEditingAquarium(aquariumToEdit);
+      setIsDialogOpen(true);
+    }
   };
 
   const handleDeleteAquarium = (aquariumId: string) => {
-     // For now, just filter out the aquarium from the state
     setAquariums(prevAquariums => prevAquariums.filter(aq => aq.id !== aquariumId));
     toast({
-      title: "Aquarium Deleted (Mock)",
-      description: `Aquarium with ID: ${aquariumId} has been removed from view.`,
+      title: "Aquarium Deleted",
+      description: `Aquarium has been removed from view.`,
       variant: 'destructive'
     });
-    console.log('Delete aquarium:', aquariumId);
-    // In a real app, you would also call an API to delete it from the backend
+    // In a real app, call an API to delete from backend:
+    // e.g., deleteAquariumAction(aquariumId);
   };
 
-  const handleAddAquarium = () => {
-    toast({
-      title: "Add New Aquarium",
-      description: "This feature is not implemented yet.",
-    });
-    console.log('Add new aquarium');
-    // Here you would open a form/modal to add a new aquarium
+  const handleFormSubmit = async (data: AquariumFormData) => {
+    setIsLoading(true);
+    // Simulate API call delay
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
+    try {
+      if (editingAquarium) {
+        // Update existing aquarium
+        const updatedAquarium: Aquarium = { 
+            ...editingAquarium, 
+            ...data,
+            volumeGallons: data.volumeGallons ? Number(data.volumeGallons) : undefined,
+         };
+        setAquariums(prev => prev.map(aq => aq.id === editingAquarium.id ? updatedAquarium : aq));
+        toast({ title: "Aquarium Updated", description: `${updatedAquarium.name} has been updated.` });
+        // In a real app: await updateAquariumAction(updatedAquarium);
+      } else {
+        // Add new aquarium
+        const newAquarium: Aquarium = {
+          id: `aqua${Date.now()}`, // Simple mock ID
+          userId: 'user123', // Mock user ID
+          ...data,
+          volumeGallons: data.volumeGallons ? Number(data.volumeGallons) : undefined,
+        };
+        // Simulate calling a server action
+        // const result = await addAquariumAction(newAquarium);
+        // if (result.success) {
+        //   setAquariums(prev => [newAquarium, ...prev]);
+        //   toast({ title: "Aquarium Added", description: `${newAquarium.name} has been added.` });
+        // } else {
+        //   toast({ title: "Error", description: result.message || "Could not add aquarium.", variant: "destructive" });
+        // }
+        setAquariums(prev => [newAquarium, ...prev]); // Optimistic update for now
+        toast({ title: "Aquarium Added", description: `${newAquarium.name} has been added.` });
+      }
+      setIsDialogOpen(false);
+      setEditingAquarium(null);
+    } catch (error) {
+      toast({ title: "Error", description: "An error occurred while saving the aquarium.", variant: "destructive" });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -127,6 +189,31 @@ export default function AquariumsPage() {
           </CardContent>
         </Card>
       )}
+
+      <Dialog open={isDialogOpen} onOpenChange={(open) => {
+          if (!open) {
+            setEditingAquarium(null); // Reset editing state when dialog closes
+          }
+          setIsDialogOpen(open);
+        }}>
+        <DialogContent className="sm:max-w-[525px] max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>{editingAquarium ? 'Edit Aquarium' : 'Add New Aquarium'}</DialogTitle>
+            <DialogDescription>
+              {editingAquarium ? 'Update the details of your aquarium.' : 'Fill in the details to add a new aquarium.'}
+            </DialogDescription>
+          </DialogHeader>
+          <AquariumForm
+            onSubmit={handleFormSubmit}
+            onCancel={() => {
+              setIsDialogOpen(false);
+              setEditingAquarium(null);
+            }}
+            defaultValues={editingAquarium || undefined}
+            isLoading={isLoading}
+          />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

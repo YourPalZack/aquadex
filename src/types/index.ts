@@ -1,3 +1,4 @@
+
 import type { AnalyzeTestStripOutput, RecommendTreatmentProductsOutput } from '@/ai/flows';
 
 export interface TestResult {
@@ -10,12 +11,14 @@ export interface TestResult {
   notes?: string;
 }
 
+export type AquariumType = 'freshwater' | 'saltwater' | 'brackish' | 'reef';
+
 export interface Aquarium {
   id: string;
   userId: string;
   name: string;
   volumeGallons?: number;
-  type: 'freshwater' | 'saltwater' | 'brackish' | 'reef'; // Example types
+  type: AquariumType;
   lastWaterChange?: Date;
   nextWaterChangeReminder?: Date;
   notes?: string;
@@ -23,4 +26,4 @@ export interface Aquarium {
 
 // Re-export AI flow types for easier access if needed
 export type { AnalyzeTestStripInput, AnalyzeTestStripOutput } from '@/ai/flows';
-export type { RecommendTreatmentProductsInput, RecommendTreatmentProducts
+export type { RecommendTreatmentProductsInput, RecommendTreatmentProductsOutput } from '@/ai/flows/recommend-treatment-products'; // Corrected path
