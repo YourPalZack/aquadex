@@ -3,6 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import type { Aquarium, AquariumFormValues as AquariumFormData } from '@/types';
+import { mockAquariumsData } from '@/types'; // Updated import path
 import AquariumCard from '@/components/aquariums/AquariumCard';
 import AquariumForm from '@/components/aquariums/AquariumForm';
 import { Button } from '@/components/ui/button';
@@ -23,87 +24,8 @@ import {
 } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 import { useSearchParams } from 'next/navigation'; 
-import { subDays, addDays, set } from 'date-fns'; // Import date-fns helpers
+// Removed date-fns imports as they are now handled in types.ts with mockAquariumsData
 
-// Mock Data - Make it exportable
-const today = new Date();
-export const mockAquariumsData: Aquarium[] = [
-  {
-    id: 'aqua1',
-    userId: 'user123',
-    name: 'Living Room Reef',
-    volumeGallons: 75,
-    type: 'saltwater',
-    imageUrl: 'https://placehold.co/600x400.png',
-    lastWaterChange: subDays(today, 14), // 2 weeks ago
-    nextWaterChangeReminder: subDays(today, 3), // Overdue by 3 days
-    notes: 'Keeping an eye on SPS coral growth. Clownfish are active.',
-    fishSpecies: 'Clownfish, Royal Gramma, Yellow Tang',
-    fishCount: 5,
-    co2Injection: false,
-    filterDetails: 'Sump with Protein Skimmer & Refugium',
-    foodDetails: 'NLS Pellets, Rods Food, Mysis Shrimp',
-    nextFeedingReminder: subDays(today, 1), // Feeding overdue by 1 day
-    sourceWaterType: 'premixed_saltwater',
-    sourceWaterParameters: 'Using Tropic Marin Pro Reef salt mix.',
-  },
-  {
-    id: 'aqua2',
-    userId: 'user123',
-    name: 'Betta Paradise',
-    volumeGallons: 5,
-    type: 'freshwater',
-    imageUrl: 'https://placehold.co/600x400.png',
-    lastWaterChange: subDays(today, 5), // 5 days ago
-    nextWaterChangeReminder: today, // Water change due today
-    notes: 'Betta seems happy. Plants are growing well. Added some shrimp.',
-    fishSpecies: 'Betta Splendens, Amano Shrimp',
-    fishCount: 6, 
-    co2Injection: false,
-    filterDetails: 'Small HOB Filter',
-    foodDetails: 'Betta Pellets, Bloodworms (treat)',
-    nextFeedingReminder: addDays(today, 1), // Feeding due tomorrow
-    sourceWaterType: 'tap',
-    sourceWaterParameters: 'Tap water treated with Seachem Prime. pH: 7.2, GH: 5 dGH',
-  },
-  {
-    id: 'aqua3',
-    userId: 'user123',
-    name: 'Planted Community',
-    volumeGallons: 29,
-    type: 'freshwater',
-    imageUrl: 'https://placehold.co/600x400.png',
-    lastWaterChange: subDays(today, 2), // 2 days ago
-    nextWaterChangeReminder: addDays(today, 2), // Water change due in 2 days
-    notes: 'New guppies added last week. CO2 running smoothly.',
-    fishSpecies: 'Guppy, Neon Tetra, Corydora, Otocinclus',
-    fishCount: 20,
-    co2Injection: true,
-    filterDetails: 'Canister Filter - Eheim Classic 250',
-    foodDetails: 'Community Flakes, Algae Wafers',
-    nextFeedingReminder: addDays(today, 7), // Next feeding in a week
-    sourceWaterType: 'ro',
-    sourceWaterParameters: 'RO water remineralized with Seachem Equilibrium.',
-  },
-  {
-    id: 'aqua4',
-    userId: 'user123',
-    name: 'Office Nano Reef',
-    volumeGallons: 10,
-    type: 'reef',
-    imageUrl: 'https://placehold.co/600x400.png',
-    lastWaterChange: subDays(today, 10),
-    nextWaterChangeReminder: addDays(today, 4), // Due in 4 days (won't show "soon" badge)
-    notes: 'Small zoa garden and a single ricordea. Skimmer running fine.',
-    fishSpecies: 'Tailspot Blenny, Sexy Shrimp',
-    fishCount: 3,
-    co2Injection: false,
-    filterDetails: 'HOB Skimmer, Small Powerhead',
-    foodDetails: 'Reef Roids, Small Pellets',
-    nextFeedingReminder: addDays(today, 0), // Feeding due today
-    sourceWaterType: 'ro',
-  },
-];
 
 export default function AquariumsPage() {
   const [aquariums, setAquariums] = useState<Aquarium[]>([]);
@@ -256,6 +178,11 @@ export default function AquariumsPage() {
       <Dialog open={isDialogOpen} onOpenChange={(open) => {
           if (!open) {
             setEditingAquarium(null); 
+            // Clear the 'edit' query param from URL without navigation to avoid re-triggering
+             if (searchParams.get('edit')) {
+                 const newPath = window.location.pathname;
+                 window.history.replaceState({...window.history.state, as: newPath, url: newPath }, '', newPath);
+             }
           }
           setIsDialogOpen(open);
         }}>
@@ -272,6 +199,11 @@ export default function AquariumsPage() {
                 onCancel={() => {
                 setIsDialogOpen(false);
                 setEditingAquarium(null);
+                 // Clear the 'edit' query param from URL
+                if (searchParams.get('edit')) {
+                     const newPath = window.location.pathname;
+                     window.history.replaceState({...window.history.state, as: newPath, url: newPath }, '', newPath);
+                 }
                 }}
                 defaultValues={editingAquarium || undefined}
                 isLoading={isLoading}
@@ -283,3 +215,4 @@ export default function AquariumsPage() {
   );
 }
 
+    

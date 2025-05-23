@@ -8,13 +8,14 @@ import {
     HardHat, 
     HeartHandshake, 
     Gift, 
-    MessageSquare, // Ensured MessageSquare is imported
+    MessageSquare,
     type ElementType, 
     ShoppingCart, 
     SearchCheck, 
     Store as StoreIcon, 
     Star 
 } from 'lucide-react';
+import { subDays, addDays } from 'date-fns';
 
 
 export interface TestResult {
@@ -51,6 +52,87 @@ export interface Aquarium {
   sourceWaterParameters?: string;
 }
 
+// Moved from /src/app/aquariums/page.tsx
+const today = new Date();
+export const mockAquariumsData: Aquarium[] = [
+  {
+    id: 'aqua1',
+    userId: 'user123',
+    name: 'Living Room Reef',
+    volumeGallons: 75,
+    type: 'saltwater',
+    imageUrl: 'https://placehold.co/600x400.png',
+    lastWaterChange: subDays(today, 14), // 2 weeks ago
+    nextWaterChangeReminder: subDays(today, 3), // Overdue by 3 days
+    notes: 'Keeping an eye on SPS coral growth. Clownfish are active.',
+    fishSpecies: 'Clownfish, Royal Gramma, Yellow Tang',
+    fishCount: 5,
+    co2Injection: false,
+    filterDetails: 'Sump with Protein Skimmer & Refugium',
+    foodDetails: 'NLS Pellets, Rods Food, Mysis Shrimp',
+    nextFeedingReminder: subDays(today, 1), // Feeding overdue by 1 day
+    sourceWaterType: 'premixed_saltwater',
+    sourceWaterParameters: 'Using Tropic Marin Pro Reef salt mix.',
+  },
+  {
+    id: 'aqua2',
+    userId: 'user123',
+    name: 'Betta Paradise',
+    volumeGallons: 5,
+    type: 'freshwater',
+    imageUrl: 'https://placehold.co/600x400.png',
+    lastWaterChange: subDays(today, 5), // 5 days ago
+    nextWaterChangeReminder: today, // Water change due today
+    notes: 'Betta seems happy. Plants are growing well. Added some shrimp.',
+    fishSpecies: 'Betta Splendens, Amano Shrimp',
+    fishCount: 6, 
+    co2Injection: false,
+    filterDetails: 'Small HOB Filter',
+    foodDetails: 'Betta Pellets, Bloodworms (treat)',
+    nextFeedingReminder: addDays(today, 1), // Feeding due tomorrow
+    sourceWaterType: 'tap',
+    sourceWaterParameters: 'Tap water treated with Seachem Prime. pH: 7.2, GH: 5 dGH',
+  },
+  {
+    id: 'aqua3',
+    userId: 'user123',
+    name: 'Planted Community',
+    volumeGallons: 29,
+    type: 'freshwater',
+    imageUrl: 'https://placehold.co/600x400.png',
+    lastWaterChange: subDays(today, 2), // 2 days ago
+    nextWaterChangeReminder: addDays(today, 2), // Water change due in 2 days
+    notes: 'New guppies added last week. CO2 running smoothly.',
+    fishSpecies: 'Guppy, Neon Tetra, Corydora, Otocinclus',
+    fishCount: 20,
+    co2Injection: true,
+    filterDetails: 'Canister Filter - Eheim Classic 250',
+    foodDetails: 'Community Flakes, Algae Wafers',
+    nextFeedingReminder: addDays(today, 7), // Next feeding in a week
+    sourceWaterType: 'ro',
+    sourceWaterParameters: 'RO water remineralized with Seachem Equilibrium.',
+  },
+  {
+    id: 'aqua4',
+    userId: 'user123',
+    name: 'Office Nano Reef',
+    volumeGallons: 10,
+    type: 'reef',
+    imageUrl: 'https://placehold.co/600x400.png',
+    lastWaterChange: subDays(today, 10),
+    nextWaterChangeReminder: addDays(today, 4), // Due in 4 days (won't show "soon" badge)
+    notes: 'Small zoa garden and a single ricordea. Skimmer running fine.',
+    fishSpecies: 'Tailspot Blenny, Sexy Shrimp',
+    fishCount: 3,
+    co2Injection: false,
+    filterDetails: 'HOB Skimmer, Small Powerhead',
+    foodDetails: 'Reef Roids, Small Pellets',
+    nextFeedingReminder: addDays(today, 0), // Feeding due today
+    sourceWaterType: 'ro',
+  },
+];
+
+
 export interface UserProfile {
   id: string;
   name: string;
@@ -60,7 +142,7 @@ export interface UserProfile {
   isSellerApproved?: boolean;
   bio?: string;
   location?: string;
-  isFeatured?: boolean; // Added for featured sellers
+  isFeatured?: boolean;
 }
 
 export const mockCurrentUser: UserProfile = {
@@ -72,10 +154,9 @@ export const mockCurrentUser: UserProfile = {
   isSellerApproved: true,
   bio: 'Passionate aquarist with 5 years of experience in freshwater and planted tanks. Always learning!',
   location: 'Springfield, USA',
-  isFeatured: true, // Make current user featured for demo
+  isFeatured: true,
 };
 
-// Used in Q&A and potentially for seller profiles if we simplify
 export const mockUsers: UserProfile[] = [
   { id: 'user1', name: 'Alice Aqua', avatarUrl: 'https://placehold.co/40x40.png?text=AA', dataAiHint: 'female avatar', isFeatured: true },
   { id: 'user2', name: 'Bob Fishman', avatarUrl: 'https://placehold.co/40x40.png?text=BF', dataAiHint: 'male avatar' },
@@ -99,7 +180,7 @@ export interface Question {
   author: UserProfile;
   createdAt: Date;
   tags: string[];
-  category: string; // Category slug
+  category: string; 
   answers: Answer[];
 }
 
@@ -400,7 +481,6 @@ export interface WantedItemFormValues {
   tags?: string[];
 }
 
-// New types for Local Fish Stores
 export interface Coordinates {
   lat: number;
   lng: number;
@@ -419,7 +499,7 @@ export interface OperatingHours {
 export interface LocalFishStore {
   id: string;
   name: string;
-  slug: string; // For the URL, e.g., "aqua-world-springfield"
+  slug: string; 
   address: string;
   city: string;
   state: string;
@@ -428,10 +508,12 @@ export interface LocalFishStore {
   website?: string;
   description?: string;
   imageUrl?: string;
-  imageHint?: string; // For AI placeholder image generation
-  coordinates?: Coordinates; // For future map integration
+  imageHint?: string; 
+  coordinates?: Coordinates; 
   operatingHours?: OperatingHours;
-  services?: string[]; // e.g., ["Freshwater Fish", "Saltwater Fish", "Aquarium Maintenance", "Pond Supplies"]
-  isVerified?: boolean; // If the store profile is claimed/verified by the owner
-  isFeatured?: boolean; // Added for featured stores
+  services?: string[]; 
+  isVerified?: boolean; 
+  isFeatured?: boolean; 
 }
+
+    

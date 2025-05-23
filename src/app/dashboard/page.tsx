@@ -3,12 +3,12 @@
 
 import { useState, useEffect } from 'react';
 import type { Aquarium, TestResult, UserProfile } from '@/types'; 
-import { mockCurrentUser } from '@/types'; // Import mockCurrentUser
+import { mockCurrentUser, mockAquariumsData } from '@/types'; // Updated import path for mockAquariumsData
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Lightbulb, Droplet, CalendarDays, Timer, AlertTriangle, BellRing, Eye, Info, History as HistoryIcon, ListPlus } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { mockAquariumsData } from '@/app/aquariums/page'; 
+// import { mockAquariumsData } from '@/app/aquariums/page'; // Removed old import
 import { mockTestResults } from '@/app/history/page';
 import { format, differenceInDays, isPast, isToday, isFuture } from 'date-fns';
 import { cn } from '@/lib/utils';
