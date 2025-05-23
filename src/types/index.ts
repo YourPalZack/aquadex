@@ -229,3 +229,33 @@ export interface FindFilterOutput {
   searchResults: FilterListing[];
   message: string;
 }
+
+// Lighting Finder Types
+export interface LightingListing {
+  id: string;
+  sourceName: string;
+  listingTitle: string;
+  price?: string;
+  url: string;
+  imageUrl?: string;
+  dataAiHint?: string;
+  lightType?: string; // e.g., "LED", "T5 HO", "Metal Halide"
+  wattageOrPAR?: string; // e.g., "50W", "PAR 150 @ 12in"
+  coverageArea?: string; // e.g., "24-36 inches", "Suits 20G tall"
+  brand?: string;
+  isRecommended?: boolean; // To flag AI recommended alternative
+}
+
+export interface FindLightingInput {
+  lightType?: string;
+  brand?: string;
+  tankSizeOrCoverage?: string; // e.g., "24 inch tank", "30 gallon cube", "covers 2ft x 2ft"
+  keywords?: string; // e.g., "programmable", "full spectrum", "for coral growth"
+}
+
+export interface FindLightingOutput {
+  searchResults: LightingListing[];
+  message: string;
+  // recommendedListing?: LightingListing; // Decided to integrate recommendation into searchResults with a flag
+}
+

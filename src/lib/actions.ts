@@ -8,7 +8,8 @@ import {
     findFish as findFishFlow,
     findPlant as findPlantFlow,
     findTank as findTankFlow,
-    findFilter as findFilterFlow // Added findFilterFlow
+    findFilter as findFilterFlow,
+    findLighting as findLightingFlow // Added findLightingFlow
 } from '@/ai/flows';
 import type { 
     AnalyzeTestStripInput, 
@@ -28,9 +29,12 @@ import type {
     FindTankInput,
     FindTankOutput,
     TankListing,
-    FindFilterInput, // Added FindFilterInput
-    FindFilterOutput, // Added FindFilterOutput
-    FilterListing // Added FilterListing
+    FindFilterInput, 
+    FindFilterOutput, 
+    FilterListing,
+    FindLightingInput, // Added FindLightingInput
+    FindLightingOutput, // Added FindLightingOutput
+    LightingListing // Added LightingListing
 } from '@/types'; 
 import { z } from 'zod';
 
@@ -450,6 +454,65 @@ export async function findFilterAction(prevState: FindFilterActionState, formDat
   } catch (error) {
     console.error('Error in findFilterAction:', error);
     const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred while searching for filters.';
+    return {
+      message: `Search failed: ${errorMessage}`,
+      errors: { _form: [errorMessage] },
+      searchResults: null,
+      aiMessage: null,
+    };
+  }
+}
+
+// Lighting Finder Action
+const findLightingSchema = z.object({
+  lightType: z.string().optional(),
+  brand: z.string().optional(),
+  tankSizeOrCoverage: z.string().optional(),
+  keywords: z.string().optional(),
+}).refine(data => !!data.lightType || !!data.brand || !!data.tankSizeOrCoverage || !!data.keywords, {
+  message: "Please provide at least one search criterion (type, brand, coverage, or keywords).",
+  path: ["_form"],
+});
+
+export interface FindLightingActionState {
+    message: string | null;
+    errors: Record<string, string[]> | null;
+    searchResults: LightingListing[] | null;
+    aiMessage: string | null;
+    // recommendedListing: LightingListing | null; // Keeping it simple, recommendation is part of searchResults
+}
+
+export async function findLightingAction(prevState: FindLightingActionState, formData: FormData): Promise<FindLightingActionState> {
+  try {
+    const inputData: FindLightingInput = {
+        lightType: formData.get('lightType')?.toString() || undefined,
+        brand: formData.get('brand')?.toString() || undefined,
+        tankSizeOrCoverage: formData.get('tankSizeOrCoverage')?.toString() || undefined,
+        keywords: formData.get('keywords')?.toString() || undefined,
+    };
+    
+    const validatedFields = findLightingSchema.safeParse(inputData);
+
+    if (!validatedFields.success) {
+      return {
+        message: 'Validation failed. ' + (validatedFields.error.flatten().formErrors.join('. ') || 'Please check your input.'),
+        errors: validatedFields.error.flatten().fieldErrors,
+        searchResults: null,
+        aiMessage: null,
+      };
+    }
+
+    const result: FindLightingOutput = await findLightingFlow(validatedFields.data);
+
+    return {
+      message: 'Search complete.',
+      errors: null,
+      searchResults: result.searchResults,
+      aiMessage: result.message,
+    };
+  } catch (error) {
+    console.error('Error in findLightingAction:', error);
+    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred while searching for lighting.';
     return {
       message: `Search failed: ${errorMessage}`,
       errors: { _form: [errorMessage] },
