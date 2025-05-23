@@ -2,10 +2,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import ImageUploadForm from '@/components/dashboard/ImageUploadForm';
-import AnalysisResults from '@/components/dashboard/AnalysisResults';
-import TreatmentRecommendations from '@/components/dashboard/TreatmentRecommendations';
-import type { Aquarium, AnalyzeTestStripOutput, RecommendTreatmentProductsOutput, TestResult } from '@/types';
+// Removed ImageUploadForm, AnalysisResults, TreatmentRecommendations imports
+import type { Aquarium, AnalyzeTestStripOutput, RecommendTreatmentProductsOutput, TestResult } from '@/types'; // AnalyzeTestStripOutput and RecommendTreatmentProductsOutput might no longer be strictly needed here if not used elsewhere on this page.
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Lightbulb, Droplet, CalendarDays, Timer, AlertTriangle, BellRing, Eye, Info, History as HistoryIcon } from 'lucide-react';
 import Link from 'next/link';
@@ -62,8 +60,7 @@ interface RecentTestResult extends TestResult {
 }
 
 export default function DashboardPage() {
-  const [analysisResult, setAnalysisResult] = useState<AnalyzeTestStripOutput | null>(null);
-  const [recommendations, setRecommendations] = useState<RecommendTreatmentProductsOutput | null>(null);
+  // Removed analysisResult and recommendations state and handleAnalysisComplete handler
   const [aquariums, setAquariums] = useState<Aquarium[]>([]);
   const [recentTests, setRecentTests] = useState<RecentTestResult[]>([]);
 
@@ -78,11 +75,6 @@ export default function DashboardPage() {
     });
     setRecentTests(top5Tests);
   }, []);
-
-  const handleAnalysisComplete = (data: { analysis: AnalyzeTestStripOutput; recommendations: RecommendTreatmentProductsOutput | null }) => {
-    setAnalysisResult(data.analysis);
-    setRecommendations(data.recommendations);
-  };
 
   const truncateText = (text: string | undefined, maxLength: number): string => {
     if (!text) return 'N/A';
@@ -100,13 +92,13 @@ export default function DashboardPage() {
               Welcome to Your Aqua-Dashboard!
             </CardTitle>
             <CardDescription className="text-base text-foreground/80">
-              Ready to check your aquarium's water quality? Upload an image of your test strip below.
-              For best results, ensure good lighting and a clear photo.
+              Manage your aquariums, track test history, and get reminders.
+              Need to analyze a new test strip? Go to the <Link href="/analyze" className="text-primary hover:underline">Water Test page</Link>.
             </CardDescription>
           </CardHeader>
            <CardContent>
              <p className="text-sm text-muted-foreground">
-                New to analyzing? Try our <Link href="/analyze" className="text-primary hover:underline">quick analysis page</Link> which also has tips.
+                For tips on accurate test strip analysis, visit our <Link href="/analyze" className="text-primary hover:underline">Water Test page</Link>.
              </p>
            </CardContent>
         </Card>
@@ -162,72 +154,64 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
         
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-          <div className="lg:col-span-1">
-            <ImageUploadForm onAnalysisComplete={handleAnalysisComplete} />
-          </div>
-          
-          <div className="lg:col-span-2 space-y-8">
-            <AnalysisResults analysis={analysisResult} />
-            <TreatmentRecommendations recommendations={recommendations} />
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-xl md:text-2xl flex items-center">
-                  <HistoryIcon className="w-6 h-6 mr-3 text-primary" />
-                  Recent Test History
-                </CardTitle>
-                <CardDescription>
-                  A quick look at your last five water tests.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                {recentTests.length > 0 ? (
-                  <ul className="space-y-3">
-                    {recentTests.map((test, index) => (
-                      <li key={test.id}>
-                        <div className="p-3 border rounded-md bg-card hover:bg-muted/50 transition-colors">
-                            <div className="flex justify-between items-center mb-1">
-                                <span className="text-sm font-semibold text-foreground/90">
-                                    {format(new Date(test.timestamp), 'MMM d, yyyy - p')}
-                                </span>
-                                <Badge variant="secondary" className="text-xs">{test.aquariumName}</Badge>
-                            </div>
-                            <p className="text-xs text-muted-foreground mb-2">
-                                Parameters: {truncateText(test.parameters, 60)}
-                            </p>
-                            <Link href={`/history#${test.id}`} passHref>
-                                <Button variant="link" size="sm" className="p-0 h-auto text-xs text-primary hover:underline">
-                                    View Full Details <Eye className="w-3 h-3 ml-1" />
-                                </Button>
-                            </Link>
+        {/* Removed the grid layout that held ImageUploadForm, AnalysisResults, and TreatmentRecommendations */}
+        {/* RecentTestHistory and NextSteps cards will now flow in the main space-y-8 div */}
+        
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-xl md:text-2xl flex items-center">
+              <HistoryIcon className="w-6 h-6 mr-3 text-primary" />
+              Recent Test History
+            </CardTitle>
+            <CardDescription>
+              A quick look at your last five water tests.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {recentTests.length > 0 ? (
+              <ul className="space-y-3">
+                {recentTests.map((test, index) => (
+                  <li key={test.id}>
+                    <div className="p-3 border rounded-md bg-card hover:bg-muted/50 transition-colors">
+                        <div className="flex justify-between items-center mb-1">
+                            <span className="text-sm font-semibold text-foreground/90">
+                                {format(new Date(test.timestamp), 'MMM d, yyyy - p')}
+                            </span>
+                            <Badge variant="secondary" className="text-xs">{test.aquariumName}</Badge>
                         </div>
-                        {index < recentTests.length - 1 && <Separator className="my-3" />}
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <div className="text-center text-muted-foreground py-6">
-                    <Info className="w-10 h-10 mx-auto mb-2 opacity-70" />
-                    <p>No recent test results found.</p>
-                    <Button variant="link" asChild className="mt-1">
-                        <Link href="/analyze">Analyze your first test strip</Link>
+                        <p className="text-xs text-muted-foreground mb-2">
+                            Parameters: {truncateText(test.parameters, 60)}
+                        </p>
+                        <Link href={`/history#${test.id}`} passHref>
+                            <Button variant="link" size="sm" className="p-0 h-auto text-xs text-primary hover:underline">
+                                View Full Details <Eye className="w-3 h-3 ml-1" />
+                            </Button>
+                        </Link>
+                    </div>
+                    {index < recentTests.length - 1 && <Separator className="my-3" />}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <div className="text-center text-muted-foreground py-6">
+                <Info className="w-10 h-10 mx-auto mb-2 opacity-70" />
+                <p>No recent test results found.</p>
+                <Button variant="link" asChild className="mt-1">
+                    <Link href="/analyze">Analyze your first test strip</Link>
+                </Button>
+              </div>
+            )}
+          </CardContent>
+          {recentTests.length > 0 && (
+             <CardFooter>
+                <Link href="/history" passHref>
+                    <Button variant="outline" size="sm" className="w-full">
+                        View All Test History
                     </Button>
-                  </div>
-                )}
-              </CardContent>
-              {recentTests.length > 0 && (
-                 <CardFooter>
-                    <Link href="/history" passHref>
-                        <Button variant="outline" size="sm" className="w-full">
-                            View All Test History
-                        </Button>
-                    </Link>
-                 </CardFooter>
-              )}
-            </Card>
-          </div>
-        </div>
+                </Link>
+             </CardFooter>
+          )}
+        </Card>
         
         <Card>
             <CardHeader>
@@ -235,6 +219,14 @@ export default function DashboardPage() {
                 <CardDescription>Explore more features to manage your aquarium.</CardDescription>
             </CardHeader>
             <CardContent className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                <Link href="/analyze" passHref>
+                     <Button variant="outline" className="w-full justify-start text-left h-auto py-3">
+                        <div className="flex flex-col">
+                            <span className="font-semibold">Analyze Water Test</span>
+                            <span className="text-xs text-muted-foreground">Upload a new test strip.</span>
+                        </div>
+                    </Button>
+                </Link>
                 <Link href="/history" passHref>
                     <Button variant="outline" className="w-full justify-start text-left h-auto py-3">
                         <div className="flex flex-col">
@@ -265,3 +257,4 @@ export default function DashboardPage() {
     </div>
   );
 }
+
