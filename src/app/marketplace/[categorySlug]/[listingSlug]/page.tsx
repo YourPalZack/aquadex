@@ -8,7 +8,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { format } from 'date-fns';
 import type { MarketplaceListing, MarketplaceCategory } from '@/types';
-import { mockMarketplaceListingsData, marketplaceCategoriesData } from '@/app/marketplace/page'; 
+import { marketplaceCategoriesData } from '@/types'; // Corrected import
+import { mockMarketplaceListingsData } from '@/app/marketplace/page'; 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
