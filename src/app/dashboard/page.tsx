@@ -103,28 +103,32 @@ export default function DashboardPage() {
                 Quick glance at your tanks and any upcoming maintenance.
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className={aquariums.length > 0 ? "grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6" : ""}>
             {aquariums.length > 0 ? (
               aquariums.map(aquarium => (
-                <Card key={aquarium.id} className="p-4 bg-card shadow-sm hover:shadow-md transition-shadow">
-                  <div className="flex flex-col sm:flex-row justify-between items-start gap-3">
-                    <div>
-                      <Link href={`/aquariums/${aquarium.id}`} className="hover:underline">
-                        <h3 className="text-lg font-semibold text-primary">{aquarium.name}</h3>
-                      </Link>
-                      <p className="text-sm text-muted-foreground capitalize">
-                        {aquarium.type} - {aquarium.volumeGallons ? `${aquarium.volumeGallons} Gallons` : 'Volume N/A'}
-                      </p>
+                <Card key={aquarium.id} className="p-4 bg-card shadow-sm hover:shadow-md transition-shadow flex flex-col">
+                  <div className="flex-grow">
+                    <div className="flex flex-col sm:flex-row justify-between items-start gap-2 mb-3">
+                      <div>
+                        <Link href={`/aquariums/${aquarium.id}`} className="hover:underline">
+                          <h3 className="text-lg font-semibold text-primary">{aquarium.name}</h3>
+                        </Link>
+                        <p className="text-sm text-muted-foreground capitalize">
+                          {aquarium.type} - {aquarium.volumeGallons ? `${aquarium.volumeGallons} Gallons` : 'Volume N/A'}
+                        </p>
+                      </div>
                     </div>
+                    <div className="flex flex-wrap gap-2 mb-3">
+                      <ReminderStatus reminderDate={aquarium.nextWaterChangeReminder} type="Water Change" />
+                      <ReminderStatus reminderDate={aquarium.nextFeedingReminder} type="Feeding" />
+                    </div>
+                  </div>
+                  <div className="mt-auto pt-3 border-t border-border/50">
                     <Link href={`/aquariums/${aquarium.id}`} passHref>
-                        <Button variant="outline" size="sm">
+                        <Button variant="outline" size="sm" className="w-full">
                             <Eye className="w-4 h-4 mr-2" /> View Details
                         </Button>
                     </Link>
-                  </div>
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    <ReminderStatus reminderDate={aquarium.nextWaterChangeReminder} type="Water Change" />
-                    <ReminderStatus reminderDate={aquarium.nextFeedingReminder} type="Feeding" />
                   </div>
                 </Card>
               ))
@@ -187,3 +191,4 @@ export default function DashboardPage() {
     </div>
   );
 }
+
