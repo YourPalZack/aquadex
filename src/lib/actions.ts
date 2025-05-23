@@ -7,7 +7,8 @@ import {
     getFoodPurchaseLinks as getFoodPurchaseLinksFlow,
     findFish as findFishFlow,
     findPlant as findPlantFlow,
-    findTank as findTankFlow // Added findTankFlow
+    findTank as findTankFlow,
+    findFilter as findFilterFlow // Added findFilterFlow
 } from '@/ai/flows';
 import type { 
     AnalyzeTestStripInput, 
@@ -24,9 +25,12 @@ import type {
     FindPlantInput, 
     FindPlantOutput, 
     PlantListing,
-    FindTankInput, // Added FindTankInput
-    FindTankOutput, // Added FindTankOutput
-    TankListing // Added TankListing
+    FindTankInput,
+    FindTankOutput,
+    TankListing,
+    FindFilterInput, // Added FindFilterInput
+    FindFilterOutput, // Added FindFilterOutput
+    FilterListing // Added FilterListing
 } from '@/types'; 
 import { z } from 'zod';
 
@@ -347,7 +351,7 @@ const findTankSchema = z.object({
   keywords: z.string().optional(),
 }).refine(data => !!data.tankType || !!data.capacity || !!data.brand || !!data.keywords, {
   message: "Please provide at least one search criteria (type, capacity, brand, or keywords).",
-  path: ["_form"], // Assign error to a general form field if needed, or handle in UI
+  path: ["_form"], 
 });
 
 export interface FindTankActionState {
@@ -388,6 +392,64 @@ export async function findTankAction(prevState: FindTankActionState, formData: F
   } catch (error) {
     console.error('Error in findTankAction:', error);
     const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred while searching for tanks.';
+    return {
+      message: `Search failed: ${errorMessage}`,
+      errors: { _form: [errorMessage] },
+      searchResults: null,
+      aiMessage: null,
+    };
+  }
+}
+
+// Filter Finder Action
+const findFilterSchema = z.object({
+  filterType: z.string().optional(),
+  brand: z.string().optional(),
+  tankSizeGallons: z.string().optional(),
+  keywords: z.string().optional(),
+}).refine(data => !!data.filterType || !!data.brand || !!data.tankSizeGallons || !!data.keywords, {
+  message: "Please provide at least one search criterion (type, brand, tank size, or keywords).",
+  path: ["_form"],
+});
+
+export interface FindFilterActionState {
+    message: string | null;
+    errors: Record<string, string[]> | null;
+    searchResults: FilterListing[] | null;
+    aiMessage: string | null;
+}
+
+export async function findFilterAction(prevState: FindFilterActionState, formData: FormData): Promise<FindFilterActionState> {
+  try {
+    const inputData: FindFilterInput = {
+        filterType: formData.get('filterType')?.toString() || undefined,
+        brand: formData.get('brand')?.toString() || undefined,
+        tankSizeGallons: formData.get('tankSizeGallons')?.toString() || undefined,
+        keywords: formData.get('keywords')?.toString() || undefined,
+    };
+    
+    const validatedFields = findFilterSchema.safeParse(inputData);
+
+    if (!validatedFields.success) {
+      return {
+        message: 'Validation failed. ' + (validatedFields.error.flatten().formErrors.join('. ') || 'Please check your input.'),
+        errors: validatedFields.error.flatten().fieldErrors,
+        searchResults: null,
+        aiMessage: null,
+      };
+    }
+
+    const result: FindFilterOutput = await findFilterFlow(validatedFields.data);
+
+    return {
+      message: 'Search complete.',
+      errors: null,
+      searchResults: result.searchResults,
+      aiMessage: result.message,
+    };
+  } catch (error) {
+    console.error('Error in findFilterAction:', error);
+    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred while searching for filters.';
     return {
       message: `Search failed: ${errorMessage}`,
       errors: { _form: [errorMessage] },

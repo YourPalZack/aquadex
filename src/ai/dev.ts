@@ -8,5 +8,6 @@ import '@/ai/flows/analyze-test-strip.ts';
 import '@/ai/flows/get-food-purchase-links.ts';
 import '@/ai/flows/find-fish-flow.ts';
 import '@/ai/flows/find-plant-flow.ts';
-import '@/ai/flows/find-tank-flow.ts'; // Added new tank flow
+import '@/ai/flows/find-tank-flow.ts';
+import '@/ai/flows/find-filter-flow.ts'; // Added new filter flow
 

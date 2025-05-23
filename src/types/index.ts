@@ -202,3 +202,30 @@ export interface FindTankOutput {
   searchResults: TankListing[];
   message: string;
 }
+
+// Filter Finder Types
+export interface FilterListing {
+  id: string;
+  sourceName: string; // e.g., "Amazon", "AquaForest", "BulkReefSupply"
+  listingTitle: string;
+  price?: string;
+  url: string;
+  imageUrl?: string;
+  dataAiHint?: string;
+  filterType?: string; // e.g., "Canister", "HOB", "Sponge", "Internal"
+  flowRate?: string; // e.g., "300 GPH", "1000 L/H"
+  suitableTankSize?: string; // e.g., "Up to 50 Gallons", "100-200 Liters"
+  brand?: string;
+}
+
+export interface FindFilterInput {
+  filterType?: string;
+  brand?: string;
+  tankSizeGallons?: string; // e.g. "20", "50-75"
+  keywords?: string;
+}
+
+export interface FindFilterOutput {
+  searchResults: FilterListing[];
+  message: string;
+}

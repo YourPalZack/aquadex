@@ -5,4 +5,5 @@ export * from './suggest-prompt-from-water-type';
 export * from './get-food-purchase-links';
 export * from './find-fish-flow';
 export * from './find-plant-flow';
-export * from './find-tank-flow'; // Added new tank flow
+export * from './find-tank-flow';
+export * from './find-filter-flow'; // Added new filter flow
