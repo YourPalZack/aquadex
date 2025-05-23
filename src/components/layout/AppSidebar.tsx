@@ -32,7 +32,8 @@ import {
   FlaskConical,
   Fish,
   BellRing,
-  Leaf // Added Leaf icon
+  Leaf,
+  Archive // Added Archive icon for Tank Finder
 } from 'lucide-react';
 
 // Define navigation items with potential sub-items
@@ -57,7 +58,8 @@ const navItemsConfig = [
     icon: ShoppingCart,
     subItems: [
       { href: '/fish-finder', label: 'Fish Finder', icon: Fish },
-      { href: '/plant-finder', label: 'Plant Finder', icon: Leaf }, // Added Plant Finder
+      { href: '/plant-finder', label: 'Plant Finder', icon: Leaf },
+      { href: '/tank-finder', label: 'Tank Finder', icon: Archive }, // Added Tank Finder
     ]
   },
 ];

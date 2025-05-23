@@ -176,3 +176,29 @@ export interface FindPlantOutput {
   searchResults: PlantListing[];
   message: string;
 }
+
+// Tank Finder Types
+export interface TankListing {
+  id: string;
+  sourceName: string; // e.g., "Amazon", "Petco", "AquaWorld Superstore"
+  listingTitle: string;
+  price?: string;
+  url: string;
+  imageUrl?: string;
+  dataAiHint?: string;
+  capacity?: string; // e.g., "20 Gallons", "75 Liters"
+  dimensions?: string; // e.g., "24x12x16 inches"
+  brand?: string;
+}
+
+export interface FindTankInput {
+  tankType?: string; // e.g., "freshwater", "rimless", "nano"
+  capacity?: string; // e.g., "10 gallons", "approx 50L"
+  brand?: string; // e.g., "Waterbox", "Fluval", "UNS"
+  keywords?: string; // General keywords if specific fields are not enough
+}
+
+export interface FindTankOutput {
+  searchResults: TankListing[];
+  message: string;
+}
