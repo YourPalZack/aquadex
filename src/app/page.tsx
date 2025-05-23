@@ -1,9 +1,10 @@
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import Logo from "@/components/layout/Logo";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowRight, BarChart3, BotMessageSquare, ShoppingBag, Users2, UploadCloud } from "lucide-react";
+import { ArrowRight, BarChart3, BotMessageSquare, ShoppingBag, Users2, UploadCloud, CalendarClock } from "lucide-react";
 
 export default function LandingPage() {
   return (
@@ -89,7 +90,7 @@ export default function LandingPage() {
               description="Connect with fellow aquarists, ask questions, and share your experiences."
             />
              <FeatureCard
-              icon={<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="m9 12 2 2 4-4"/></svg>}
+              icon={<CalendarClock className="h-10 w-10 text-primary" />}
               title="Water Change Reminders"
               description="Track your water changes and get notified so you never miss a schedule."
             />
@@ -106,7 +107,7 @@ export default function LandingPage() {
   );
 }
 
-function FeatureCard({ icon, title, description }: { icon: React.ReactNode; title: string; description: string }) {
+function FeatureCard({ icon, ReactNode, title, description }: { icon: React.ReactNode; title: string; description: string }) {
   return (
     <Card className="bg-card/80 backdrop-blur-sm hover:shadow-lg transition-shadow duration-300">
       <CardHeader className="items-center">
@@ -119,3 +120,4 @@ function FeatureCard({ icon, title, description }: { icon: React.ReactNode; titl
     </Card>
   );
 }
+
