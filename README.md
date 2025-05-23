@@ -1,5 +1,5 @@
-# Firebase Studio
+# AquaDex - The Fishkeepers Toolkit
 
-This is a NextJS starter in Firebase Studio.
+Welcome to AquaDex! This is a NextJS application built with Firebase Studio, designed to be the ultimate toolkit for aquarium enthusiasts.
 
-To get started, take a look at src/app/page.tsx.
+To get started, explore the features or take a look at src/app/page.tsx.

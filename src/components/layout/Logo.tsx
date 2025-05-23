@@ -30,7 +30,7 @@ export default function Logo({ size = 'md' }: { size?: 'sm' | 'md' | 'lg' }) {
   return (
     <div className="flex items-center gap-2">
       <AquaDropIcon className={`${iconSize} text-primary`} />
-      <span className={`font-semibold ${textSize} text-primary`}>AquaStrip Analyzer</span>
+      <span className={`font-semibold ${textSize} text-primary`}>AquaDex</span>
     </div>
   );
 }

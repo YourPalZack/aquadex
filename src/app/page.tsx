@@ -27,10 +27,10 @@ export default function LandingPage() {
       <main className="flex-1">
         <section className="container mx-auto py-12 md:py-24 px-4 md:px-6 text-center">
           <h1 className="text-4xl md:text-6xl font-bold tracking-tight text-foreground mb-6">
-            Dive Deeper into Your Aquarium's Health
+            AquaDex: The Fishkeeper's Toolkit
           </h1>
           <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto mb-10">
-            AquaStrip Analyzer uses AI to instantly read your aquarium test strips, track water parameters, and recommend treatments. Keep your aquatic pets thriving with smart insights.
+            Unlock smarter aquarium management with AquaDex. Analyze water, track parameters, get AI insights, and connect with a community of fishkeepers.
           </p>
           <div className="flex justify-center gap-4">
             <Link href="/dashboard" passHref>
@@ -49,12 +49,12 @@ export default function LandingPage() {
         <section className="py-12 md:py-24">
             <div className="container mx-auto px-4 md:px-6">
                 <Image 
-                    src="https://placehold.co/1200x600.png?bg=E0F7FA&text=Aquarium+Test+Strip+Analysis" 
-                    alt="AquaStrip Analyzer in action" 
+                    src="https://placehold.co/1200x600.png?bg=E0F7FA&text=AquaDex+App+Screenshot" 
+                    alt="AquaDex in action" 
                     width={1200} 
                     height={600} 
                     className="rounded-xl shadow-2xl mx-auto"
-                    data-ai-hint="aquarium analysis app"
+                    data-ai-hint="aquarium management app"
                 />
             </div>
         </section>
@@ -100,7 +100,7 @@ export default function LandingPage() {
 
       <footer className="py-8 bg-background/50 border-t">
         <div className="container mx-auto px-4 md:px-6 text-center text-muted-foreground">
-          &copy; {new Date().getFullYear()} AquaStrip Analyzer. All rights reserved.
+          &copy; {new Date().getFullYear()} AquaDex. All rights reserved.
         </div>
       </footer>
     </div>
@@ -120,4 +120,3 @@ function FeatureCard({ icon, ReactNode, title, description }: { icon: React.Reac
     </Card>
   );
 }
-

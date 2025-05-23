@@ -2,8 +2,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-// Removed ImageUploadForm, AnalysisResults, TreatmentRecommendations imports
-import type { Aquarium, AnalyzeTestStripOutput, RecommendTreatmentProductsOutput, TestResult } from '@/types'; // AnalyzeTestStripOutput and RecommendTreatmentProductsOutput might no longer be strictly needed here if not used elsewhere on this page.
+import type { Aquarium, TestResult } from '@/types'; 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Lightbulb, Droplet, CalendarDays, Timer, AlertTriangle, BellRing, Eye, Info, History as HistoryIcon } from 'lucide-react';
 import Link from 'next/link';
@@ -60,7 +59,6 @@ interface RecentTestResult extends TestResult {
 }
 
 export default function DashboardPage() {
-  // Removed analysisResult and recommendations state and handleAnalysisComplete handler
   const [aquariums, setAquariums] = useState<Aquarium[]>([]);
   const [recentTests, setRecentTests] = useState<RecentTestResult[]>([]);
 
@@ -89,7 +87,7 @@ export default function DashboardPage() {
           <CardHeader>
             <CardTitle className="text-2xl md:text-3xl text-primary flex items-center">
               <Lightbulb className="w-8 h-8 mr-3 text-primary" />
-              Welcome to Your Aqua-Dashboard!
+              Welcome to Your AquaDex Dashboard!
             </CardTitle>
             <CardDescription className="text-base text-foreground/80">
               Manage your aquariums, track test history, and get reminders.
@@ -153,9 +151,6 @@ export default function DashboardPage() {
             )}
           </CardContent>
         </Card>
-        
-        {/* Removed the grid layout that held ImageUploadForm, AnalysisResults, and TreatmentRecommendations */}
-        {/* RecentTestHistory and NextSteps cards will now flow in the main space-y-8 div */}
         
         <Card>
           <CardHeader>
@@ -257,4 +252,3 @@ export default function DashboardPage() {
     </div>
   );
 }
-

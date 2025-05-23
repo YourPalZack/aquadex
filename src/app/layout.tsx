@@ -15,8 +15,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'AquaStrip Analyzer',
-  description: 'Analyze your aquarium test strips with AI',
+  title: 'AquaDex - The Fishkeepers Toolkit',
+  description: 'AquaDex - The Fishkeepers Toolkit for smart aquarium management.',
 };
 
 export default function RootLayout({
