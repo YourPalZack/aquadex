@@ -18,7 +18,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import {
-  ArrowLeft, MapPin, Phone, Globe, Clock, Info, ShieldCheck, ShoppingBag, Building
+  ArrowLeft, MapPin, Phone, Globe, Clock, Info, ShieldCheck, ShoppingBag, Building, ExternalLink
 } from 'lucide-react';
 
 const mockStoreHasSellerProfile = true; // Simulate if this store also has a seller profile for listings
@@ -79,7 +79,7 @@ export default function LocalFishStoreProfilePage() {
 
   const renderHours = (hours?: LocalFishStore['operatingHours']) => {
     if (!hours || Object.keys(hours).length === 0) return <p className="text-foreground/80">Not available</p>;
-    const daysOrder: (keyof LocalFishStore['operatingHours'])[] = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+    const daysOrder: (keyof NonNullable<LocalFishStore['operatingHours']>)[] = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
     return (
       <ul className="space-y-1 text-sm">
         {daysOrder.map(day => {
@@ -97,6 +97,12 @@ export default function LocalFishStoreProfilePage() {
       </ul>
     );
   };
+  
+  const getGoogleMapsUrl = (store: LocalFishStore) => {
+    const address = `${store.address}, ${store.city}, ${store.state} ${store.zipCode}`;
+    return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
+  };
+
 
   return (
     <div className="container mx-auto py-8 space-y-8">
@@ -113,8 +119,9 @@ export default function LocalFishStoreProfilePage() {
             <Image 
                 src={store.imageUrl} 
                 alt={`Image of ${store.name}`} 
-                layout="fill" 
-                objectFit="cover" 
+                fill 
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                style={{ objectFit: 'cover' }}
                 data-ai-hint={store.imageHint || "fish store building"}
                 priority 
             />
@@ -130,9 +137,15 @@ export default function LocalFishStoreProfilePage() {
             <Building className="w-8 h-8 lg:w-10 lg:h-10 mr-3" />
             {store.name}
           </CardTitle>
-          <CardDescription className="text-base mt-2 ml-1">
+          <CardDescription className="text-base mt-2 ml-1 flex items-center gap-2">
+            <MapPin className="w-4 h-4 text-muted-foreground" />
             {store.address}, {store.city}, {store.state} {store.zipCode}
           </CardDescription>
+             <Button variant="outline" size="sm" asChild className="mt-3 w-fit">
+                <a href={getGoogleMapsUrl(store)} target="_blank" rel="noopener noreferrer">
+                    <ExternalLink className="w-4 h-4 mr-2" /> View on Map
+                </a>
+            </Button>
         </CardHeader>
         
         <CardContent className="pt-6 grid md:grid-cols-3 gap-x-10 gap-y-8">
@@ -203,3 +216,5 @@ export default function LocalFishStoreProfilePage() {
     </div>
   );
 }
+
+    
