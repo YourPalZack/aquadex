@@ -5,17 +5,17 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
   Sidebar,
-  SidebarClose,
   SidebarContent,
   SidebarFooter,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarTrigger,
+  SidebarMenuSub,
+  SidebarMenuSubItem,
+  SidebarMenuSubButton,
   useSidebar,
 } from '@/components/ui/sidebar';
-import { Button } from '@/components/ui/button';
 import Logo from './Logo';
 import { 
   LayoutDashboard, 
@@ -26,19 +26,24 @@ import {
   Settings, 
   LogOut,
   HelpCircle,
-  ImageUp,
-  MessageSquare,
-  FileScan // Added FileScan as it's used on the analyze page, could be ImageUp too
+  FileScan,
+  MessageSquare
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
 
-const navItems = [
+// Define navigation items with potential sub-items
+const navItemsConfig = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/analyze', label: 'Water Test', icon: FileScan }, // Changed label and icon
-  { href: '/history', label: 'Test History', icon: History },
+  {
+    href: '/analyze', // Parent item
+    label: 'Water Test',
+    icon: FileScan,
+    subItems: [
+      { href: '/history', label: 'Test History', icon: History }, // Child item
+    ],
+  },
   { href: '/aquariums', label: 'My Aquariums', icon: Droplet },
   { href: '/qa', label: 'Q&A', icon: MessageSquare },
-  { href: '/marketplace', label: 'Marketplace', icon: ShoppingCart },
+  { href: '/marketplace', label: 'Marketplace', icon: ShoppingCart }, // Assuming marketplace is a future page
 ];
 
 const bottomNavItems = [
@@ -50,35 +55,67 @@ export default function AppSidebar() {
   const pathname = usePathname();
   const { openMobile, setOpenMobile } = useSidebar();
 
-  const isActive = (href: string) => pathname === href || (href !== '/dashboard' && pathname.startsWith(href));
+  // General isActive check for items without sub-items, or for sub-items themselves
+  const isActiveRoute = (href: string) => {
+    if (href === '/') return pathname === href; // Handle home explicitly if needed
+    return pathname.startsWith(href);
+  };
   
   return (
     <Sidebar collapsible="icon" side="left" variant="sidebar">
       <SidebarHeader className="border-b">
         <div className="flex items-center justify-between w-full p-2">
           <Logo size="sm" />
-          {/* <SidebarClose className="md:hidden" /> TODO: Check if needed with new sidebar setup */}
         </div>
       </SidebarHeader>
       <SidebarContent className="flex-grow p-2">
         <SidebarMenu>
-          {navItems.map((item) => (
-            <SidebarMenuItem key={item.label}>
-              <Link href={item.href} passHref legacyBehavior>
-                <SidebarMenuButton
-                  asChild
-                  isActive={isActive(item.href)}
-                  tooltip={item.label}
-                  onClick={() => openMobile && setOpenMobile(false)}
-                >
-                  <a>
-                    <item.icon className="h-5 w-5" />
-                    <span>{item.label}</span>
-                  </a>
-                </SidebarMenuButton>
-              </Link>
-            </SidebarMenuItem>
-          ))}
+          {navItemsConfig.map((item) => {
+            // Determine if the parent item or any of its sub-items are active
+            const isParentSectionActive = item.subItems
+              ? isActiveRoute(item.href) || item.subItems.some(sub => isActiveRoute(sub.href))
+              : isActiveRoute(item.href);
+
+            return (
+              <SidebarMenuItem key={item.label}>
+                <Link href={item.href} passHref legacyBehavior>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={isParentSectionActive}
+                    tooltip={item.label}
+                    onClick={() => openMobile && setOpenMobile(false)}
+                  >
+                    <a>
+                      <item.icon className="h-5 w-5" />
+                      <span>{item.label}</span>
+                    </a>
+                  </SidebarMenuButton>
+                </Link>
+                {/* Render sub-menu if there are sub-items and the parent section is active */}
+                {item.subItems && item.subItems.length > 0 && isParentSectionActive && (
+                  <SidebarMenuSub>
+                    {item.subItems.map((subItem) => (
+                      <SidebarMenuSubItem key={subItem.label}>
+                        <Link href={subItem.href} passHref legacyBehavior>
+                          <SidebarMenuSubButton
+                            asChild
+                            isActive={isActiveRoute(subItem.href)}
+                            onClick={() => openMobile && setOpenMobile(false)}
+                          >
+                            <a>
+                              {/* Optional: Add icon for sub-item if desired */}
+                              {/* <subItem.icon className="h-4 w-4" /> */}
+                              <span>{subItem.label}</span>
+                            </a>
+                          </SidebarMenuSubButton>
+                        </Link>
+                      </SidebarMenuSubItem>
+                    ))}
+                  </SidebarMenuSub>
+                )}
+              </SidebarMenuItem>
+            );
+          })}
         </SidebarMenu>
       </SidebarContent>
       <SidebarFooter className="p-2 border-t">
@@ -88,7 +125,7 @@ export default function AppSidebar() {
               <Link href={item.href} passHref legacyBehavior>
                 <SidebarMenuButton
                   asChild
-                  isActive={isActive(item.href)}
+                  isActive={isActiveRoute(item.href)}
                   tooltip={item.label}
                   onClick={() => openMobile && setOpenMobile(false)}
                 >
@@ -101,10 +138,8 @@ export default function AppSidebar() {
             </SidebarMenuItem>
           ))}
           <SidebarMenuItem>
-            {/* Placeholder for logout functionality */}
              <SidebarMenuButton tooltip="Log Out" onClick={() => {
                 openMobile && setOpenMobile(false);
-                // Add actual logout logic here
                 console.log("Logout clicked");
              }}>
                 <LogOut className="h-5 w-5" />
