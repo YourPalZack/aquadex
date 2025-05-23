@@ -45,9 +45,28 @@ export interface Question {
   author: UserProfile;
   createdAt: Date;
   tags: string[];
+  category: string; // Category slug
   answers: Answer[];
 }
 
+export interface Category {
+  name: string;
+  slug: string;
+  description?: string;
+}
+
+export const questionCategories: Category[] = [
+  { name: 'Freshwater', slug: 'freshwater', description: 'Discussions about freshwater aquariums, fish, and plants.' },
+  { name: 'Saltwater', slug: 'saltwater', description: 'All about saltwater tanks, marine fish, and invertebrates.' },
+  { name: 'Reef Tanks', slug: 'reef-tanks', description: 'Focus on coral care, reef ecosystems, and advanced setups.' },
+  { name: 'Fish Health', slug: 'fish-health', description: 'Diagnosing and treating fish diseases and health issues.' },
+  { name: 'Aquascaping & Plants', slug: 'aquascaping-plants', description: 'The art of aquarium design and live plant care.' },
+  { name: 'Equipment & Setup', slug: 'equipment-setup', description: 'Filters, lighting, heaters, and setting up new tanks.' },
+  { name: 'General Discussion', slug: 'general-discussion', description: 'For everything else related to the aquarium hobby.' },
+];
+
+
 // Re-export AI flow types for easier access if needed
 export type { AnalyzeTestStripInput, AnalyzeTestStripOutput } from '@/ai/flows';
-export type { RecommendTreatmentProductsInput, RecommendTreatmentProductsOutput } from '@/ai/flows/recommend-treatment-products'; // Corrected path
+export type { RecommendTreatmentProductsInput, RecommendTreatmentProductsOutput } from '@/ai/flows/recommend-treatment-products';
+

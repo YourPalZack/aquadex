@@ -2,12 +2,14 @@
 'use client';
 
 import type { Question, Answer, UserProfile } from '@/types';
+import { questionCategories } from '@/types';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { MessageSquare, ThumbsUp } from 'lucide-react';
+import { MessageSquare, ThumbsUp, Tag } from 'lucide-react';
 import { format } from 'date-fns';
+import Link from 'next/link';
 
 interface QuestionCardProps {
   question: Question;
@@ -17,7 +19,7 @@ function UserDisplay({ user, date }: { user: UserProfile; date: Date }) {
   return (
     <div className="flex items-center space-x-2 text-sm text-muted-foreground">
       <Avatar className="h-6 w-6">
-        <AvatarImage src={user.avatarUrl || `https://avatar.vercel.sh/${user.name}.png`} alt={user.name} />
+        <AvatarImage src={user.avatarUrl || `https://avatar.vercel.sh/${user.name}.png`} alt={user.name} data-ai-hint={user.dataAiHint || 'avatar'} />
         <AvatarFallback>{user.name.charAt(0).toUpperCase()}</AvatarFallback>
       </Avatar>
       <span>{user.name}</span>
@@ -27,10 +29,22 @@ function UserDisplay({ user, date }: { user: UserProfile; date: Date }) {
 }
 
 export default function QuestionCard({ question }: QuestionCardProps) {
+  const categoryDetails = questionCategories.find(cat => cat.slug === question.category);
+
   return (
     <Card className="w-full shadow-md">
       <CardHeader>
-        <CardTitle className="text-xl">{question.title}</CardTitle>
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2">
+          <CardTitle className="text-xl">{question.title}</CardTitle>
+          {categoryDetails && (
+            <Link href={`/qa/${categoryDetails.slug}`} passHref>
+              <Badge variant="outline" className="cursor-pointer hover:bg-accent whitespace-nowrap">
+                <Tag className="w-3 h-3 mr-1" />
+                {categoryDetails.name}
+              </Badge>
+            </Link>
+          )}
+        </div>
         <UserDisplay user={question.author} date={question.createdAt} />
         {question.tags && question.tags.length > 0 && (
           <div className="flex flex-wrap gap-2 pt-2">
@@ -51,7 +65,7 @@ export default function QuestionCard({ question }: QuestionCardProps) {
             </div>
             <Separator />
             {question.answers.map((answer) => (
-              <div key={answer.id} className="ml-2 p-4 rounded-md bg-muted/50 border border-border/50">
+              <div key={answer.id} className="ml-0 md:ml-2 p-4 rounded-md bg-muted/50 border border-border/50">
                 <UserDisplay user={answer.author} date={answer.createdAt} />
                 <p className="mt-2 text-sm text-foreground/80 whitespace-pre-wrap">{answer.content}</p>
                 {answer.upvotes !== undefined && (
@@ -72,3 +86,4 @@ export default function QuestionCard({ question }: QuestionCardProps) {
     </Card>
   );
 }
+
