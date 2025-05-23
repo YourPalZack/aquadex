@@ -36,9 +36,10 @@ import {
   Filter,
   Sun,
   Percent,
-  Sparkles 
+  Sparkles,
+  HeartHandshake // Added for Items Wanted
 } from 'lucide-react';
-import { marketplaceCategoriesData, type MarketplaceCategory } from '@/types'; // Import marketplace categories
+import { marketplaceCategoriesData, type MarketplaceCategory } from '@/types';
 
 
 // Define navigation items with potential sub-items
@@ -64,7 +65,7 @@ const navItemsConfig = [
   { href: '/reminders', label: 'Reminders', icon: BellRing }, 
   { href: '/qa', label: 'Q&A', icon: MessageSquare },
   { 
-    href: '/aiquarium-tools', // Main link for the section (can be # or a dedicated overview page)
+    href: '/aiquarium-tools', 
     label: 'AIQuarium Tools', 
     icon: Sparkles, 
     subItems: [
@@ -79,11 +80,14 @@ const navItemsConfig = [
     href: '/marketplace', 
     label: 'Marketplace', 
     icon: ShoppingCart,
-    subItems: marketplaceCategoriesData.map((category: MarketplaceCategory) => ({
-        href: `/marketplace/${category.slug}`,
-        label: category.name,
-        icon: category.icon || Leaf, // Default to Leaf if no icon specified
-    }))
+    subItems: [
+        ...marketplaceCategoriesData.map((category: MarketplaceCategory) => ({
+            href: `/marketplace/${category.slug}`,
+            label: category.name,
+            icon: category.icon || Leaf, 
+        })),
+        { href: '/items-wanted', label: 'Items Wanted', icon: HeartHandshake }, // Added Items Wanted link
+    ]
   },
   { href: '/discounts-deals', label: 'Discounts & Deals', icon: Percent },
 ];
@@ -98,11 +102,12 @@ export default function AppSidebar() {
   const { openMobile, setOpenMobile } = useSidebar();
 
   const isActiveRoute = (href: string) => {
-    if (!href || href === '/aiquarium-tools') return false; // Don't activate parent for group label
+    if (!href || href === '/aiquarium-tools' || href === '/marketplace') return false; 
     if (href === '/') return pathname === href; 
     
+    // Check if the current path starts with the item's href
     if (pathname.startsWith(href)) return true;
-
+    
     // Check if any sub-item of a parent is active
     const parentConfig = navItemsConfig.find(item => 
         item.subItems && item.subItems.some(sub => sub.href && pathname.startsWith(sub.href))
@@ -120,14 +125,16 @@ export default function AppSidebar() {
       <SidebarContent className="flex-grow p-2">
         <SidebarMenu>
           {navItemsConfig.map((item) => {
-            const isParentSectionActive = item.href && pathname.startsWith(item.href) && item.href !== '/aiquarium-tools';
+            const isParentSectionActive = (item.href && (pathname.startsWith(item.href) && item.href !== '/aiquarium-tools')) || 
+                                          (item.subItems && item.subItems.some(sub => sub.href && pathname.startsWith(sub.href)));
+
 
             return (
               <SidebarMenuItem key={item.label}>
                 <Link href={item.href || '#'} passHref legacyBehavior>
                   <SidebarMenuButton
                     asChild
-                    isActive={isParentSectionActive}
+                    isActive={isParentSectionActive && item.href !== '/aiquarium-tools' && item.href !== '/marketplace'} // Don't activate parent for group label itself unless it's a direct page
                     tooltip={item.label}
                     onClick={() => openMobile && setOpenMobile(false)}
                   >
@@ -140,7 +147,7 @@ export default function AppSidebar() {
                 {item.subItems && item.subItems.length > 0 && isParentSectionActive && (
                   <SidebarMenuSub>
                     {item.subItems.map((subItem) => {
-                       const SubIcon = subItem.icon; // Get icon component
+                       const SubIcon = subItem.icon; 
                        return (
                           <SidebarMenuSubItem key={subItem.label}>
                             <Link href={subItem.href} passHref legacyBehavior>
@@ -172,7 +179,7 @@ export default function AppSidebar() {
               <Link href={item.href} passHref legacyBehavior>
                 <SidebarMenuButton
                   asChild
-                  isActive={isActiveRoute(item.href)}
+                  isActive={isActiveRoute(item.href)} // Uses the refined isActiveRoute
                   tooltip={item.label}
                   onClick={() => openMobile && setOpenMobile(false)}
                 >
@@ -198,6 +205,3 @@ export default function AppSidebar() {
     </Sidebar>
   );
 }
-
-
-    

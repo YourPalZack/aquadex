@@ -1,7 +1,7 @@
 
 import type { AnalyzeTestStripOutput, RecommendTreatmentProductsOutput } from '@/ai/flows';
 import type { LucideIcon } from 'lucide-react';
-import { Fish, Leaf, Package as PackageIcon, HardHat } from 'lucide-react';
+import { Fish, Leaf, Package as PackageIcon, HardHat, HeartHandshake } from 'lucide-react';
 
 
 export interface TestResult {
@@ -291,10 +291,9 @@ export interface MarketplaceCategory {
   slug: string;
   name: string;
   description: string;
-  icon?: React.ElementType; // e.g., Lucide icon component
+  icon?: LucideIcon; // e.g., Lucide icon component
 }
 
-// Moved from marketplace/page.tsx to be globally available
 export const marketplaceCategoriesData: MarketplaceCategory[] = [
   { slug: 'live-fish', name: 'Live Fish', description: 'Freshwater and saltwater fish.', icon: Fish },
   { slug: 'live-plants', name: 'Live Plants', description: 'Aquatic plants for all tank types.', icon: Leaf },
@@ -327,9 +326,6 @@ export interface MarketplaceListing {
 export interface MarketplaceSeller {
   id: string;
   name: string;
-  // We'll assume a seller is "approved" for mock data if they have listings.
-  // In a real app, this would be a flag in their user profile.
-  // For now, we won't explicitly model seller approval in types beyond this.
   avatarUrl?: string;
   dataAiHint?: string;
 }
@@ -341,5 +337,26 @@ export interface SellerApplicationFormValues {
   productTypes: string;
 }
 
+// Items Wanted Types
+export type WantedItemStatus = 'pending' | 'approved' | 'rejected' | 'found';
 
-    
+export interface WantedItem {
+  id: string;
+  title: string;
+  description: string;
+  categorySlug?: string; // Optional: maps to MarketplaceCategory slug
+  userId: string; // ID of the user posting the wanted item
+  userName: string; // Denormalized for easy display
+  userAvatarUrl?: string;
+  userAvatarHint?: string;
+  createdAt: Date;
+  status: WantedItemStatus; // For admin approval flow
+  tags?: string[];
+}
+
+export interface WantedItemFormValues {
+  title: string;
+  description: string;
+  categorySlug?: string;
+  tags?: string[];
+}
