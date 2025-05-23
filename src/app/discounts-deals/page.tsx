@@ -24,14 +24,12 @@ export default function DiscountsDealsPage() {
   const [aiMessage, setAiMessage] = useState<string | null>(null);
   const { toast } = useToast();
 
-  const [actionState, formAction] = useActionState(findAquariumDealsAction, initialActionState);
-  const [isFetching, setIsFetching] = useState(false);
+  const [actionState, formAction, isActionPending] = useActionState(findAquariumDealsAction, initialActionState);
 
-  const fetchDeals = async () => {
-    setIsFetching(true);
+  const fetchDeals = () => {
     // @ts-ignore // We are not passing formData, so prevState is the first arg by convention for useActionState.
-    await formAction(); 
-    setIsFetching(false);
+    // Calling formAction will set isActionPending to true and then false when the action completes.
+    formAction(); 
   };
 
   useEffect(() => {
@@ -71,15 +69,15 @@ export default function DiscountsDealsPage() {
                 Discover simulated deals on popular aquarium products. Deals are "updated daily" by our AI.
               </CardDescription>
             </div>
-            <Button onClick={fetchDeals} disabled={isFetching}>
-              {isFetching ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <RefreshCw className="mr-2 h-4 w-4" />}
-              {isFetching ? 'Refreshing...' : 'Refresh Deals'}
+            <Button onClick={fetchDeals} disabled={isActionPending}>
+              {isActionPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <RefreshCw className="mr-2 h-4 w-4" />}
+              {isActionPending ? 'Refreshing...' : 'Refresh Deals'}
             </Button>
           </div>
         </CardHeader>
       </Card>
 
-      {isFetching && !deals && (
+      {isActionPending && !deals && (
         <div className="flex justify-center items-center h-64">
           <Loader2 className="w-12 h-12 animate-spin text-primary" />
           <p className="ml-4 text-lg text-muted-foreground">Fetching today's deals...</p>
@@ -119,7 +117,7 @@ export default function DiscountsDealsPage() {
         </div>
       )}
 
-      {!isFetching && deals && deals.length === 0 && !actionState.errors && (
+      {!isActionPending && deals && deals.length === 0 && !actionState.errors && (
          <Card className="mt-8">
             <CardContent className="pt-6 text-center text-muted-foreground">
                 <Search className="w-12 h-12 mx-auto mb-3 opacity-50" />
