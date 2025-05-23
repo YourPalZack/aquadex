@@ -2,9 +2,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import type { Aquarium, TestResult } from '@/types'; 
+import type { Aquarium, TestResult, UserProfile } from '@/types'; 
+import { mockCurrentUser } from '@/types'; // Import mockCurrentUser
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
-import { Lightbulb, Droplet, CalendarDays, Timer, AlertTriangle, BellRing, Eye, Info, History as HistoryIcon } from 'lucide-react';
+import { Lightbulb, Droplet, CalendarDays, Timer, AlertTriangle, BellRing, Eye, Info, History as HistoryIcon, ListPlus } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { mockAquariumsData } from '@/app/aquariums/page'; 
@@ -61,6 +62,7 @@ interface RecentTestResult extends TestResult {
 export default function DashboardPage() {
   const [aquariums, setAquariums] = useState<Aquarium[]>([]);
   const [recentTests, setRecentTests] = useState<RecentTestResult[]>([]);
+  const currentUser = mockCurrentUser; // Use the mock current user
 
   useEffect(() => {
     setAquariums(mockAquariumsData);
@@ -246,6 +248,17 @@ export default function DashboardPage() {
                         </div>
                     </Button>
                 </Link>
+                {currentUser.isSellerApproved && (
+                    <Link href="/marketplace/add-listing" passHref>
+                        <Button variant="default" className="w-full justify-start text-left h-auto py-3 bg-primary/90 hover:bg-primary text-primary-foreground">
+                            <div className="flex flex-col">
+                                <span className="font-semibold">Create New Listing</span>
+                                <span className="text-xs text-primary-foreground/80">Sell items on the marketplace.</span>
+                            </div>
+                             <ListPlus className="w-5 h-5 ml-auto" />
+                        </Button>
+                    </Link>
+                )}
             </CardContent>
         </Card>
       </div>

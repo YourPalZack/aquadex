@@ -1,7 +1,7 @@
 
 import type { AnalyzeTestStripOutput, RecommendTreatmentProductsOutput } from '@/ai/flows';
 import type { LucideProps } from 'lucide-react';
-import { Fish, Leaf, Package as PackageIcon, HardHat, HeartHandshake, Gift, type ForwardRefExoticComponent, type RefAttributes, type ReactElement, type ElementType } from 'lucide-react';
+import { Fish, Leaf, Package as PackageIcon, HardHat, HeartHandshake, Gift, type ElementType, ShoppingCart, SearchCheck } from 'lucide-react';
 
 
 export interface TestResult {
@@ -41,22 +41,21 @@ export interface Aquarium {
 export interface UserProfile {
   id: string;
   name: string;
-  email?: string; // Added email
+  email?: string; 
   avatarUrl?: string;
   dataAiHint?: string;
-  isSellerApproved?: boolean; // Added for marketplace
-  bio?: string; // Optional bio
-  location?: string; // Optional location
+  isSellerApproved?: boolean; 
+  bio?: string; 
+  location?: string; 
 }
 
-// Mock Current User (for demonstration without actual auth)
 export const mockCurrentUser: UserProfile = {
   id: 'currentUser123',
   name: 'Aqua User',
   email: 'aqua.user@example.com',
   avatarUrl: 'https://placehold.co/100x100.png?text=AU',
   dataAiHint: 'user avatar',
-  isSellerApproved: false, // Example, can be true
+  isSellerApproved: true, // Set to true for demo purposes to see the "Add Listing" button
   bio: 'Passionate aquarist with 5 years of experience in freshwater and planted tanks. Always learning!',
   location: 'Springfield, USA',
 };
@@ -81,7 +80,6 @@ export interface Question {
   answers: Answer[];
 }
 
-// Using a more generic type for Lucide icons
 export type IconType = ElementType;
 
 
@@ -103,18 +101,17 @@ export const questionCategories: Category[] = [
 ];
 
 export interface ReminderItem {
-  id: string; // e.g., aquariumId-waterchange
+  id: string; 
   aquariumId: string;
   aquariumName: string;
   type: 'Water Change' | 'Feeding';
   dueDate: Date;
   status: 'Overdue' | 'Due Today' | 'Due Soon' | 'Upcoming';
-  message: string; // Full descriptive message, e.g., "Living Room Reef: Water Change Overdue by 3 days"
-  daysDiff: number; // e.g., -3 for 3 days overdue, 0 for today, 2 for due in 2 days
+  message: string; 
+  daysDiff: number; 
 }
 
 
-// Re-export AI flow types for easier access if needed
 export type { AnalyzeTestStripInput, AnalyzeTestStripOutput } from '@/ai/flows';
 export type { RecommendTreatmentProductsInput, RecommendTreatmentProductsOutput } from '@/ai/flows/recommend-treatment-products';
 export type { GetFoodPurchaseLinksInput, GetFoodPurchaseLinksOutput } from '@/ai/flows/get-food-purchase-links';
@@ -130,10 +127,10 @@ export interface AmazonLink {
 }
 export interface FishFood {
   id: string;
-  userId: string; // For future user scoping
+  userId: string; 
   name: string;
   brand?: string;
-  variant?: string; // e.g., "Medium Pellet", "50g", "Color Enhancing"
+  variant?: string; 
   notes?: string;
   amazonLinks?: AmazonLink[];
 }
@@ -150,7 +147,7 @@ export interface WaterTreatmentProduct {
   userId: string;
   name: string;
   brand?: string;
-  type?: string; // e.g., "Dechlorinator", "Beneficial Bacteria", "pH Up"
+  type?: string; 
   notes?: string;
   amazonLinks?: AmazonLink[];
 }
@@ -162,15 +159,14 @@ export interface WaterTreatmentProductFormValues {
   notes?: string;
 }
 
-// Fish Finder Types
 export interface FishListing {
-  id: string; // Added for unique key in React lists
-  sourceName: string; // e.g., "Ebay", "AquaBid", "Dan's Fish", "Simulated Trusted Source"
+  id: string; 
+  sourceName: string; 
   listingTitle: string;
-  price?: string; // e.g., "$15.99", "Bidding starts at $5"
-  url: string; // Direct link or search link
-  imageUrl?: string; // Optional image for the listing
-  dataAiHint?: string; // For placeholder image
+  price?: string; 
+  url: string; 
+  imageUrl?: string; 
+  dataAiHint?: string; 
 }
 
 export interface FindFishInput {
@@ -179,13 +175,12 @@ export interface FindFishInput {
 
 export interface FindFishOutput {
   searchResults: FishListing[];
-  message: string; // e.g., "Here are some listings...", "No current listings found."
+  message: string; 
 }
 
-// Plant Finder Types
 export interface PlantListing {
   id: string;
-  sourceName: string; // e.g., "Ebay", "Etsy", "Amazon", "Aquarium Co-Op"
+  sourceName: string; 
   listingTitle: string;
   price?: string;
   url: string;
@@ -202,25 +197,24 @@ export interface FindPlantOutput {
   message: string;
 }
 
-// Tank Finder Types
 export interface TankListing {
   id: string;
-  sourceName: string; // e.g., "Amazon", "Petco", "AquaWorld Superstore"
+  sourceName: string; 
   listingTitle: string;
   price?: string;
   url: string;
   imageUrl?: string;
   dataAiHint?: string;
-  capacity?: string; // e.g., "20 Gallons", "75 Liters"
-  dimensions?: string; // e.g., "24x12x16 inches"
+  capacity?: string; 
+  dimensions?: string; 
   brand?: string;
 }
 
 export interface FindTankInput {
-  tankType?: string; // e.g., "freshwater", "rimless", "nano"
-  capacity?: string; // e.g., "10 gallons", "approx 50L"
-  brand?: string; // e.g., "Waterbox", "Fluval", "UNS"
-  keywords?: string; // General keywords if specific fields are not enough
+  tankType?: string; 
+  capacity?: string; 
+  brand?: string; 
+  keywords?: string; 
 }
 
 export interface FindTankOutput {
@@ -228,25 +222,24 @@ export interface FindTankOutput {
   message: string;
 }
 
-// Filter Finder Types
 export interface FilterListing {
   id: string;
-  sourceName: string; // e.g., "Amazon", "AquaForest", "BulkReefSupply"
+  sourceName: string; 
   listingTitle: string;
   price?: string;
   url: string;
   imageUrl?: string;
   dataAiHint?: string;
-  filterType?: string; // e.g., "Canister", "HOB", "Sponge", "Internal"
-  flowRate?: string; // e.g., "300 GPH", "1000 L/H"
-  suitableTankSize?: string; // e.g., "Up to 50 Gallons", "100-200 Liters"
+  filterType?: string; 
+  flowRate?: string; 
+  suitableTankSize?: string; 
   brand?: string;
 }
 
 export interface FindFilterInput {
   filterType?: string;
   brand?: string;
-  tankSizeGallons?: string; // e.g. "20", "50-75"
+  tankSizeGallons?: string; 
   keywords?: string;
 }
 
@@ -255,7 +248,6 @@ export interface FindFilterOutput {
   message: string;
 }
 
-// Lighting Finder Types
 export interface LightingListing {
   id: string;
   sourceName: string;
@@ -264,18 +256,18 @@ export interface LightingListing {
   url: string;
   imageUrl?: string;
   dataAiHint?: string;
-  lightType?: string; // e.g., "LED", "T5 HO", "Metal Halide"
-  wattageOrPAR?: string; // e.g., "50W", "PAR 150 @ 12in"
-  coverageArea?: string; // e.g., "24-36 inches", "Suits 20G tall"
+  lightType?: string; 
+  wattageOrPAR?: string; 
+  coverageArea?: string; 
   brand?: string;
-  isRecommended?: boolean; // To flag AI recommended alternative
+  isRecommended?: boolean; 
 }
 
 export interface FindLightingInput {
   lightType?: string;
   brand?: string;
-  tankSizeOrCoverage?: string; // e.g., "24 inch tank", "30 gallon cube", "covers 2ft x 2ft"
-  keywords?: string; // e.g., "programmable", "full spectrum", "for coral growth"
+  tankSizeOrCoverage?: string; 
+  keywords?: string; 
 }
 
 export interface FindLightingOutput {
@@ -283,7 +275,6 @@ export interface FindLightingOutput {
   message: string;
 }
 
-// Discounts & Deals Types
 export const dealCategories = ['Fish Food', 'Filters & Media', 'Lighting', 'Tanks & Stands', 'Water Treatments', 'Decorations & Substrate', 'Heaters & Chillers', 'Other Equipment'] as const;
 export type DealCategory = typeof dealCategories[number];
 
@@ -295,19 +286,17 @@ export interface DealItem {
   discountPercentage?: string;
   sourceName: string;
   url: string;
-  imageUrl: string; // Required, will use placeholder
-  dataAiHint: string; // Required for placeholder, 1-2 keywords
-  description?: string; // Brief description of the deal or product
+  imageUrl: string; 
+  dataAiHint: string; 
+  description?: string; 
   category?: DealCategory;
 }
 
 export interface FindDealsOutput {
   deals: DealItem[];
-  message: string; // e.g., "Today's top simulated deals!"
+  message: string; 
 }
 
-
-// Marketplace Types
 export interface MarketplaceCategory {
   slug: string;
   name: string;
@@ -324,27 +313,40 @@ export const marketplaceCategoriesData: MarketplaceCategory[] = [
 ];
 
 
-export type MarketplaceItemCondition = 'new' | 'used-like-new' | 'used-good' | 'used-fair' | 'for-parts';
+export const marketplaceItemConditions = ['new', 'used-like-new', 'used-good', 'used-fair', 'for-parts'] as const;
+export type MarketplaceItemCondition = typeof marketplaceItemConditions[number];
+
 
 export interface MarketplaceListing {
   id: string;
-  slug: string; // For URL, e.g., "rare-l123-pleco-breeder-bob"
+  slug: string; 
   title: string;
   description: string;
-  price: string; // e.g., "$25.00" or "Contact for price"
+  price: string; 
   categorySlug: string;
-  sellerId: string; // Link to a conceptual SellerProfile
-  sellerName: string; // Denormalized for easy display
-  imageUrl: string; // Main image URL
-  imageHint?: string; // For Unsplash hint if using placeholder
+  sellerId: string; 
+  sellerName: string; 
+  imageUrl: string; 
+  imageHint?: string; 
   condition: MarketplaceItemCondition;
-  location?: string; // e.g., "City, State" or "Local pickup only"
+  location?: string; 
   createdAt: Date;
   isFeatured?: boolean;
   tags?: string[];
 }
 
-// Conceptual seller profile
+export interface MarketplaceListingFormValues {
+  title: string;
+  description: string;
+  price: string;
+  categorySlug: string;
+  condition: MarketplaceItemCondition;
+  imageUrl: string;
+  imageHint?: string;
+  location?: string;
+  tags?: string[];
+}
+
 export interface MarketplaceSeller {
   id: string;
   name: string;
@@ -359,20 +361,19 @@ export interface SellerApplicationFormValues {
   productTypes: string;
 }
 
-// Items Wanted Types
 export type WantedItemStatus = 'pending' | 'approved' | 'rejected' | 'found';
 
 export interface WantedItem {
   id: string;
   title: string;
   description: string;
-  categorySlug?: string; // Optional: maps to MarketplaceCategory slug
-  userId: string; // ID of the user posting the wanted item
-  userName: string; // Denormalized for easy display
+  categorySlug?: string; 
+  userId: string; 
+  userName: string; 
   userAvatarUrl?: string;
   userAvatarHint?: string;
   createdAt: Date;
-  status: WantedItemStatus; // For admin approval flow
+  status: WantedItemStatus; 
   tags?: string[];
 }
 
@@ -380,8 +381,5 @@ export interface WantedItemFormValues {
   title: string;
   description: string;
   categorySlug?: string;
-  tags?: string[];
+  tags?: string[]; // Kept as string[] for display, will be converted from comma-separated input
 }
-
-
-    
