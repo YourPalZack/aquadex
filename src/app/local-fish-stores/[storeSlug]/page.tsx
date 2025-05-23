@@ -6,10 +6,7 @@ import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import type { LocalFishStore, MarketplaceListing } from '@/types';
-// For now, we'll re-use the mock data from the main LFS page for simplicity.
-// In a real app, you'd fetch specific store data.
-import { mockLocalFishStoresData } from '@/app/local-fish-stores/page'; 
-// For mock marketplace listings:
+import { mockLocalFishStoresData } from '@/types'; // Updated import
 import { mockMarketplaceListingsData } from '@/app/marketplace/page';
 import MarketplaceListingCard from '@/components/marketplace/MarketplaceListingCard';
 

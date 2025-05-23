@@ -4,8 +4,7 @@
 import { useState, useEffect } from 'react';
 import type { MarketplaceListing, LocalFishStore, UserProfile } from '@/types';
 import { mockMarketplaceListingsData } from '@/app/marketplace/page';
-import { mockLocalFishStoresData } from '@/app/local-fish-stores/page';
-import { mockUsers } from '@/types'; // Assuming mockUsers are potential sellers
+import { mockLocalFishStoresData, mockUsers } from '@/types'; // Updated import
 
 import MarketplaceListingCard from '@/components/marketplace/MarketplaceListingCard';
 import LocalFishStoreCard from '@/components/local-fish-stores/LocalFishStoreCard';
@@ -123,3 +122,5 @@ export default function FeaturedMarketplacePage() {
     </div>
   );
 }
+
+    

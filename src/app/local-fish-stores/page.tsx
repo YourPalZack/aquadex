@@ -3,6 +3,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import type { LocalFishStore } from '@/types';
+import { mockLocalFishStoresData } from '@/types'; // Updated import
 import LocalFishStoreCard from '@/components/local-fish-stores/LocalFishStoreCard';
 import { Card, CardDescription, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -11,80 +12,7 @@ import { Store, Search, MapPin, Info, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
-// Mock Data for Local Fish Stores
-export const mockLocalFishStoresData: LocalFishStore[] = [
-  {
-    id: 'lfs1',
-    name: 'Aqua World Emporium',
-    slug: 'aqua-world-emporium-springfield',
-    address: '123 Main Street',
-    city: 'Springfield',
-    state: 'IL',
-    zipCode: '62701',
-    phone: '217-555-1212',
-    website: 'https://www.aquaworldemporium.example.com',
-    description: 'Springfield\'s largest selection of freshwater and saltwater fish, corals, and supplies. Expert advice and friendly service.',
-    imageUrl: 'https://placehold.co/600x400.png',
-    imageHint: 'fish store interior',
-    operatingHours: {
-      monday: '10 AM - 7 PM',
-      tuesday: '10 AM - 7 PM',
-      wednesday: '10 AM - 7 PM',
-      thursday: '10 AM - 8 PM',
-      friday: '10 AM - 8 PM',
-      saturday: '9 AM - 6 PM',
-      sunday: '12 PM - 5 PM',
-    },
-    services: ['Freshwater Fish', 'Saltwater Fish', 'Corals', 'Live Plants', 'Aquarium Supplies', 'Water Testing'],
-    isVerified: true,
-    isFeatured: true, // Make this one featured
-  },
-  {
-    id: 'lfs2',
-    name: 'The Reef Corner',
-    slug: 'the-reef-corner-shelbyville',
-    address: '456 Ocean Drive',
-    city: 'Shelbyville',
-    state: 'IL',
-    zipCode: '62565',
-    phone: '217-555-REEF',
-    website: 'https://www.thereefcorner.example.com',
-    description: 'Specializing in rare and exotic corals, high-end reef equipment, and custom aquarium installations.',
-    imageUrl: 'https://placehold.co/600x400.png',
-    imageHint: 'coral reef tank',
-    operatingHours: {
-      monday: 'Closed',
-      tuesday: '11 AM - 6 PM',
-      wednesday: '11 AM - 6 PM',
-      thursday: '11 AM - 7 PM',
-      friday: '11 AM - 7 PM',
-      saturday: '10 AM - 5 PM',
-      sunday: 'Closed',
-    },
-    services: ['Saltwater Fish', 'Corals', 'Reef Supplies', 'RODI Water'],
-    isVerified: false,
-  },
-  {
-    id: 'lfs3',
-    name: 'Planted Aquatics & More',
-    slug: 'planted-aquatics-capital-city',
-    address: '789 River Road',
-    city: 'Capital City',
-    state: 'IL',
-    zipCode: '62704',
-    phone: '217-555-PLNT',
-    description: 'Your source for aquascaping supplies, a wide variety of aquatic plants, and nano fish.',
-    imageUrl: 'https://placehold.co/600x400.png',
-    imageHint: 'aquascape planted tank',
-    operatingHours: {
-      saturday: '10 AM - 4 PM',
-      sunday: '12 PM - 4 PM',
-    },
-    services: ['Aquatic Plants', 'Nano Fish', 'Shrimp', 'Aquascaping Supplies', 'Hardscape'],
-    isVerified: true,
-    isFeatured: false,
-  },
-];
+// Mock Data for Local Fish Stores moved to src/types/index.ts
 
 export default function LocalFishStoresPage() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -184,3 +112,5 @@ export default function LocalFishStoresPage() {
     </div>
   );
 }
+
+    

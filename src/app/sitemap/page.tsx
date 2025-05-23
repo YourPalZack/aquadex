@@ -1,10 +1,10 @@
 
 // src/app/sitemap/page.tsx
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { mockAquariumsData } from '@/types'; // Updated import path
+import { mockAquariumsData, mockLocalFishStoresData } from '@/types'; // Updated import path
 import { questionCategories } from '@/types';
 import { marketplaceCategoriesData } from '@/types';
-import { mockLocalFishStoresData } from '@/app/local-fish-stores/page';
+// import { mockLocalFishStoresData } from '@/app/local-fish-stores/page'; // Removed old import
 import Link from 'next/link';
 import { MapIcon, ChevronRight } from 'lucide-react';
 

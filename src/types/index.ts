@@ -62,15 +62,15 @@ export const mockAquariumsData: Aquarium[] = [
     volumeGallons: 75,
     type: 'saltwater',
     imageUrl: 'https://placehold.co/600x400.png',
-    lastWaterChange: subDays(today, 14), // 2 weeks ago
-    nextWaterChangeReminder: subDays(today, 3), // Overdue by 3 days
+    lastWaterChange: subDays(today, 14), 
+    nextWaterChangeReminder: subDays(today, 3), 
     notes: 'Keeping an eye on SPS coral growth. Clownfish are active.',
     fishSpecies: 'Clownfish, Royal Gramma, Yellow Tang',
     fishCount: 5,
     co2Injection: false,
     filterDetails: 'Sump with Protein Skimmer & Refugium',
     foodDetails: 'NLS Pellets, Rods Food, Mysis Shrimp',
-    nextFeedingReminder: subDays(today, 1), // Feeding overdue by 1 day
+    nextFeedingReminder: subDays(today, 1), 
     sourceWaterType: 'premixed_saltwater',
     sourceWaterParameters: 'Using Tropic Marin Pro Reef salt mix.',
   },
@@ -81,15 +81,15 @@ export const mockAquariumsData: Aquarium[] = [
     volumeGallons: 5,
     type: 'freshwater',
     imageUrl: 'https://placehold.co/600x400.png',
-    lastWaterChange: subDays(today, 5), // 5 days ago
-    nextWaterChangeReminder: today, // Water change due today
+    lastWaterChange: subDays(today, 5), 
+    nextWaterChangeReminder: today, 
     notes: 'Betta seems happy. Plants are growing well. Added some shrimp.',
     fishSpecies: 'Betta Splendens, Amano Shrimp',
     fishCount: 6, 
     co2Injection: false,
     filterDetails: 'Small HOB Filter',
     foodDetails: 'Betta Pellets, Bloodworms (treat)',
-    nextFeedingReminder: addDays(today, 1), // Feeding due tomorrow
+    nextFeedingReminder: addDays(today, 1), 
     sourceWaterType: 'tap',
     sourceWaterParameters: 'Tap water treated with Seachem Prime. pH: 7.2, GH: 5 dGH',
   },
@@ -100,15 +100,15 @@ export const mockAquariumsData: Aquarium[] = [
     volumeGallons: 29,
     type: 'freshwater',
     imageUrl: 'https://placehold.co/600x400.png',
-    lastWaterChange: subDays(today, 2), // 2 days ago
-    nextWaterChangeReminder: addDays(today, 2), // Water change due in 2 days
+    lastWaterChange: subDays(today, 2), 
+    nextWaterChangeReminder: addDays(today, 2), 
     notes: 'New guppies added last week. CO2 running smoothly.',
     fishSpecies: 'Guppy, Neon Tetra, Corydora, Otocinclus',
     fishCount: 20,
     co2Injection: true,
     filterDetails: 'Canister Filter - Eheim Classic 250',
     foodDetails: 'Community Flakes, Algae Wafers',
-    nextFeedingReminder: addDays(today, 7), // Next feeding in a week
+    nextFeedingReminder: addDays(today, 7), 
     sourceWaterType: 'ro',
     sourceWaterParameters: 'RO water remineralized with Seachem Equilibrium.',
   },
@@ -120,14 +120,14 @@ export const mockAquariumsData: Aquarium[] = [
     type: 'reef',
     imageUrl: 'https://placehold.co/600x400.png',
     lastWaterChange: subDays(today, 10),
-    nextWaterChangeReminder: addDays(today, 4), // Due in 4 days (won't show "soon" badge)
+    nextWaterChangeReminder: addDays(today, 4), 
     notes: 'Small zoa garden and a single ricordea. Skimmer running fine.',
     fishSpecies: 'Tailspot Blenny, Sexy Shrimp',
     fishCount: 3,
     co2Injection: false,
     filterDetails: 'HOB Skimmer, Small Powerhead',
     foodDetails: 'Reef Roids, Small Pellets',
-    nextFeedingReminder: addDays(today, 0), // Feeding due today
+    nextFeedingReminder: addDays(today, 0), 
     sourceWaterType: 'ro',
   },
 ];
@@ -158,10 +158,10 @@ export const mockCurrentUser: UserProfile = {
 };
 
 export const mockUsers: UserProfile[] = [
-  { id: 'user1', name: 'Alice Aqua', avatarUrl: 'https://placehold.co/40x40.png?text=AA', dataAiHint: 'female avatar', isFeatured: true },
-  { id: 'user2', name: 'Bob Fishman', avatarUrl: 'https://placehold.co/40x40.png?text=BF', dataAiHint: 'male avatar' },
-  { id: 'user3', name: 'Charlie Coral', avatarUrl: 'https://placehold.co/40x40.png?text=CC', dataAiHint: 'person avatar', isFeatured: true },
-  { id: 'user4', name: 'Diana Driftwood', avatarUrl: 'https://placehold.co/40x40.png?text=DD', dataAiHint: 'avatar' },
+  { id: 'user1', name: 'Alice Aqua', avatarUrl: 'https://placehold.co/40x40.png?text=AA', dataAiHint: 'female avatar', isFeatured: true, bio: 'Specializing in rare Anubias and Bucephalandra.' },
+  { id: 'user2', name: 'Bob Fishman', avatarUrl: 'https://placehold.co/40x40.png?text=BF', dataAiHint: 'male avatar', bio: 'Breeder of high-quality Angelfish and Discus.' },
+  { id: 'user3', name: 'Charlie Coral', avatarUrl: 'https://placehold.co/40x40.png?text=CC', dataAiHint: 'person avatar', isFeatured: true, bio: 'Coral propagation expert. WYSIWYG frags available.' },
+  { id: 'user4', name: 'Diana Driftwood', avatarUrl: 'https://placehold.co/40x40.png?text=DD', dataAiHint: 'avatar', bio: 'Collector and seller of unique driftwood pieces for aquascaping.' },
 ];
 
 
@@ -515,5 +515,82 @@ export interface LocalFishStore {
   isVerified?: boolean; 
   isFeatured?: boolean; 
 }
+
+// Moved from /src/app/local-fish-stores/page.tsx
+export const mockLocalFishStoresData: LocalFishStore[] = [
+  {
+    id: 'lfs1',
+    name: 'Aqua World Emporium',
+    slug: 'aqua-world-emporium-springfield',
+    address: '123 Main Street',
+    city: 'Springfield',
+    state: 'IL',
+    zipCode: '62701',
+    phone: '217-555-1212',
+    website: 'https://www.aquaworldemporium.example.com',
+    description: 'Springfield\'s largest selection of freshwater and saltwater fish, corals, and supplies. Expert advice and friendly service.',
+    imageUrl: 'https://placehold.co/600x400.png',
+    imageHint: 'fish store interior',
+    operatingHours: {
+      monday: '10 AM - 7 PM',
+      tuesday: '10 AM - 7 PM',
+      wednesday: '10 AM - 7 PM',
+      thursday: '10 AM - 8 PM',
+      friday: '10 AM - 8 PM',
+      saturday: '9 AM - 6 PM',
+      sunday: '12 PM - 5 PM',
+    },
+    services: ['Freshwater Fish', 'Saltwater Fish', 'Corals', 'Live Plants', 'Aquarium Supplies', 'Water Testing'],
+    isVerified: true,
+    isFeatured: true, 
+  },
+  {
+    id: 'lfs2',
+    name: 'The Reef Corner',
+    slug: 'the-reef-corner-shelbyville',
+    address: '456 Ocean Drive',
+    city: 'Shelbyville',
+    state: 'IL',
+    zipCode: '62565',
+    phone: '217-555-REEF',
+    website: 'https://www.thereefcorner.example.com',
+    description: 'Specializing in rare and exotic corals, high-end reef equipment, and custom aquarium installations.',
+    imageUrl: 'https://placehold.co/600x400.png',
+    imageHint: 'coral reef tank',
+    operatingHours: {
+      monday: 'Closed',
+      tuesday: '11 AM - 6 PM',
+      wednesday: '11 AM - 6 PM',
+      thursday: '11 AM - 7 PM',
+      friday: '11 AM - 7 PM',
+      saturday: '10 AM - 5 PM',
+      sunday: 'Closed',
+    },
+    services: ['Saltwater Fish', 'Corals', 'Reef Supplies', 'RODI Water'],
+    isVerified: false,
+    isFeatured: false,
+  },
+  {
+    id: 'lfs3',
+    name: 'Planted Aquatics & More',
+    slug: 'planted-aquatics-capital-city',
+    address: '789 River Road',
+    city: 'Capital City',
+    state: 'IL',
+    zipCode: '62704',
+    phone: '217-555-PLNT',
+    description: 'Your source for aquascaping supplies, a wide variety of aquatic plants, and nano fish.',
+    imageUrl: 'https://placehold.co/600x400.png',
+    imageHint: 'aquascape planted tank',
+    operatingHours: {
+      saturday: '10 AM - 4 PM',
+      sunday: '12 PM - 4 PM',
+    },
+    services: ['Aquatic Plants', 'Nano Fish', 'Shrimp', 'Aquascaping Supplies', 'Hardscape'],
+    isVerified: true,
+    isFeatured: false,
+  },
+];
+    
 
     
