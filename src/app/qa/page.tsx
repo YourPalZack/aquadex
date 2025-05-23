@@ -5,7 +5,7 @@ import type { Question, UserProfile } from '@/types';
 import QuestionCard from '@/components/qa/QuestionCard';
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { MessageSquarePlus, Search } from 'lucide-react';
+import { MessageSquarePlus, Search, MessageSquare } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { useState } from 'react';
 
