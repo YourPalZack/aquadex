@@ -54,14 +54,6 @@ import { cn } from '@/lib/utils';
 const navItemsConfig = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   {
-    href: '/analyze',
-    label: 'Water Test',
-    icon: FileScan,
-    subItems: [
-      { href: '/history', label: 'Test History', icon: History },
-    ],
-  },
-  {
     href: '/aquariums',
     label: 'My Aquariums',
     icon: Droplet,
@@ -86,6 +78,11 @@ const navItemsConfig = [
     label: 'AIQuarium Tools',
     icon: Sparkles,
     subItems: [
+      { href: '/analyze', label: 'Water Test', icon: FileScan,
+        subItems: [
+            { href: '/history', label: 'Test History', icon: History },
+        ]
+      },
       { href: '/fish-finder', label: 'Fish Finder', icon: Fish },
       { href: '/plant-finder', label: 'Plant Finder', icon: Leaf },
       { href: '/tank-finder', label: 'Tank Finder', icon: Archive },
@@ -151,10 +148,10 @@ export default function AppSidebar() {
     return pathname.startsWith(href);
   };
   
-  const isSectionActive = (item: typeof navItemsConfig[0]) => {
+  const isSectionActive = (item: typeof navItemsConfig[0] | typeof navItemsConfig[0]['subItems'][0]) => {
     if (!item.href) return false;
     if (pathname.startsWith(item.href)) return true;
-    if (item.subItems) {
+    if (item.subItems && item.subItems.length > 0) { // Check if subItems exists and is not empty
         return item.subItems.some(sub => sub.href && pathname.startsWith(sub.href));
     }
     return false;
@@ -202,21 +199,56 @@ export default function AppSidebar() {
                   <SidebarMenuSub>
                     {item.subItems.map((subItem) => {
                        const SubIcon = subItem.icon as ElementType;
+                       // Recursive check for nested sub-items
+                       const hasNestedSubItems = subItem.subItems && subItem.subItems.length > 0;
+                       const isNestedSectionActive = isSectionActive(subItem);
+
                        return (
                           <SidebarMenuSubItem key={subItem.label}>
                             <Link href={subItem.href} passHref legacyBehavior>
                               <SidebarMenuSubButton
                                 asChild
-                                isActive={subItem.href && pathname.startsWith(subItem.href)}
-                                onClick={() => openMobile && setOpenMobile(false)}
+                                isActive={subItem.href && pathname.startsWith(subItem.href) && (!hasNestedSubItems || subItem.href === pathname)}
+                                onClick={() => {
+                                   if (openMobile && !hasNestedSubItems) setOpenMobile(false);
+                                }}
                                 className={cn(subItem.className)}
                               >
                                 <a>
                                   {SubIcon && <SubIcon className={cn("h-4 w-4", subItem.iconClassName)} />}
                                   <span>{subItem.label}</span>
+                                  {hasNestedSubItems && (
+                                    isNestedSectionActive ?
+                                    <ChevronDown className="h-3 w-3 shrink-0 ml-auto" /> :
+                                    <ChevronRight className="h-3 w-3 shrink-0 ml-auto" />
+                                  )}
                                 </a>
                               </SidebarMenuSubButton>
                             </Link>
+                            {hasNestedSubItems && isNestedSectionActive && (
+                                <SidebarMenuSub>
+                                    {subItem.subItems.map(nestedSubItem => {
+                                        const NestedSubIcon = nestedSubItem.icon as ElementType;
+                                        return (
+                                            <SidebarMenuSubItem key={nestedSubItem.label}>
+                                                <Link href={nestedSubItem.href} passHref legacyBehavior>
+                                                    <SidebarMenuSubButton
+                                                        asChild
+                                                        isActive={nestedSubItem.href && pathname.startsWith(nestedSubItem.href)}
+                                                        onClick={() => openMobile && setOpenMobile(false)}
+                                                        className={cn("pl-6", nestedSubItem.className)} // Indent further
+                                                    >
+                                                        <a>
+                                                            {NestedSubIcon && <NestedSubIcon className={cn("h-3 w-3", nestedSubItem.iconClassName)} />}
+                                                            <span>{nestedSubItem.label}</span>
+                                                        </a>
+                                                    </SidebarMenuSubButton>
+                                                </Link>
+                                            </SidebarMenuSubItem>
+                                        )
+                                    })}
+                                </SidebarMenuSub>
+                            )}
                           </SidebarMenuSubItem>
                        );
                     })}
@@ -260,3 +292,4 @@ export default function AppSidebar() {
     </Sidebar>
   );
 }
+
