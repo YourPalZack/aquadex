@@ -13,6 +13,7 @@ export interface TestResult {
 }
 
 export type AquariumType = 'freshwater' | 'saltwater' | 'brackish' | 'reef';
+export type SourceWaterType = 'tap' | 'ro' | 'premixed_saltwater';
 
 export interface Aquarium {
   id: string;
@@ -28,8 +29,10 @@ export interface Aquarium {
   fishCount?: number;
   co2Injection?: boolean;
   filterDetails?: string;
-  foodDetails?: string; // New field for food type/brand
-  nextFeedingReminder?: Date; // New field for feeding reminder
+  foodDetails?: string; 
+  nextFeedingReminder?: Date;
+  sourceWaterType?: SourceWaterType;
+  sourceWaterParameters?: string;
 }
 
 export interface UserProfile {
@@ -120,3 +123,4 @@ export interface WaterTreatmentProductFormValues {
   type?: string;
   notes?: string;
 }
+

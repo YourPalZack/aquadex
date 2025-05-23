@@ -6,7 +6,7 @@ import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { format, differenceInDays, isFuture, isPast, isToday } from 'date-fns';
-import type { Aquarium, TestResult } from '@/types';
+import type { Aquarium, TestResult, SourceWaterType } from '@/types';
 import { mockAquariumsData } from '@/app/aquariums/page'; 
 import { mockTestResults }  from '@/app/history/page'; 
 import { Button } from '@/components/ui/button';
@@ -14,7 +14,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Separator } from '@/components/ui/separator';
 import HistoryTable from '@/components/history/HistoryTable'; 
 import {
-  ArrowLeft, Droplet, CalendarDays, Users, Leaf, Filter, Info, Utensils, Timer, Edit3, AlertTriangle, BellRing, FishSymbol, Activity, Trash2, PackageSearch
+  ArrowLeft, Droplet, CalendarDays, Users, Leaf, Filter, Info, Utensils, Timer, Edit3, AlertTriangle, BellRing, FishSymbol, Activity, Trash2, PackageSearch, Pipette
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
@@ -129,6 +129,16 @@ export default function AquariumDetailPage() {
     return `AquaStrip Test from ${aquarium?.name || 'My Aquarium'} - ${new Date(result.timestamp).toLocaleString()}:\nParameters: ${result.parameters}`;
   };
 
+  const getSourceWaterTypeDisplay = (type?: SourceWaterType) => {
+    if (!type) return 'Not specified';
+    switch (type) {
+      case 'ro': return 'R/O Water';
+      case 'premixed_saltwater': return 'Pre-mixed Saltwater';
+      case 'tap': return 'Tap Water';
+      default: return 'Not specified';
+    }
+  };
+
 
   if (isLoading) {
     return <div className="container mx-auto py-8 text-center text-lg font-semibold">Loading aquarium details...</div>;
@@ -196,6 +206,13 @@ export default function AquariumDetailPage() {
                 {typeof aquarium.co2Injection === 'boolean' && <DetailItem icon={<Leaf />} label="CO2 Injection" value={aquarium.co2Injection ? 'Yes' : 'No'} />}
                 {aquarium.filterDetails && <DetailItem icon={<Filter />} label="Filter Details" value={aquarium.filterDetails} />}
                 {aquarium.foodDetails && <DetailItem icon={<Utensils />} label="Food Details" value={aquarium.foodDetails} />}
+                {aquarium.sourceWaterType && (
+                  <DetailItem icon={<Pipette />} label="Source Water" value={getSourceWaterTypeDisplay(aquarium.sourceWaterType)}>
+                    {aquarium.sourceWaterParameters && (
+                      <p className="text-foreground/80 whitespace-pre-wrap bg-muted/50 p-2 rounded-md mt-1 border text-xs">{aquarium.sourceWaterParameters}</p>
+                    )}
+                  </DetailItem>
+                )}
             </div>
 
             <div className="space-y-1 p-4 border rounded-lg bg-background shadow-sm">
@@ -270,3 +287,4 @@ export default function AquariumDetailPage() {
     </div>
   );
 }
+

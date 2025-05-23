@@ -29,9 +29,10 @@ import { CalendarIcon, Loader2 } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
-import type { Aquarium, AquariumType } from '@/types';
+import type { Aquarium, AquariumType, SourceWaterType } from '@/types';
 
 const aquariumTypes: AquariumType[] = ['freshwater', 'saltwater', 'brackish', 'reef'];
+const sourceWaterTypes: SourceWaterType[] = ['tap', 'ro', 'premixed_saltwater'];
 
 const aquariumFormSchema = z.object({
   name: z.string().min(2, { message: 'Name must be at least 2 characters.' }).max(50),
@@ -48,6 +49,8 @@ const aquariumFormSchema = z.object({
   filterDetails: z.string().max(100, { message: 'Filter details cannot exceed 100 characters.' }).optional(),
   foodDetails: z.string().max(200, { message: "Food details cannot exceed 200 characters."}).optional(),
   nextFeedingReminder: z.date().optional(),
+  sourceWaterType: z.enum(sourceWaterTypes).optional(),
+  sourceWaterParameters: z.string().max(300, { message: "Source water parameters cannot exceed 300 characters."}).optional(),
   notes: z.string().max(500, { message: 'Notes cannot exceed 500 characters.' }).optional(),
 });
 
@@ -76,6 +79,8 @@ export default function AquariumForm({ onSubmit, onCancel, defaultValues, isLoad
       filterDetails: defaultValues?.filterDetails || '',
       foodDetails: defaultValues?.foodDetails || '',
       nextFeedingReminder: defaultValues?.nextFeedingReminder ? new Date(defaultValues.nextFeedingReminder) : undefined,
+      sourceWaterType: defaultValues?.sourceWaterType || undefined,
+      sourceWaterParameters: defaultValues?.sourceWaterParameters || '',
       notes: defaultValues?.notes || '',
     },
   });
@@ -88,6 +93,7 @@ export default function AquariumForm({ onSubmit, onCancel, defaultValues, isLoad
       co2Injection: values.co2Injection || false, 
       imageUrl: values.imageUrl === '' ? undefined : values.imageUrl,
       foodDetails: values.foodDetails === '' ? undefined : values.foodDetails,
+      sourceWaterParameters: values.sourceWaterParameters === '' ? undefined : values.sourceWaterParameters,
     };
     onSubmit(processedValues);
   };
@@ -163,6 +169,52 @@ export default function AquariumForm({ onSubmit, onCancel, defaultValues, isLoad
             </FormItem>
           )}
         />
+        
+        <FormField
+            control={form.control}
+            name="sourceWaterType"
+            render={({ field }) => (
+                <FormItem>
+                <FormLabel>Source Water Type</FormLabel>
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                    <SelectTrigger>
+                        <SelectValue placeholder="Select source water type" />
+                    </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                    {sourceWaterTypes.map((type) => (
+                        <SelectItem key={type} value={type} className="capitalize">
+                        {type === 'ro' ? 'R/O Water' : type === 'premixed_saltwater' ? 'Pre-mixed Saltwater' : 'Tap Water'}
+                        </SelectItem>
+                    ))}
+                    </SelectContent>
+                </Select>
+                <FormDescription>Optional. Specify the type of water you use for changes/top-offs.</FormDescription>
+                <FormMessage />
+                </FormItem>
+            )}
+        />
+        <FormField
+          control={form.control}
+          name="sourceWaterParameters"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Source Water Parameters/Notes</FormLabel>
+              <FormControl>
+                <Textarea
+                  placeholder="E.g., Tap pH: 7.6, GH: 8. Or for RO: Remineralized with XYZ."
+                  className="resize-none"
+                  rows={2}
+                  {...field}
+                />
+              </FormControl>
+              <FormDescription>Optional. Note parameters of tap water, or details about RO/Saltwater mix.</FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
 
         <FormField
           control={form.control}
@@ -396,3 +448,4 @@ export default function AquariumForm({ onSubmit, onCancel, defaultValues, isLoad
     </Form>
   );
 }
+

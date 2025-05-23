@@ -6,14 +6,14 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from '@/components/ui/button';
 import { 
     Droplet, CalendarDays, Pencil, Trash2, Edit3, AlertTriangle, BellRing, CalendarClock,
-    FishSymbol, Users, Leaf, Filter, Info, Image as ImageIcon, Utensils, Timer
+    FishSymbol, Users, Leaf, Filter, Info, Image as ImageIcon, Utensils, Timer, Pipette
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { format, differenceInDays, isPast, isToday, isFuture } from 'date-fns';
 import { Separator } from '@/components/ui/separator';
 import Image from 'next/image';
-import Link from 'next/link'; // Added Link import
+import Link from 'next/link'; 
 
 interface AquariumCardProps {
   aquarium: Aquarium;
@@ -21,12 +21,13 @@ interface AquariumCardProps {
   onDelete: (aquariumId: string) => void;
 }
 
-const DetailItem: React.FC<{ icon: React.ReactNode; label?: string; value: React.ReactNode; className?: string }> = ({ icon, label, value, className }) => (
+const DetailItem: React.FC<{ icon: React.ReactNode; label?: string; value?: React.ReactNode; className?: string; children?: React.ReactNode }> = ({ icon, label, value, children, className }) => (
   <div className={cn("flex items-start text-sm", className)}>
     <div className="flex-shrink-0 w-5 h-5 mr-2 text-muted-foreground">{icon}</div>
     <div>
       {label && <span className="font-medium">{label}: </span>}
-      <span className="text-foreground/90">{value}</span>
+      {value && <span className="text-foreground/90">{value}</span>}
+      {children}
     </div>
   </div>
 );
@@ -72,10 +73,6 @@ export default function AquariumCard({ aquarium, onEdit, onDelete }: AquariumCar
     if (isToday(reminder)) {
       return { text: 'Feeding Due Today!', icon: <Timer className="w-4 h-4 mr-1" />, className: 'text-amber-600 dark:text-amber-500 font-semibold' };
     }
-    // Shorter window for feeding reminder, e.g., 1 day in advance
-    if (daysDiff === 0 ) { // This case is covered by isToday
-        return { text: `Feeding Due Today! (${format(reminder, 'MMM d')})`, icon: <Timer className="w-4 h-4 mr-1" />, className: 'text-amber-600 dark:text-amber-500' };
-    }
     if (isFuture(reminder)) {
       return { text: `Next Feeding: ${format(reminder, 'MMM d, yyyy')}`, icon: <Timer className="w-4 h-4 mr-1" />, className: 'text-muted-foreground' };
     }
@@ -84,6 +81,10 @@ export default function AquariumCard({ aquarium, onEdit, onDelete }: AquariumCar
 
   const waterChangeReminderStatus = getWaterChangeReminderStatus(aquarium.nextWaterChangeReminder);
   const feedingReminderStatus = getFeedingReminderStatus(aquarium.nextFeedingReminder);
+
+  const sourceWaterTypeDisplay = aquarium.sourceWaterType ? 
+    (aquarium.sourceWaterType === 'ro' ? 'R/O Water' : aquarium.sourceWaterType === 'premixed_saltwater' ? 'Pre-mixed Saltwater' : 'Tap Water')
+    : 'Not Specified';
 
   return (
     <Card className="w-full shadow-lg flex flex-col h-full bg-card hover:shadow-xl transition-shadow duration-300">
@@ -147,8 +148,7 @@ export default function AquariumCard({ aquarium, onEdit, onDelete }: AquariumCar
             </div>
         )}
 
-
-        {(aquarium.fishSpecies || aquarium.fishCount !== undefined || typeof aquarium.co2Injection === 'boolean' || aquarium.filterDetails || aquarium.foodDetails) && (
+        {(aquarium.fishSpecies || aquarium.fishCount !== undefined || typeof aquarium.co2Injection === 'boolean' || aquarium.filterDetails || aquarium.foodDetails || aquarium.sourceWaterType) && (
             <Separator className="my-3" />
         )}
         
@@ -157,6 +157,14 @@ export default function AquariumCard({ aquarium, onEdit, onDelete }: AquariumCar
         {typeof aquarium.co2Injection === 'boolean' && <DetailItem icon={<Leaf />} label="CO2" value={aquarium.co2Injection ? 'Yes' : 'No'} />}
         {aquarium.filterDetails && <DetailItem icon={<Filter />} label="Filter" value={aquarium.filterDetails} />}
         {aquarium.foodDetails && <DetailItem icon={<Utensils />} label="Food" value={aquarium.foodDetails} />}
+        
+        {aquarium.sourceWaterType && (
+          <DetailItem icon={<Pipette />} label="Source Water" value={sourceWaterTypeDisplay}>
+            {aquarium.sourceWaterParameters && (
+              <p className="text-xs text-muted-foreground mt-1 ml-0 pl-0 bg-muted/30 p-1.5 rounded-md border whitespace-pre-wrap">{aquarium.sourceWaterParameters}</p>
+            )}
+          </DetailItem>
+        )}
 
 
         {aquarium.notes && (
@@ -182,3 +190,4 @@ export default function AquariumCard({ aquarium, onEdit, onDelete }: AquariumCar
     </Card>
   );
 }
+

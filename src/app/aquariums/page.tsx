@@ -22,8 +22,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
-import { useSearchParams } from 'next/navigation'; // Import useSearchParams
-// import { addAquarium as addAquariumAction } from '@/lib/actions'; // Assuming a similar action exists or will be created
+import { useSearchParams } from 'next/navigation'; 
 
 // Mock Data - Make it exportable
 export const mockAquariumsData: Aquarium[] = [
@@ -42,7 +41,9 @@ export const mockAquariumsData: Aquarium[] = [
     co2Injection: false,
     filterDetails: 'Sump with Protein Skimmer & Refugium',
     foodDetails: 'NLS Pellets, Rods Food, Mysis Shrimp',
-    nextFeedingReminder: new Date(new Date().setDate(new Date().getDate() + 0)), // Today
+    nextFeedingReminder: new Date(new Date().setDate(new Date().getDate() + 0)), 
+    sourceWaterType: 'premixed_saltwater',
+    sourceWaterParameters: 'Using Tropic Marin Pro Reef salt mix.',
   },
   {
     id: 'aqua2',
@@ -55,11 +56,13 @@ export const mockAquariumsData: Aquarium[] = [
     nextWaterChangeReminder: new Date('2024-07-27'),
     notes: 'Betta seems happy. Plants are growing well. Added some shrimp.',
     fishSpecies: 'Betta Splendens, Amano Shrimp',
-    fishCount: 6, // 1 betta, 5 shrimp
+    fishCount: 6, 
     co2Injection: false,
     filterDetails: 'Small HOB Filter',
     foodDetails: 'Betta Pellets, Bloodworms (treat)',
-    nextFeedingReminder: new Date(new Date().setDate(new Date().getDate() - 1)), // Yesterday (Overdue)
+    nextFeedingReminder: new Date(new Date().setDate(new Date().getDate() - 1)), 
+    sourceWaterType: 'tap',
+    sourceWaterParameters: 'Tap water treated with Seachem Prime. pH: 7.2, GH: 5 dGH',
   },
   {
     id: 'aqua3',
@@ -75,7 +78,9 @@ export const mockAquariumsData: Aquarium[] = [
     co2Injection: true,
     filterDetails: 'Canister Filter - Eheim Classic 250',
     foodDetails: 'Community Flakes, Algae Wafers',
-    nextFeedingReminder: new Date(new Date().setDate(new Date().getDate() + 1)), // Tomorrow
+    nextFeedingReminder: new Date(new Date().setDate(new Date().getDate() + 1)), 
+    sourceWaterType: 'ro',
+    sourceWaterParameters: 'RO water remineralized with Seachem Equilibrium.',
   },
   {
     id: 'aqua4',
@@ -91,7 +96,7 @@ export const mockAquariumsData: Aquarium[] = [
     co2Injection: false,
     filterDetails: 'HOB Skimmer, Small Powerhead',
     foodDetails: 'Reef Roids, Small Pellets',
-    // No feeding reminder set for this one
+    sourceWaterType: 'ro',
   },
 ];
 
@@ -101,7 +106,7 @@ export default function AquariumsPage() {
   const [editingAquarium, setEditingAquarium] = useState<Aquarium | null>(null);
   const [isLoading, setIsLoading] = useState(true); 
   const { toast } = useToast();
-  const searchParams = useSearchParams(); // Get search params
+  const searchParams = useSearchParams(); 
 
   useEffect(() => {
     setIsLoading(true);
@@ -109,9 +114,8 @@ export default function AquariumsPage() {
         setAquariums(mockAquariumsData);
         setIsLoading(false);
 
-        // Check for edit query parameter after data is loaded
         const editAquariumId = searchParams.get('edit');
-        if (editAquariumId && !isLoading) { // Ensure data is loaded before trying to edit
+        if (editAquariumId && !isLoading) { 
             const aquariumToEdit = mockAquariumsData.find(aq => aq.id === editAquariumId);
             if (aquariumToEdit) {
                 setEditingAquarium(aquariumToEdit);
@@ -120,7 +124,7 @@ export default function AquariumsPage() {
         }
     }, 500);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchParams]); // Add searchParams.isLoading to dependency array
+  }, [searchParams]); 
 
   const handleAddAquarium = () => {
     setEditingAquarium(null);
@@ -159,6 +163,8 @@ export default function AquariumsPage() {
             imageUrl: data.imageUrl || undefined,
             foodDetails: data.foodDetails || undefined,
             nextFeedingReminder: data.nextFeedingReminder,
+            sourceWaterType: data.sourceWaterType || undefined,
+            sourceWaterParameters: data.sourceWaterParameters || undefined,
          };
         setAquariums(prev => prev.map(aq => aq.id === editingAquarium.id ? updatedAquarium : aq));
         toast({ title: "Aquarium Updated", description: `${updatedAquarium.name} has been updated.` });
@@ -173,6 +179,8 @@ export default function AquariumsPage() {
           imageUrl: data.imageUrl || undefined,
           foodDetails: data.foodDetails || undefined,
           nextFeedingReminder: data.nextFeedingReminder,
+          sourceWaterType: data.sourceWaterType || undefined,
+          sourceWaterParameters: data.sourceWaterParameters || undefined,
         };
         setAquariums(prev => [newAquariumData, ...prev]); 
         toast({ title: "Aquarium Added", description: `${newAquariumData.name} has been added.` });
@@ -269,3 +277,4 @@ export default function AquariumsPage() {
     </div>
   );
 }
+
