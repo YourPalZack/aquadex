@@ -4,6 +4,19 @@
 
 AquaDex is a NextJS web application developed within Firebase Studio. The primary goal of AquaDex is to provide aquarium enthusiasts with a comprehensive toolkit for managing their aquariums effectively. This includes features for water analysis, tracking, AI-powered insights, and community engagement.
 
+## Documentation Index
+
+- **[Application Sitemap](./SITEMAP.md)** - Complete URL structure and navigation hierarchy
+- **[Feature Documentation](./features/)** - Detailed documentation for each feature area:
+  - [Aquarium Management](./features/aquarium-management/) - Tank profiles, parameters, and maintenance
+  - [Water Testing](./features/water-testing/) - AI-powered test analysis and tracking
+  - [AI Tools](./features/ai-tools/) - Intelligent product discovery suite
+  - [Marketplace](./features/marketplace/) - Community buying and selling platform
+  - [Community](./features/community/) - Q&A forum and local resources
+  - [User Management](./features/user-management/) - Authentication and profiles
+- **[Frontend Todo](./FrontendTodo.md)** - Missing pages and components to implement
+- **[AI Agent Guide](./AgentKnowledge.md)** - Technical guide for AI assistants
+
 ## Features
 
 AquaDex includes the following key features:
