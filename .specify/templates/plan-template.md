@@ -31,7 +31,18 @@
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-[Gates determined based on constitution file]
+Reference: `.specify/memory/constitution.md` for current principles
+
+### Required Checks:
+- [ ] **Component-First**: Feature designed as modular React components?
+- [ ] **Cloud-Native**: No localhost-only dependencies? Uses Neon/Firebase?
+- [ ] **User Story Prioritization**: P1/P2/P3 priorities defined with MVP identified?
+- [ ] **AI-Enhanced**: AI flows use Genkit with API route exposure?
+- [ ] **Type Safety**: TypeScript interfaces + Zod schemas defined?
+- [ ] **Mobile-First**: Responsive design considerations documented?
+
+### Violations (if any):
+[Document any principle violations with clear justification]
 
 ## Project Structure
 

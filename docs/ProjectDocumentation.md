@@ -6,7 +6,12 @@ AquaDex is a NextJS web application developed within Firebase Studio. The primar
 
 ## Documentation Index
 
+### Governance & Architecture
+- **[Project Constitution](../.specify/memory/constitution.md)** - Core principles and governance (v1.0.0)
 - **[Application Sitemap](./SITEMAP.md)** - Complete URL structure and navigation hierarchy
+- **[Master Project Plan](./MASTER_PROJECT_PLAN.md)** - Complete roadmap and implementation phases
+
+### Feature Documentation
 - **[Feature Documentation](./features/)** - Detailed documentation for each feature area:
   - [Aquarium Management](./features/aquarium-management/) - Tank profiles, parameters, and maintenance
   - [Water Testing](./features/water-testing/) - AI-powered test analysis and tracking
@@ -14,8 +19,11 @@ AquaDex is a NextJS web application developed within Firebase Studio. The primar
   - [Marketplace](./features/marketplace/) - Community buying and selling platform
   - [Community](./features/community/) - Q&A forum and local resources
   - [User Management](./features/user-management/) - Authentication and profiles
-- **[Frontend Todo](./FrontendTodo.md)** - Missing pages and components to implement
+
+### Development Guides
+- **[Neon Database Setup](./NEON_SETUP.md)** - Complete guide for setting up cloud PostgreSQL
 - **[AI Agent Guide](./AgentKnowledge.md)** - Technical guide for AI assistants
+- **[Frontend Todo](./FrontendTodo.md)** - Missing pages and components to implement
 
 ## Features
 
@@ -37,18 +45,38 @@ AquaDex includes the following key features:
 
 ## Technical Requirements
 
-AquaDex is built upon the following technical stack and dependencies:
+AquaDex is built upon the following technical stack and dependencies (aligned with [Project Constitution](../.specify/memory/constitution.md)):
 
-*   **Framework:** NextJS
-*   **Backend/Cloud Platform:** Firebase (likely utilized for user authentication, database (Firestore or Realtime Database), storage, and potentially Cloud Functions for backend logic like email notifications and AI processing).
-*   **Database:** Implied by "Historical Data Tracking" and "Community Support Forum" (likely Firestore or Realtime Database).
-*   **Storage:** Implied by "Image Upload" (Firebase Storage).
-*   **Authentication:** Implied by "Community Support Forum" and "Account Registration" (Firebase Authentication).
-*   **AI/ML Libraries:** Required for "AI Parameter Analysis" and other AI features (Genkit with Google AI).
-*   **External APIs:**
-    *   Amazon API (simulated for product suggestions via AI flow): Used for "Recommended Treatment Products", "Fish Food Management", and "Water Treatment Management".
-*   **Styling/Component Library:** Shadcn UI
-*   **Icon Library:** Lucide (integrated with Shadcn UI)
+### Core Framework
+*   **Framework:** Next.js 15+ with App Router
+*   **Language:** TypeScript 5+ (strict mode)
+*   **Runtime:** Node.js
+
+### Database & Storage
+*   **Primary Database:** Neon PostgreSQL (serverless, cloud-hosted) - see [setup guide](./NEON_SETUP.md)
+*   **ORM:** Prisma or Drizzle (for type-safe database access)
+*   **File Storage:** Firebase Storage (for images)
+*   **Authentication:** Firebase Authentication
+
+### AI/ML Integration
+*   **AI Framework:** Genkit with Google AI
+*   **AI Flows:** Located in `src/ai/flows/`
+*   **Use Cases:** Water parameter analysis, product discovery, treatment recommendations
+
+### Frontend Stack
+*   **Styling:** Tailwind CSS
+*   **Component Library:** Shadcn UI
+*   **Icon Library:** Lucide React
+*   **Form Management:** React Hook Form with Zod validation
+
+### External APIs
+*   **Amazon Product API:** Product recommendations (simulated via AI flows)
+*   **Email Service:** For notifications (configurable provider)
+
+### Development Tools
+*   **Package Manager:** npm
+*   **Code Quality:** ESLint, TypeScript compiler
+*   **Environment:** `.env.local` for configuration
 
 ## Design Guidelines
 
