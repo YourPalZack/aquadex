@@ -20,6 +20,7 @@ import Link from 'next/link';
 import type { Aquarium, Livestock, Equipment, WaterTest } from '@/types/aquarium';
 import { format } from 'date-fns';
 import { WaterTestList } from './water-test-list';
+import { WaterQualityTrends } from './water-quality-trends';
 
 interface AquariumDetailsProps {
   aquarium: Aquarium;
@@ -146,7 +147,13 @@ export function AquariumDetails({ aquarium, livestock = [], equipment = [], wate
             <Button variant="outline" asChild>
               <Link href={`/analyze?aquariumId=${aquarium.id}`}>
                 <Activity className="h-4 w-4 mr-2" />
-                Test Water
+                Test Water (AI)
+              </Link>
+            </Button>
+            <Button variant="outline" asChild>
+              <Link href={`/aquariums/${aquarium.id}/test-manual`}>
+                <FileText className="h-4 w-4 mr-2" />
+                Manual Entry
               </Link>
             </Button>
           </div>
@@ -294,15 +301,29 @@ export function AquariumDetails({ aquarium, livestock = [], equipment = [], wate
                   <CardTitle>Water Quality Tests</CardTitle>
                   <CardDescription>Track and monitor water parameters over time</CardDescription>
                 </div>
-                <Button asChild>
-                  <Link href={`/analyze?aquariumId=${aquarium.id}`}>
-                    <TestTube className="h-4 w-4 mr-2" />
-                    Test Water
-                  </Link>
-                </Button>
+                <div className="flex gap-2">
+                  <Button variant="outline" asChild>
+                    <Link href={`/aquariums/${aquarium.id}/test-manual`}>
+                      <FileText className="h-4 w-4 mr-2" />
+                      Manual Entry
+                    </Link>
+                  </Button>
+                  <Button asChild>
+                    <Link href={`/analyze?aquariumId=${aquarium.id}`}>
+                      <TestTube className="h-4 w-4 mr-2" />
+                      AI Test
+                    </Link>
+                  </Button>
+                </div>
               </div>
             </CardHeader>
-            <CardContent>
+            <CardContent className="space-y-6">
+              {/* Water Quality Trends */}
+              {waterTests.length >= 2 && (
+                <WaterQualityTrends tests={waterTests} />
+              )}
+              
+              {/* Water Test List */}
               <WaterTestList 
                 tests={waterTests} 
                 aquariumId={aquarium.id}

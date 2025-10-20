@@ -69,12 +69,19 @@ export function WaterTestList({ tests, aquariumId, showActions = true }: WaterTe
           Start tracking your water quality by testing your aquarium water.
         </p>
         {showActions && (
-          <Button asChild>
-            <Link href={`/analyze?aquariumId=${aquariumId}`}>
-              <Plus className="h-4 w-4 mr-2" />
-              Test Water
-            </Link>
-          </Button>
+          <div className="flex gap-3 justify-center">
+            <Button variant="outline" asChild>
+              <Link href={`/aquariums/${aquariumId}/test-manual`}>
+                Manual Entry
+              </Link>
+            </Button>
+            <Button asChild>
+              <Link href={`/analyze?aquariumId=${aquariumId}`}>
+                <Plus className="h-4 w-4 mr-2" />
+                AI Test
+              </Link>
+            </Button>
+          </div>
         )}
       </div>
     );
