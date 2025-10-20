@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { Suspense, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 import ImageUploadForm from '@/components/dashboard/ImageUploadForm';
@@ -15,7 +15,7 @@ import { Card, CardDescription, CardHeader, CardTitle, CardContent } from '@/com
 import { FileScan, Sparkles } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
-export default function AnalyzePage() {
+function AnalyzePageContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { toast } = useToast();
@@ -158,5 +158,20 @@ export default function AnalyzePage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function AnalyzePage() {
+  return (
+    <Suspense fallback={
+      <div className="container mx-auto py-8">
+        <div className="animate-pulse space-y-8">
+          <div className="h-32 bg-muted rounded-lg" />
+          <div className="h-64 bg-muted rounded-lg" />
+        </div>
+      </div>
+    }>
+      <AnalyzePageContent />
+    </Suspense>
   );
 }
