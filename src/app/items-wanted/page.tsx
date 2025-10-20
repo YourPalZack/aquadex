@@ -6,6 +6,7 @@ import type { WantedItem, WantedItemFormValues, UserProfile } from '@/types';
 import WantedItemCard from '@/components/items-wanted/WantedItemCard';
 import WantedItemForm from '@/components/items-wanted/WantedItemForm';
 import { Card, CardDescription, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { HeartHandshake, PlusCircle, Info, Search } from 'lucide-react';
 import {
