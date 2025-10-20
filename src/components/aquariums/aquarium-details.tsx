@@ -23,6 +23,8 @@ import { WaterTestList } from './water-test-list';
 import { AdvancedWaterCharts } from './advanced-water-charts';
 import { MultiParameterChart } from './multi-parameter-chart';
 import { WaterTestSchedule } from './water-test-schedule';
+import { AlertThresholds } from './alert-thresholds';
+import { AlertsDashboard } from './alerts-dashboard';
 
 interface AquariumDetailsProps {
   aquarium: Aquarium;
