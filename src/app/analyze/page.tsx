@@ -55,9 +55,9 @@ export default function AnalyzePage() {
           status: 'acceptable' as const,
         }];
 
-        const recommendationTexts = data.recommendations?.products?.map(p => 
-          `${p.productName}: ${p.reasoning}`
-        ) || [];
+        const recommendationTexts = data.recommendations ? 
+          [data.recommendations.reasoning, ...data.recommendations.products] : 
+          [];
 
         const result = await createWaterTest({
           aquariumId: selectedAquariumId,
