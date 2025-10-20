@@ -149,7 +149,7 @@ export function exportAsPDF(
       // Test date and method
       doc.setFontSize(12);
       doc.setFont('helvetica', 'bold');
-      doc.text(`${format(test.testedAt, 'PPP')} - ${test.method}`, margin, yPosition);
+      doc.text(`${format(test.testDate, 'PPP')} - ${test.method}`, margin, yPosition);
       yPosition += 8;
 
       // Parameters
@@ -163,11 +163,11 @@ export function exportAsPDF(
         }
 
         const statusColor = 
-          param.status === 'critical' ? [220, 53, 69] :
-          param.status === 'warning' ? [255, 193, 7] :
-          [40, 167, 69];
+          param.status === 'critical' ? [220, 53, 69] as const :
+          param.status === 'warning' ? [255, 193, 7] as const :
+          [40, 167, 69] as const;
 
-        doc.setTextColor(...statusColor);
+        doc.setTextColor(statusColor[0], statusColor[1], statusColor[2]);
         const paramText = `${param.name}: ${param.value} ${param.unit}`;
         doc.text(`• ${paramText}`, margin + 10, yPosition);
         
@@ -218,7 +218,7 @@ export function exportAsPDF(
   yPosition += 6;
   
   const dateRange = waterTests.length > 0 ? 
-    `${format(new Date(Math.min(...waterTests.map(t => new Date(t.testedAt).getTime()))), 'PP')} - ${format(new Date(Math.max(...waterTests.map(t => new Date(t.testedAt).getTime()))), 'PP')}` :
+    `${format(new Date(Math.min(...waterTests.map(t => new Date(t.testDate).getTime()))), 'PP')} - ${format(new Date(Math.max(...waterTests.map(t => new Date(t.testDate).getTime()))), 'PP')}` :
     'No tests found';
   doc.text(`Date Range: ${dateRange}`, margin, yPosition);
 
@@ -253,7 +253,7 @@ export function getExportSummary(
   const parameterCount = waterTests.reduce((sum, test) => sum + test.parameters.length, 0);
   
   const dateRange = waterTests.length > 0 ? 
-    `${format(new Date(Math.min(...waterTests.map(t => new Date(t.testedAt).getTime()))), 'MMM d, yyyy')} - ${format(new Date(Math.max(...waterTests.map(t => new Date(t.testedAt).getTime()))), 'MMM d, yyyy')}` :
+    `${format(new Date(Math.min(...waterTests.map(t => new Date(t.testDate).getTime()))), 'MMM d, yyyy')} - ${format(new Date(Math.max(...waterTests.map(t => new Date(t.testDate).getTime()))), 'MMM d, yyyy')}` :
     'No tests available';
 
   return {
