@@ -101,8 +101,14 @@
 - [ ] T053 [US1] Create dashboard layout with navigation sidebar in src/app/(dashboard)/layout.tsx
 - [ ] T054 [US1] Create main dashboard page showing aquarium overview in src/app/(dashboard)/dashboard/page.tsx
 - [ ] T055 [US1] Add delete confirmation dialog component for aquariums in src/components/aquariums/delete-confirmation.tsx
+- [ ] T055a [P] [US1] Create server action for exporting user data to JSON in src/lib/actions/user-export.ts (implements FR-060 data export)
+- [ ] T055b [P] [US1] Create server action for account deletion with 30-day audit log in src/lib/actions/user-delete.ts (implements FR-060 account deletion)
+- [ ] T055c [P] [US1] Create DataExport component with download button in src/components/profile/data-export.tsx
+- [ ] T055d [P] [US1] Create AccountDeletion component with confirmation flow in src/components/profile/account-deletion.tsx
+- [ ] T055e [P] [US1] Create RetentionPreferences component for test strip image retention opt-in in src/components/profile/retention-preferences.tsx (implements FR-060 retention preferences)
+- [ ] T055f [US1] Create account settings page with export/delete/retention options in src/app/(dashboard)/profile/settings/page.tsx
 
-**Checkpoint**: At this point, User Story 1 should be fully functional - users can create aquariums, add livestock/equipment, and manage profiles independently
+**Checkpoint**: At this point, User Story 1 should be fully functional - users can create aquariums, add livestock/equipment, manage profiles, and control their data (export/deletion/retention preferences) independently
 
 ---
 
@@ -325,7 +331,7 @@
 - [ ] T181 [US8] Create new listing page with form at src/app/(community)/marketplace/new/page.tsx
 - [ ] T182 [US8] Create my listings page for seller management at src/app/(dashboard)/profile/my-listings/page.tsx
 - [ ] T183 [US8] Create messages inbox page at src/app/(dashboard)/profile/messages/page.tsx
-- [ ] T184 [US8] Add seller verification check before allowing listing creation in src/lib/actions/listings.ts
+- [ ] T184 [US8] Add verified_seller role check before allowing listing creation in src/lib/actions/listings.ts (implements FR-053 seller verification)
 
 **Checkpoint**: At this point, User Story 8 should be fully functional - users can create listings, browse marketplace, contact sellers, and manage their own listings
 

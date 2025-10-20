@@ -421,17 +421,15 @@ A fishkeeper wants to buy or sell used aquarium equipment, fish, plants, or othe
 - **FR-057**: System MUST allow users to manage profile information (display name, photo, location)
 - **FR-058**: System MUST maintain user sessions with server-side token validation across browser sessions until logout
 - **FR-059**: System MUST protect all user data and aquarium information behind authentication with role-based access control enforcing permissions per feature (e.g., verified_seller required for marketplace listing creation, moderator for community content moderation)
-- **FR-060**: System MUST provide account settings with data export (JSON format), account deletion (immediate purge with 30-day audit log retention), and data retention preferences (opt-in to keep test strip images >90 days)
+- **FR-060**: System MUST persist all user data (profiles, aquariums, tests, settings) with tiered retention policy: test strip images (90 days auto-deletion), marketplace messages (1 year), core data (aquarium profiles, test results - indefinite until user deletion) with row-level security (RLS) enforcing user_id ownership on all tables; AND provide account settings with data export (JSON format), account deletion (immediate purge with 30-day audit log retention), and retention preferences (opt-in to keep test strip images >90 days)
 
 **Data & Performance**
 
-- **FR-060**: System MUST persist all user data (profiles, aquariums, tests, settings) with tiered retention policy: test strip images (90 days auto-deletion), marketplace messages (1 year), core data (aquarium profiles, test results - indefinite until user deletion) with row-level security (RLS) enforcing user_id ownership on all tables
 - **FR-061**: System MUST respond to user interactions within 2 seconds under normal load (up to 100 concurrent users with 95th percentile response time at 2 seconds)
 - **FR-062**: System MUST process test strip image analysis within 10 seconds for 85% of requests, with 15-second timeout for remaining cases
 - **FR-063**: System MUST be accessible on mobile devices (phones and tablets) with responsive design
 - **FR-064**: System MUST work reliably with slow internet connections (3G) for core features (aquarium profile CRUD, manual test entry, test history viewing; excludes AI analysis, image uploads, marketplace browsing)
 - **FR-065**: System MUST handle graceful degradation when AI services are temporarily unavailable by queuing analysis requests with automatic retry (max 3 attempts with exponential backoff: 2s, 4s, 8s) while immediately displaying manual entry form as fallback option
-- **FR-066**: System MUST provide user data export functionality (JSON format with all user data) and account deletion with immediate data purge (except legally required audit logs retained 30 days)
 
 ### Key Entities
 
