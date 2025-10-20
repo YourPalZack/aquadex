@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
 import { getAquariumById, getLivestock, getEquipment } from '@/lib/actions/aquarium';
+import { getAquariumWaterTests } from '@/lib/actions/water-test';
 import { AquariumDetails } from '@/components/aquariums/aquarium-details';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft } from 'lucide-react';
@@ -15,10 +16,11 @@ export default async function AquariumDetailPage({ params }: AquariumDetailPageP
   const { aquariumId } = params;
 
   // Fetch aquarium and related data
-  const [aquariumResult, livestockResult, equipmentResult] = await Promise.all([
+  const [aquariumResult, livestockResult, equipmentResult, waterTestsResult] = await Promise.all([
     getAquariumById(aquariumId),
     getLivestock({ aquariumId }),
     getEquipment({ aquariumId }),
+    getAquariumWaterTests(aquariumId),
   ]);
 
   // Handle not found
@@ -32,6 +34,9 @@ export default async function AquariumDetailPage({ params }: AquariumDetailPageP
     : [];
   const equipment = Array.isArray(equipmentResult.equipment)
     ? equipmentResult.equipment
+    : [];
+  const waterTests = Array.isArray(waterTestsResult.waterTests)
+    ? waterTestsResult.waterTests
     : [];
 
   return (
@@ -51,6 +56,7 @@ export default async function AquariumDetailPage({ params }: AquariumDetailPageP
         aquarium={aquarium} 
         livestock={livestock}
         equipment={equipment}
+        waterTests={waterTests}
       />
     </div>
   );

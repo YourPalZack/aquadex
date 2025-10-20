@@ -12,20 +12,23 @@ import {
   Edit,
   FileText,
   Activity,
-  Package
+  Package,
+  TestTube
 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import type { Aquarium, Livestock, Equipment } from '@/types/aquarium';
+import type { Aquarium, Livestock, Equipment, WaterTest } from '@/types/aquarium';
 import { format } from 'date-fns';
+import { WaterTestList } from './water-test-list';
 
 interface AquariumDetailsProps {
   aquarium: Aquarium;
   livestock?: Livestock[];
   equipment?: Equipment[];
+  waterTests?: WaterTest[];
 }
 
-export function AquariumDetails({ aquarium, livestock = [], equipment = [] }: AquariumDetailsProps) {
+export function AquariumDetails({ aquarium, livestock = [], equipment = [], waterTests = [] }: AquariumDetailsProps) {
   const waterTypeColors = {
     freshwater: 'bg-blue-500',
     saltwater: 'bg-cyan-500',
@@ -152,7 +155,7 @@ export function AquariumDetails({ aquarium, livestock = [], equipment = [] }: Aq
 
       {/* Tabs for Livestock, Equipment, etc. */}
       <Tabs defaultValue="livestock" className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
+        <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="livestock">
             <Fish className="h-4 w-4 mr-2" />
             Livestock ({livestock.length})
@@ -160,6 +163,10 @@ export function AquariumDetails({ aquarium, livestock = [], equipment = [] }: Aq
           <TabsTrigger value="equipment">
             <Package className="h-4 w-4 mr-2" />
             Equipment ({equipment.length})
+          </TabsTrigger>
+          <TabsTrigger value="water-tests">
+            <TestTube className="h-4 w-4 mr-2" />
+            Water Tests ({waterTests.length})
           </TabsTrigger>
         </TabsList>
 
@@ -274,6 +281,33 @@ export function AquariumDetails({ aquarium, livestock = [], equipment = [] }: Aq
                   ))}
                 </div>
               )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Water Tests Tab */}
+        <TabsContent value="water-tests" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle>Water Quality Tests</CardTitle>
+                  <CardDescription>Track and monitor water parameters over time</CardDescription>
+                </div>
+                <Button asChild>
+                  <Link href={`/analyze?aquariumId=${aquarium.id}`}>
+                    <TestTube className="h-4 w-4 mr-2" />
+                    Test Water
+                  </Link>
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <WaterTestList 
+                tests={waterTests} 
+                aquariumId={aquarium.id}
+                showActions={true}
+              />
             </CardContent>
           </Card>
         </TabsContent>
