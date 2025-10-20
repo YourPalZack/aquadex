@@ -14,20 +14,18 @@ import {
 import { LogOut, Settings, User, SidebarOpenIcon, LayoutGrid } from 'lucide-react';
 import Logo from './Logo';
 import { SidebarTrigger, useSidebar } from '@/components/ui/sidebar';
-import { mockCurrentUser } from '@/types'; 
+import { useMockAuth } from '@/lib/mock/auth';
 import React from 'react';
 
 
 export default function AppHeader() {
   const { isMobile, openMobile, setOpenMobile } = useSidebar();
   const [mounted, setMounted] = React.useState(false);
+  const { user, isAuthenticated } = useMockAuth();
 
   React.useEffect(() => {
     setMounted(true);
   }, []);
-  
-  const isAuthenticated = true; 
-  const user = mockCurrentUser;
 
 
   return (
@@ -46,16 +44,16 @@ export default function AppHeader() {
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-10 w-10 rounded-full">
                   <Avatar className="h-10 w-10">
-                    <AvatarImage src={user.avatarUrl || `https://avatar.vercel.sh/${user.email}.png`} alt={user.name} data-ai-hint={user.dataAiHint} />
-                    <AvatarFallback>{user.name?.charAt(0).toUpperCase() || 'U'}</AvatarFallback>
+                    <AvatarImage src={user?.photoUrl || `https://avatar.vercel.sh/${user?.email}.png`} alt={user?.displayName || 'User'} />
+                    <AvatarFallback>{user?.displayName?.charAt(0).toUpperCase() || 'U'}</AvatarFallback>
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56" align="end" forceMount>
                 <DropdownMenuLabel className="font-normal">
                   <div className="flex flex-col space-y-1">
-                    <p className="text-sm font-medium leading-none">{user.name}</p>
-                    {user.email && (
+                    <p className="text-sm font-medium leading-none">{user?.displayName}</p>
+                    {user?.email && (
                         <p className="text-xs leading-none text-muted-foreground">
                         {user.email}
                         </p>
