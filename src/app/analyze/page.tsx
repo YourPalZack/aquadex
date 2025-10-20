@@ -73,7 +73,6 @@ export default function AnalyzePage() {
           <div className="lg:col-span-1">
             <ImageUploadForm 
               onAnalysisComplete={handleAnalysisComplete}
-              disabled={!selectedAquariumId}
             />
           </div>
           
