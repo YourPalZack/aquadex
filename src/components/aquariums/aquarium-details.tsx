@@ -327,6 +327,7 @@ export function AquariumDetails({ aquarium, livestock = [], equipment = [], wate
               <WaterTestList 
                 tests={waterTests} 
                 aquariumId={aquarium.id}
+                aquariumName={aquarium.name}
                 showActions={true}
               />
             </CardContent>

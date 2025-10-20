@@ -7,6 +7,7 @@
 
 import { useState } from 'react';
 import { WaterTestCard } from './water-test-card';
+import { ExportWaterTests } from './export-water-tests';
 import { Button } from '@/components/ui/button';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Droplet, Plus } from 'lucide-react';
@@ -20,9 +21,10 @@ interface WaterTestListProps {
   tests: WaterTest[];
   aquariumId: string;
   showActions?: boolean;
+  aquariumName?: string;
 }
 
-export function WaterTestList({ tests, aquariumId, showActions = true }: WaterTestListProps) {
+export function WaterTestList({ tests, aquariumId, showActions = true, aquariumName }: WaterTestListProps) {
   const router = useRouter();
   const { toast } = useToast();
   const [deleteId, setDeleteId] = useState<string | null>(null);
@@ -90,18 +92,26 @@ export function WaterTestList({ tests, aquariumId, showActions = true }: WaterTe
   return (
     <>
       <div className="space-y-4">
-        {/* Header with action button */}
+        {/* Header with action buttons */}
         {showActions && (
           <div className="flex justify-between items-center">
             <h3 className="text-lg font-semibold">
               Water Quality History ({tests.length})
             </h3>
-            <Button variant="outline" asChild>
-              <Link href={`/analyze?aquariumId=${aquariumId}`}>
-                <Plus className="h-4 w-4 mr-2" />
-                New Test
-              </Link>
-            </Button>
+            <div className="flex gap-2">
+              {tests.length > 0 && (
+                <ExportWaterTests 
+                  waterTests={tests} 
+                  aquariumLookup={aquariumName ? { [aquariumId]: aquariumName } : {}}
+                />
+              )}
+              <Button variant="outline" asChild>
+                <Link href={`/analyze?aquariumId=${aquariumId}`}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  New Test
+                </Link>
+              </Button>
+            </div>
           </div>
         )}
 

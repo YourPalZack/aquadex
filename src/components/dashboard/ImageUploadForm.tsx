@@ -124,3 +124,4 @@ export default function ImageUploadForm({ onAnalysisComplete }: ImageUploadFormP
       </form>
     </Card>
   );
+}
