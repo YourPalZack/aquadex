@@ -20,7 +20,7 @@ import Link from 'next/link';
 import type { Aquarium, Livestock, Equipment, WaterTest } from '@/types/aquarium';
 import { format } from 'date-fns';
 import { WaterTestList } from './water-test-list';
-import { WaterQualityTrends } from './water-quality-trends';
+import { AdvancedWaterCharts } from './advanced-water-charts';
 import { WaterTestSchedule } from './water-test-schedule';
 
 interface AquariumDetailsProps {
@@ -322,9 +322,9 @@ export function AquariumDetails({ aquarium, livestock = [], equipment = [], wate
               {/* Water Test Schedule */}
               <WaterTestSchedule aquarium={aquarium} />
               
-              {/* Water Quality Trends */}
+              {/* Advanced Water Charts */}
               {waterTests.length >= 2 && (
-                <WaterQualityTrends tests={waterTests} />
+                <AdvancedWaterCharts tests={waterTests} aquariumType={aquarium.waterType} />
               )}
               
               {/* Water Test List */}
