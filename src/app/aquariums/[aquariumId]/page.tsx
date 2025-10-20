@@ -27,8 +27,12 @@ export default async function AquariumDetailPage({ params }: AquariumDetailPageP
   }
 
   const { aquarium } = aquariumResult;
-  const livestock = livestockResult.livestock || [];
-  const equipment = equipmentResult.equipment || [];
+  const livestock = Array.isArray(livestockResult.livestock) 
+    ? livestockResult.livestock 
+    : [];
+  const equipment = Array.isArray(equipmentResult.equipment)
+    ? equipmentResult.equipment
+    : [];
 
   return (
     <div className="container mx-auto py-8 px-4">
