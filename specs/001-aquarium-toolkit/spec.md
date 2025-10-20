@@ -182,20 +182,20 @@ A fishkeeper wants to buy or sell used aquarium equipment, fish, plants, or othe
 
 - **FR-008**: System MUST allow users to capture or upload photos of water test strips
 - **FR-009**: System MUST analyze test strip images using AI to extract parameter values (pH, ammonia, nitrite, nitrate, KH, GH, chlorine)
-- **FR-010**: System MUST display analyzed parameters with numeric values, units, and status indicators (safe/warning/critical)
+- **FR-010**: System MUST display analyzed parameters with numeric values, units, and status indicators using color coding: safe (green #10b981), warning (yellow #f59e0b), critical (red #ef4444) with WCAG AA contrast ratios
 - **FR-011**: System MUST provide confidence scores for AI analysis and allow manual value adjustment when confidence score is below 75%
 - **FR-012**: System MUST save test results with timestamp and association to specific aquarium
 - **FR-013**: System MUST allow users to manually enter test results without photo upload
 - **FR-014**: System MUST support multiple test strip brands by identifying brand from photo or user selection
-- **FR-015**: System MUST provide explanations for each parameter status (why it's safe/warning/critical)
+- **FR-015**: System MUST provide explanations for each parameter status (1-2 sentence explanations, max 200 characters, with actionable next steps when status is warning/critical)
 
 **Historical Tracking**
 
 - **FR-016**: System MUST store all water test results with timestamps for long-term tracking
 - **FR-017**: System MUST display test history in chronological order with filtering by date range
-- **FR-018**: System MUST generate trend visualizations showing parameter changes over time
+- **FR-018**: System MUST generate trend visualizations using line charts with connected data points, dual-axis support for multiple parameters, showing parameter changes over time
 - **FR-019**: System MUST allow users to export test history in standard formats (CSV, PDF)
-- **FR-020**: System MUST highlight concerning trends (e.g., steadily rising nitrates) with explanatory text
+- **FR-020**: System MUST highlight concerning trends (parameters exceeding 20% increase over 7 days or 50% over 30 days) with explanatory text
 - **FR-021**: System MUST allow users to view statistics for each parameter (average, min, max, trend direction)
 
 **Treatment Recommendations**
@@ -204,13 +204,13 @@ A fishkeeper wants to buy or sell used aquarium equipment, fish, plants, or othe
 - **FR-023**: System MUST calculate dosages based on the specific aquarium's size
 - **FR-024**: System MUST provide product suggestions with purchase links to multiple vendors
 - **FR-025**: System MUST warn users about treatment compatibility issues and safety precautions (see Appendix A: Treatment Compatibility Matrix for dangerous combinations including copper+invertebrates, certain water conditioners with oxidizers, and medication interactions)
-- **FR-026**: System MUST prioritize recommendations by severity of water quality issues
-- **FR-027**: System MUST explain the purpose and expected results of each recommended treatment
+- **FR-026**: System MUST prioritize recommendations by severity levels: CRITICAL (pH <6.0 or >8.5, ammonia >0.25ppm), WARNING (nitrite >0.1ppm, nitrate >40ppm), CAUTION (parameters at thresholds)
+- **FR-027**: System MUST explain the purpose and expected results of each recommended treatment, with expected timeframes (24-72 hours for most treatments, longer for biological cycle establishment)
 
 **Maintenance Reminders**
 
 - **FR-028**: System MUST allow users to create recurring maintenance reminders (water changes, filter cleaning, testing)
-- **FR-029**: System MUST send notifications when maintenance tasks become due via email or in-app notifications
+- **FR-029**: System MUST send notifications 1 day before due date and on due date at 9:00 AM user local time via email or in-app notifications
 - **FR-030**: System MUST allow users to mark tasks as complete and automatically schedule next occurrence
 - **FR-031**: System MUST display a maintenance calendar showing all upcoming tasks across all aquariums
 - **FR-032**: System MUST allow users to postpone or edit reminder schedules
@@ -221,8 +221,8 @@ A fishkeeper wants to buy or sell used aquarium equipment, fish, plants, or othe
 - **FR-034**: System MUST provide AI-powered fish recommendations based on tank type, size, and existing inhabitants
 - **FR-035**: System MUST provide plant recommendations based on tank type, lighting, and substrate
 - **FR-036**: System MUST provide equipment recommendations (filters, heaters, lights) based on tank specifications
-- **FR-037**: System MUST show compatibility information for fish species (tank mates, incompatible species)
-- **FR-038**: System MUST include care requirements and difficulty ratings for recommended species
+- **FR-037**: System MUST show compatibility information for fish species with compatibility status (compatible/caution/incompatible), text explanation, and aggression level rating (1-5 scale)
+- **FR-038**: System MUST include care requirements and difficulty ratings (1-5 scale: 1=beginner, 2=easy, 3=intermediate, 4=advanced, 5=expert) based on water stability requirements, feeding complexity, and aggression management
 - **FR-039**: System MUST provide purchase links to multiple vendors for recommended products
 
 **Community Features**
@@ -231,9 +231,9 @@ A fishkeeper wants to buy or sell used aquarium equipment, fish, plants, or othe
 - **FR-041**: System MUST allow users to answer questions posted by others
 - **FR-042**: System MUST allow users to upvote helpful answers and mark accepted solutions
 - **FR-043**: System MUST allow users to search past questions and answers by keywords and tags
-- **FR-044**: System MUST allow users to report inappropriate content for moderator review
-- **FR-045**: System MUST display user reputation based on community contributions and accepted answers
-- **FR-046**: System MUST send notifications when users receive answers to their questions
+- **FR-044**: System MUST allow users to report inappropriate content (spam, harassment, off-topic, misinformation, illegal sales, explicit content) for moderator review
+- **FR-045**: System MUST display user reputation based on community contributions and accepted answers (calculation: 10 × accepted_answers + 2 × helpful_upvotes + 1 × questions_asked)
+- **FR-046**: System MUST send notifications via email or in-app when users receive answers to their questions
 
 **Marketplace**
 
@@ -242,8 +242,8 @@ A fishkeeper wants to buy or sell used aquarium equipment, fish, plants, or othe
 - **FR-049**: System MUST allow users to search listings by keywords, location, and price range
 - **FR-050**: System MUST allow users to contact sellers through the platform messaging system
 - **FR-051**: System MUST allow sellers to manage their listings (edit, mark as sold, delete)
-- **FR-052**: System MUST allow users to leave ratings and reviews after transactions
-- **FR-053**: System MUST require seller verification before allowing marketplace listing creation
+- **FR-052**: System MUST allow users to leave ratings and reviews after transactions (5-star rating required, text review optional with 500 character max, transaction photos optional with max 5 images)
+- **FR-053**: System MUST require seller verification (email confirmation + phone number verification, optional government ID upload for featured sellers) before allowing marketplace listing creation
 
 **User Management & Authentication**
 
@@ -260,7 +260,7 @@ A fishkeeper wants to buy or sell used aquarium equipment, fish, plants, or othe
 - **FR-061**: System MUST respond to user interactions within 2 seconds under normal load (up to 100 concurrent users with 95th percentile response time at 2 seconds)
 - **FR-062**: System MUST process test strip image analysis within 10 seconds for 85% of requests, with 15-second timeout for remaining cases
 - **FR-063**: System MUST be accessible on mobile devices (phones and tablets) with responsive design
-- **FR-064**: System MUST work reliably with slow internet connections (3G) for core features
+- **FR-064**: System MUST work reliably with slow internet connections (3G) for core features (aquarium profile CRUD, manual test entry, test history viewing; excludes AI analysis, image uploads, marketplace browsing)
 - **FR-065**: System MUST handle graceful degradation when AI services are temporarily unavailable
 
 ### Key Entities
@@ -284,15 +284,15 @@ A fishkeeper wants to buy or sell used aquarium equipment, fish, plants, or othe
 **Core Functionality**
 
 - **SC-001**: Users can create an aquarium profile and record their first water test within 5 minutes of signup
-- **SC-002**: AI test strip analysis produces results within 10 seconds with 90% or higher confidence in 85% of cases
+- **SC-002**: AI test strip analysis produces results within 10 seconds with 90% or higher confidence in 85% of cases (confidence calibrated on API Master Test Kit, Tetra EasyStrips, and Seachem MultiTest)
 - **SC-003**: 90% of users successfully complete water test analysis on their first attempt without assistance
 - **SC-004**: Users can view their complete test history for any aquarium within 2 seconds
 
 **User Engagement**
 
 - **SC-005**: 70% of users who create an aquarium profile record at least 3 water tests within their first month
-- **SC-006**: Users with active maintenance reminders show 40% higher engagement than users without reminders
-- **SC-007**: Community questions receive at least one answer within 24 hours in 80% of cases
+- **SC-006**: Users with active maintenance reminders (having 1+ enabled recurring reminders with at least 1 task completed in past 30 days) show 40% higher engagement than users without reminders
+- **SC-007**: Community questions receive at least one substantive answer (minimum 25 words, not flagged as spam) within 24 hours in 80% of cases
 - **SC-008**: 60% of users who receive treatment recommendations report improved water parameters within 2 weeks
 
 **Performance & Reliability**

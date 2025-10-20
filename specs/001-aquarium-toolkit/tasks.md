@@ -46,7 +46,7 @@
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
 - [ ] T013 Create complete database schema with all 11 entities in src/lib/db/schema.ts per data-model.md
-- [ ] T014 Export Drizzle client instance configured for Neon serverless in src/lib/db/index.ts
+- [ ] T014 Export Drizzle client instance configured for Neon serverless with connection pooling (max 10 connections, 30s idle timeout) in src/lib/db/index.ts
 - [ ] T015 Run drizzle-kit generate to create migration SQL files in drizzle/ directory
 - [ ] T016 Run drizzle-kit push to apply schema to Neon database
 - [ ] T017 [P] Create Supabase client for browser components in src/lib/supabase/client.ts
@@ -57,7 +57,7 @@
 - [ ] T022 [P] Create root layout with Tailwind styles and font configuration in src/app/layout.tsx
 - [ ] T023 [P] Create base navigation component with logo and auth status in src/components/layout/navbar.tsx
 - [ ] T024 [P] Create footer component with links in src/components/layout/footer.tsx
-- [ ] T025 [P] Setup Shadcn UI base components (button, card, dialog, form, input, label, select) in src/components/ui/
+- [ ] T025 [P] Setup Shadcn UI base components (button, card, dialog, form, input, label, select, checkbox, radio-group, textarea, switch, tabs, separator) in src/components/ui/
 - [ ] T026 [P] Create error boundary component for graceful error handling in src/components/shared/error-boundary.tsx
 - [ ] T027 [P] Create loading spinner component for async operations in src/components/shared/loading-spinner.tsx
 - [ ] T028 [P] Create toast notification system using Shadcn toast in src/components/ui/toast.tsx and src/hooks/use-toast.ts
@@ -74,9 +74,9 @@
 
 ### Implementation for User Story 1
 
-- [ ] T029 [P] [US1] Create Aquarium TypeScript type in src/types/aquarium.ts matching database schema
-- [ ] T030 [P] [US1] Create Zod validation schema for aquarium creation/update in src/lib/validations/aquarium.ts
-- [ ] T031 [P] [US1] Create Livestock and Equipment TypeScript types in src/types/aquarium.ts
+- [ ] T029 [P] [US1] Create Aquarium TypeScript type in src/types/aquarium.ts matching database schema (maps to aquariums table) with size_value, size_unit enum ('gallons'|'liters'), and conversion utility functions
+- [ ] T030 [P] [US1] Create Zod validation schema for aquarium creation/update in src/lib/validations/aquarium.ts with unit validation
+- [ ] T031 [P] [US1] Create Livestock and Equipment TypeScript types in src/types/aquarium.ts (map to livestock and equipment tables)
 - [ ] T032 [US1] Create server action for creating aquarium in src/lib/actions/aquariums.ts
 - [ ] T033 [US1] Create server action for updating aquarium in src/lib/actions/aquariums.ts
 - [ ] T034 [US1] Create server action for deleting aquarium in src/lib/actions/aquariums.ts
@@ -84,7 +84,7 @@
 - [ ] T036 [US1] Create server action for fetching single aquarium with livestock/equipment in src/lib/actions/aquariums.ts
 - [ ] T037 [P] [US1] Create AquariumCard component displaying tank summary in src/components/aquariums/aquarium-card.tsx
 - [ ] T038 [P] [US1] Create AquariumForm component with React Hook Form and Zod validation in src/components/aquariums/aquarium-form.tsx
-- [ ] T039 [P] [US1] Create ImageUpload component for aquarium photos using Supabase Storage in src/components/shared/image-upload.tsx
+- [ ] T039 [P] [US1] Create ImageUpload component for aquarium photos using Supabase Storage in src/components/shared/image-upload.tsx with validation (max 5MB, formats jpg/png/webp, strip EXIF data, generate thumbnails)
 - [ ] T040 [US1] Create aquariums list page displaying user's tanks in src/app/(dashboard)/aquariums/page.tsx
 - [ ] T041 [US1] Create aquarium detail page showing full profile in src/app/(dashboard)/aquariums/[id]/page.tsx
 - [ ] T042 [US1] Create new aquarium page with creation form in src/app/(dashboard)/aquariums/new/page.tsx
@@ -195,17 +195,19 @@
 
 ### Implementation for User Story 5
 
-- [ ] T097 [P] [US5] Create MaintenanceTask TypeScript type in src/types/reminder.ts matching database schema
+- [ ] T097 [P] [US5] Create MaintenanceTask TypeScript type in src/types/reminder.ts matching database schema (maps to maintenance_tasks table)
 - [ ] T098 [P] [US5] Create Zod validation schema for reminder creation in src/lib/validations/reminder.ts
 - [ ] T099 [US5] Create server action for creating maintenance reminder in src/lib/actions/reminders.ts
 - [ ] T100 [US5] Create server action for updating reminder in src/lib/actions/reminders.ts
 - [ ] T101 [US5] Create server action for deleting reminder in src/lib/actions/reminders.ts
 - [ ] T102 [US5] Create server action for marking task complete and scheduling next occurrence in src/lib/actions/reminders.ts
+- [ ] T102b [US5] Create server action for fetching maintenance completion history in src/lib/actions/reminders.ts (implements FR-033)
 - [ ] T103 [US5] Create server action for fetching due/upcoming reminders in src/lib/actions/reminders.ts
 - [ ] T104 [P] [US5] Create ReminderForm component with frequency selector in src/components/reminders/reminder-form.tsx
 - [ ] T105 [P] [US5] Create ReminderCard component displaying task details and due date in src/components/reminders/reminder-card.tsx
 - [ ] T106 [P] [US5] Create MaintenanceCalendar component showing all tasks chronologically in src/components/reminders/maintenance-calendar.tsx
 - [ ] T107 [P] [US5] Create TaskCompleteButton component for marking tasks done in src/components/reminders/task-complete-button.tsx
+- [ ] T107b [P] [US5] Create MaintenanceHistory component displaying completion log in src/components/reminders/maintenance-history.tsx (implements FR-033)
 - [ ] T108 [US5] Create reminders page with calendar view and upcoming tasks list in src/app/(dashboard)/reminders/page.tsx
 - [ ] T109 [US5] Integrate email notification system for due reminders using Supabase Edge Functions or external service
 - [ ] T110 [US5] Create notification preferences component in user settings in src/components/profile/notification-preferences.tsx
@@ -360,7 +362,7 @@
 - [ ] T202 [P] Implement infinite scroll or pagination for long lists (tests, questions, listings)
 - [ ] T203 [P] Add search functionality with debouncing to prevent excessive API calls
 - [ ] T204 [P] Implement WCAG 2.1 AA accessibility: keyboard navigation, ARIA labels, focus indicators
-- [ ] T205 [P] Add meta tags for SEO on all public pages (landing, Q&A, marketplace)
+- [ ] T205 [P] Add SEO meta tags to all pages (include: title, description, og:title, og:description, og:image, twitter:card, canonical URL)
 - [ ] T206 [P] Implement responsive design testing at 320px, 768px, 1024px, 1920px breakpoints
 - [ ] T207 [P] Add analytics tracking for key user actions using privacy-friendly solution
 - [ ] T208 [P] Create landing page at src/app/page.tsx with feature showcase and signup CTA
