@@ -50,6 +50,11 @@ export interface Aquarium {
   nextFeedingReminder?: Date;
   sourceWaterType?: SourceWaterType;
   sourceWaterParameters?: string;
+  // Water test scheduling
+  testFrequencyDays?: number;
+  lastTestDate?: Date;
+  nextTestDate?: Date;
+  testReminderEnabled?: boolean;
 }
 
 // Moved from /src/app/aquariums/page.tsx
@@ -73,6 +78,10 @@ export const mockAquariumsData: Aquarium[] = [
     nextFeedingReminder: subDays(today, 1), 
     sourceWaterType: 'premixed_saltwater',
     sourceWaterParameters: 'Using Tropic Marin Pro Reef salt mix.',
+    testFrequencyDays: 14,
+    lastTestDate: subDays(today, 7),
+    nextTestDate: addDays(today, 7),
+    testReminderEnabled: true,
   },
   {
     id: 'aqua2',
@@ -92,6 +101,10 @@ export const mockAquariumsData: Aquarium[] = [
     nextFeedingReminder: addDays(today, 1), 
     sourceWaterType: 'tap',
     sourceWaterParameters: 'Tap water treated with Seachem Prime. pH: 7.2, GH: 5 dGH',
+    testFrequencyDays: 7,
+    lastTestDate: subDays(today, 3),
+    nextTestDate: addDays(today, 4),
+    testReminderEnabled: true,
   },
   {
     id: 'aqua3',
@@ -111,6 +124,10 @@ export const mockAquariumsData: Aquarium[] = [
     nextFeedingReminder: addDays(today, 7), 
     sourceWaterType: 'ro',
     sourceWaterParameters: 'RO water remineralized with Seachem Equilibrium.',
+    testFrequencyDays: 10,
+    lastTestDate: subDays(today, 4),
+    nextTestDate: addDays(today, 6),
+    testReminderEnabled: true,
   },
   {
     id: 'aqua4',
@@ -129,6 +146,10 @@ export const mockAquariumsData: Aquarium[] = [
     foodDetails: 'Reef Roids, Small Pellets',
     nextFeedingReminder: addDays(today, 0), 
     sourceWaterType: 'ro',
+    testFrequencyDays: 21,
+    lastTestDate: subDays(today, 12),
+    nextTestDate: addDays(today, 9),
+    testReminderEnabled: false,
   },
 ];
 

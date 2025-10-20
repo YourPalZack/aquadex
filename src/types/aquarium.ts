@@ -23,13 +23,18 @@ export interface Aquarium extends BaseEntity {
   imageUrls: string[];
   notes?: string;
   isActive: boolean;
+  // Water test scheduling
+  testFrequencyDays?: number;
+  lastTestDate?: Date;
+  nextTestDate?: Date;
+  testReminderEnabled?: boolean;
 }
 
 export interface AquariumWithStats extends Aquarium {
   livestockCount: number;
   equipmentCount: number;
-  lastTestDate?: Date;
   lastMaintenanceDate?: Date;
+  upcomingTestsCount?: number;
 }
 
 // Livestock types
@@ -84,11 +89,15 @@ export interface CreateAquariumData {
   setupDate: Date | string;
   imageUrls?: string[];
   notes?: string;
+  testFrequencyDays?: number;
+  testReminderEnabled?: boolean;
 }
 
 export interface UpdateAquariumData extends Partial<CreateAquariumData> {
   id: string;
   isActive?: boolean;
+  lastTestDate?: Date | string;
+  nextTestDate?: Date | string;
 }
 
 export interface CreateLivestockData {

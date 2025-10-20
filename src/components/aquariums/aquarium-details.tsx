@@ -21,6 +21,7 @@ import type { Aquarium, Livestock, Equipment, WaterTest } from '@/types/aquarium
 import { format } from 'date-fns';
 import { WaterTestList } from './water-test-list';
 import { WaterQualityTrends } from './water-quality-trends';
+import { WaterTestSchedule } from './water-test-schedule';
 
 interface AquariumDetailsProps {
   aquarium: Aquarium;
@@ -318,6 +319,9 @@ export function AquariumDetails({ aquarium, livestock = [], equipment = [], wate
               </div>
             </CardHeader>
             <CardContent className="space-y-6">
+              {/* Water Test Schedule */}
+              <WaterTestSchedule aquarium={aquarium} />
+              
               {/* Water Quality Trends */}
               {waterTests.length >= 2 && (
                 <WaterQualityTrends tests={waterTests} />
