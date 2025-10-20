@@ -228,3 +228,76 @@ export interface WaterTestResponse {
   waterTests?: WaterTest[];
   error?: string;
 }
+
+// Alert System Types
+export type ParameterAlertSeverity = 'low' | 'medium' | 'high' | 'critical';
+export type AlertStatus = 'active' | 'acknowledged' | 'resolved' | 'snoozed';
+export type AlertNotificationMethod = 'email' | 'push' | 'in-app' | 'sms';
+
+export interface ParameterThreshold {
+  id: string;
+  parameterName: string;
+  unit: string;
+  aquariumId: string;
+  userId: string;
+  // Threshold ranges
+  idealMin?: number;
+  idealMax?: number;
+  warningMin?: number;
+  warningMax?: number;
+  criticalMin?: number;
+  criticalMax?: number;
+  // Alert settings
+  enabled: boolean;
+  notificationMethods: AlertNotificationMethod[];
+  snoozeUntil?: Date;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface ParameterAlert extends BaseEntity {
+  aquariumId: string;
+  userId: string;
+  thresholdId: string;
+  testId: string;
+  parameterName: string;
+  parameterValue: number;
+  unit: string;
+  severity: ParameterAlertSeverity;
+  status: AlertStatus;
+  title: string;
+  message: string;
+  triggeredAt: Date;
+  acknowledgedAt?: Date;
+  resolvedAt?: Date;
+  snoozedUntil?: Date;
+  notificationsSent: AlertNotificationMethod[];
+}
+
+// Alert configuration for different aquarium types
+export interface AlertConfiguration {
+  aquariumType: WaterType;
+  parameterName: string;
+  unit: string;
+  defaultThresholds: {
+    idealMin?: number;
+    idealMax?: number;
+    warningMin?: number;
+    warningMax?: number;
+    criticalMin?: number;
+    criticalMax?: number;
+  };
+}
+
+// Alert management responses
+export interface AlertResponse {
+  alert?: ParameterAlert;
+  alerts?: ParameterAlert[];
+  error?: string;
+}
+
+export interface ThresholdResponse {
+  threshold?: ParameterThreshold;
+  thresholds?: ParameterThreshold[];
+  error?: string;
+}
