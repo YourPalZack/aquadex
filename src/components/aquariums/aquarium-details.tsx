@@ -13,7 +13,8 @@ import {
   FileText,
   Activity,
   Package,
-  TestTube
+  TestTube,
+  AlertTriangle
 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -166,7 +167,7 @@ export function AquariumDetails({ aquarium, livestock = [], equipment = [], wate
 
       {/* Tabs for Livestock, Equipment, etc. */}
       <Tabs defaultValue="livestock" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="livestock">
             <Fish className="h-4 w-4 mr-2" />
             Livestock ({livestock.length})
@@ -178,6 +179,10 @@ export function AquariumDetails({ aquarium, livestock = [], equipment = [], wate
           <TabsTrigger value="water-tests">
             <TestTube className="h-4 w-4 mr-2" />
             Water Tests ({waterTests.length})
+          </TabsTrigger>
+          <TabsTrigger value="alerts">
+            <AlertTriangle className="h-4 w-4 mr-2" />
+            Alerts
           </TabsTrigger>
         </TabsList>
 
@@ -342,6 +347,16 @@ export function AquariumDetails({ aquarium, livestock = [], equipment = [], wate
               />
             </CardContent>
           </Card>
+        </TabsContent>
+
+        {/* Alerts Tab */}
+        <TabsContent value="alerts" className="space-y-6">
+          <AlertThresholds 
+            aquariumId={aquarium.id}
+            aquariumName={aquarium.name}
+            waterType={aquarium.waterType}
+          />
+          <AlertsDashboard />
         </TabsContent>
       </Tabs>
     </div>
