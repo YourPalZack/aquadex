@@ -18,6 +18,7 @@ npm test && npm run lint
 TypeScript 5.3+ (strict mode), Node.js 20+: Follow standard conventions
 
 ## Recent Changes
+- 001-aquarium-toolkit: Added TypeScript 5.3+ (strict mode), Node.js 20+
 - 001-aquarium-toolkit: Added TypeScript 5.3+ (strict mode), Node.js 20+ + Next.js 15.2+, React 18.3+, Supabase 2.39+, Drizzle ORM 0.30+, Genkit 1.8+, Zod 3.24+
 
 <!-- MANUAL ADDITIONS START -->
