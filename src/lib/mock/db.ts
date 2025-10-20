@@ -103,12 +103,30 @@ export const mockDb = {
       await simulateDelay();
       let tests = [...mockData.waterTests];
       
+      if (options?.where?.userId) {
+        tests = tests.filter(t => t.userId === options.where.userId);
+      }
+      
       if (options?.where?.aquariumId) {
         tests = tests.filter(t => t.aquariumId === options.where.aquariumId);
       }
       
-      if (options?.orderBy) {
+      if (options?.where?.startDate || options?.where?.endDate) {
+        const startDate = options.where?.startDate ? new Date(options.where.startDate) : null;
+        const endDate = options.where?.endDate ? new Date(options.where.endDate) : null;
+        
+        tests = tests.filter(t => {
+          const testDate = new Date(t.testDate);
+          if (startDate && testDate < startDate) return false;
+          if (endDate && testDate > endDate) return false;
+          return true;
+        });
+      }
+      
+      if (options?.orderBy?.testDate === 'desc') {
         tests.sort((a, b) => b.testDate.getTime() - a.testDate.getTime());
+      } else if (options?.orderBy?.testDate === 'asc') {
+        tests.sort((a, b) => a.testDate.getTime() - b.testDate.getTime());
       }
       
       if (options?.limit) {
@@ -119,7 +137,65 @@ export const mockDb = {
     },
     findFirst: async (options?: { where?: any }) => {
       await simulateDelay();
-      return mockData.waterTests[0];
+      let tests = [...mockData.waterTests];
+      
+      if (options?.where?.aquariumId) {
+        tests = tests.filter(t => t.aquariumId === options.where.aquariumId);
+      }
+      
+      if (options?.where?.userId) {
+        tests = tests.filter(t => t.userId === options.where.userId);
+      }
+      
+      if (options?.where?.id) {
+        return tests.find(t => t.id === options.where.id);
+      }
+      
+      return tests[0];
+    },
+    findUnique: async (options?: { where?: any }) => {
+      await simulateDelay();
+      if (options?.where?.id) {
+        const test = mockData.waterTests.find(t => t.id === options.where.id);
+        if (test && options.where.userId && test.userId !== options.where.userId) {
+          return null;
+        }
+        return test || null;
+      }
+      return null;
+    },
+    create: async (data: any) => {
+      await simulateDelay();
+      const newTest = {
+        ...data.data,
+        id: `test_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+      mockData.waterTests.unshift(newTest); // Add to beginning for most recent
+      return newTest;
+    },
+    update: async (options: any) => {
+      await simulateDelay();
+      const index = mockData.waterTests.findIndex(t => t.id === options.where.id);
+      if (index !== -1) {
+        mockData.waterTests[index] = {
+          ...mockData.waterTests[index],
+          ...options.data,
+          updatedAt: new Date(),
+        };
+        return mockData.waterTests[index];
+      }
+      throw new Error('Water test not found');
+    },
+    delete: async (options: any) => {
+      await simulateDelay();
+      const index = mockData.waterTests.findIndex(t => t.id === options.where.id);
+      if (index !== -1) {
+        const deleted = mockData.waterTests.splice(index, 1)[0];
+        return deleted;
+      }
+      throw new Error('Water test not found');
     },
     insert: async (data: any) => {
       await simulateDelay();

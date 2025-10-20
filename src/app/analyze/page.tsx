@@ -3,23 +3,28 @@
 
 import { useState } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import ImageUploadForm from '@/components/dashboard/ImageUploadForm';
 import AnalysisResults from '@/components/dashboard/AnalysisResults';
 import TreatmentRecommendations from '@/components/dashboard/TreatmentRecommendations';
 import { AquariumSelector } from '@/components/aquariums/aquarium-selector';
+import { createWaterTest } from '@/lib/actions/water-test';
 import type { AnalyzeTestStripOutput, RecommendTreatmentProductsOutput } from '@/types';
+import type { WaterParameter } from '@/types/aquarium';
 import { Card, CardDescription, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { FileScan, Sparkles } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { useToast } from '@/hooks/use-toast';
 
 export default function AnalyzePage() {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const { toast } = useToast();
   const aquariumIdFromUrl = searchParams.get('aquariumId');
   
   const [selectedAquariumId, setSelectedAquariumId] = useState<string>(aquariumIdFromUrl || '');
   const [analysisResult, setAnalysisResult] = useState<AnalyzeTestStripOutput | null>(null);
   const [recommendations, setRecommendations] = useState<RecommendTreatmentProductsOutput | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
 
   const handleAquariumChange = (aquariumId: string) => {
     setSelectedAquariumId(aquariumId);
@@ -29,12 +34,63 @@ export default function AnalyzePage() {
     router.push(url.pathname + url.search, { scroll: false });
   };
 
-  const handleAnalysisComplete = (data: { analysis: AnalyzeTestStripOutput; recommendations: RecommendTreatmentProductsOutput | null }) => {
+  const handleAnalysisComplete = async (data: { 
+    analysis: AnalyzeTestStripOutput; 
+    recommendations: RecommendTreatmentProductsOutput | null 
+  }) => {
     setAnalysisResult(data.analysis);
     setRecommendations(data.recommendations);
     
-    // TODO: Save test result to database with aquarium ID
-    console.log('Test result for aquarium:', selectedAquariumId, data.analysis);
+    // Save test result to database if aquarium is selected
+    if (selectedAquariumId) {
+      setIsSaving(true);
+      try {
+        // Create basic water parameters from the text analysis
+        // Since the AI returns a string description, we'll save it as notes
+        // and create a simple placeholder parameter
+        const parameters: WaterParameter[] = [{
+          name: 'Test Strip Analysis',
+          value: 1,
+          unit: '',
+          status: 'acceptable' as const,
+        }];
+
+        const recommendationTexts = data.recommendations?.products?.map(p => 
+          `${p.productName}: ${p.reasoning}`
+        ) || [];
+
+        const result = await createWaterTest({
+          aquariumId: selectedAquariumId,
+          testDate: new Date(),
+          method: 'test-strip',
+          parameters,
+          recommendations: recommendationTexts,
+          notes: data.analysis.waterParameters, // Store the full analysis text as notes
+        });
+
+        if (result.error) {
+          toast({
+            title: 'Warning',
+            description: `Test analyzed successfully, but could not save to history: ${result.error}`,
+            variant: 'destructive',
+          });
+        } else {
+          toast({
+            title: 'Success',
+            description: 'Test results saved to aquarium history',
+          });
+        }
+      } catch (error) {
+        console.error('Error saving test result:', error);
+        toast({
+          title: 'Warning',
+          description: 'Test analyzed successfully, but could not save to history',
+          variant: 'destructive',
+        });
+      } finally {
+        setIsSaving(false);
+      }
+    }
   };
 
   return (

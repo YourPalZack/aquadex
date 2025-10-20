@@ -147,6 +147,54 @@ export interface EquipmentFilters {
   needsMaintenance?: boolean;
 }
 
+// Water test types
+export interface WaterParameter {
+  name: string;
+  value: number;
+  unit: string;
+  status: 'ideal' | 'acceptable' | 'warning' | 'critical';
+  idealRange?: {
+    min: number;
+    max: number;
+  };
+}
+
+export interface WaterTest extends BaseEntity {
+  aquariumId: string;
+  userId: string;
+  testDate: Date;
+  method: 'test-strip' | 'liquid-test' | 'digital-meter' | 'manual-entry';
+  imageUrl?: string;
+  parameters: WaterParameter[];
+  notes?: string;
+  recommendations?: string[];
+}
+
+export interface WaterTestWithAquarium extends WaterTest {
+  aquarium: Pick<Aquarium, 'id' | 'name' | 'waterType' | 'sizeGallons'>;
+}
+
+export interface CreateWaterTestData {
+  aquariumId: string;
+  testDate: Date | string;
+  method: 'test-strip' | 'liquid-test' | 'digital-meter' | 'manual-entry';
+  imageUrl?: string;
+  parameters: WaterParameter[];
+  notes?: string;
+  recommendations?: string[];
+}
+
+export interface UpdateWaterTestData extends Partial<CreateWaterTestData> {
+  id: string;
+}
+
+export interface WaterTestFilters {
+  aquariumId?: string;
+  startDate?: Date;
+  endDate?: Date;
+  method?: string;
+}
+
 // Response types for server actions
 export interface AquariumResponse {
   aquarium?: Aquarium;
@@ -163,5 +211,11 @@ export interface LivestockResponse {
 export interface EquipmentResponse {
   equipment?: Equipment;
   equipmentList?: Equipment[];
+  error?: string;
+}
+
+export interface WaterTestResponse {
+  waterTest?: WaterTest;
+  waterTests?: WaterTest[];
   error?: string;
 }

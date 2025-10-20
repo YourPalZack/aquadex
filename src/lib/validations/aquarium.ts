@@ -121,6 +121,47 @@ export const equipmentFiltersSchema = z.object({
   needsMaintenance: z.boolean().optional(),
 }).optional();
 
+// Water test schemas
+export const waterParameterSchema = z.object({
+  name: z.string().min(1, 'Parameter name is required'),
+  value: z.number(),
+  unit: z.string().min(1, 'Unit is required'),
+  status: z.enum(['ideal', 'acceptable', 'warning', 'critical']),
+  idealRange: z.object({
+    min: z.number(),
+    max: z.number(),
+  }).optional(),
+});
+
+export const testMethodSchema = z.enum(['test-strip', 'liquid-test', 'digital-meter', 'manual-entry']);
+
+export const createWaterTestSchema = z.object({
+  aquariumId: z.string().min(1, 'Aquarium is required'),
+  testDate: z.coerce.date(),
+  method: testMethodSchema,
+  imageUrl: z.string().url('Invalid image URL').optional(),
+  parameters: z.array(waterParameterSchema)
+    .min(1, 'At least one parameter is required')
+    .max(20, 'Maximum 20 parameters allowed'),
+  notes: z.string()
+    .max(1000, 'Notes must be less than 1000 characters')
+    .optional(),
+  recommendations: z.array(z.string()).optional(),
+});
+
+export const updateWaterTestSchema = createWaterTestSchema
+  .partial()
+  .extend({
+    id: z.string().min(1, 'ID is required'),
+  });
+
+export const waterTestFiltersSchema = z.object({
+  aquariumId: z.string().optional(),
+  startDate: z.coerce.date().optional(),
+  endDate: z.coerce.date().optional(),
+  method: testMethodSchema.optional(),
+}).optional();
+
 // Type inference helpers
 export type CreateAquariumInput = z.infer<typeof createAquariumSchema>;
 export type UpdateAquariumInput = z.infer<typeof updateAquariumSchema>;
@@ -128,3 +169,5 @@ export type CreateLivestockInput = z.infer<typeof createLivestockSchema>;
 export type UpdateLivestockInput = z.infer<typeof updateLivestockSchema>;
 export type CreateEquipmentInput = z.infer<typeof createEquipmentSchema>;
 export type UpdateEquipmentInput = z.infer<typeof updateEquipmentSchema>;
+export type CreateWaterTestInput = z.infer<typeof createWaterTestSchema>;
+export type UpdateWaterTestInput = z.infer<typeof updateWaterTestSchema>;
