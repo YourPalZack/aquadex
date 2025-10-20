@@ -1,0 +1,594 @@
+openapi: 3.0.0
+info:
+  title: Marketplace API
+  version: 1.0.0
+  description: API for marketplace listings, search, and messaging between users
+
+paths:
+  /api/marketplace/listings:
+    get:
+      summary: Browse marketplace listings with filters
+      tags: [Marketplace]
+      parameters:
+        - name: category
+          in: query
+          schema:
+            type: string
+            enum: [fish, plant, equipment, tank, accessory, all]
+        - name: search
+          in: query
+          schema:
+            type: string
+          description: Search in title and description
+        - name: minPrice
+          in: query
+          schema:
+            type: number
+            format: float
+        - name: maxPrice
+          in: query
+          schema:
+            type: number
+            format: float
+        - name: condition
+          in: query
+          schema:
+            type: string
+            enum: [new, like_new, good, fair]
+        - name: location
+          in: query
+          schema:
+            type: string
+          description: Filter by city/state
+        - name: willingToShip
+          in: query
+          schema:
+            type: boolean
+        - name: sort
+          in: query
+          schema:
+            type: string
+            enum: [recent, price_low, price_high, popular]
+            default: recent
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+            maximum: 50
+      responses:
+        200:
+          description: List of listings
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  listings:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/MarketplaceListing'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+
+    post:
+      summary: Create a new marketplace listing
+      tags: [Marketplace]
+      security:
+        - supabaseAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateListingInput'
+      responses:
+        201:
+          description: Listing created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MarketplaceListing'
+        400:
+          description: Validation error
+        401:
+          description: Unauthorized
+
+  /api/marketplace/listings/{listingId}:
+    get:
+      summary: Get a specific listing with seller info
+      tags: [Marketplace]
+      parameters:
+        - name: listingId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Listing details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListingDetail'
+        404:
+          description: Listing not found
+
+    patch:
+      summary: Update a listing (seller only)
+      tags: [Marketplace]
+      security:
+        - supabaseAuth: []
+      parameters:
+        - name: listingId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateListingInput'
+      responses:
+        200:
+          description: Listing updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MarketplaceListing'
+        403:
+          description: Not the seller
+        404:
+          description: Listing not found
+        401:
+          description: Unauthorized
+
+    delete:
+      summary: Delete a listing (seller only)
+      tags: [Marketplace]
+      security:
+        - supabaseAuth: []
+      parameters:
+        - name: listingId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        204:
+          description: Listing deleted
+        403:
+          description: Not the seller
+        404:
+          description: Listing not found
+        401:
+          description: Unauthorized
+
+  /api/marketplace/listings/{listingId}/mark-sold:
+    post:
+      summary: Mark a listing as sold
+      tags: [Marketplace]
+      security:
+        - supabaseAuth: []
+      parameters:
+        - name: listingId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Listing marked as sold
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MarketplaceListing'
+        403:
+          description: Not the seller
+        404:
+          description: Listing not found
+        401:
+          description: Unauthorized
+
+  /api/marketplace/my-listings:
+    get:
+      summary: Get current user's listings
+      tags: [Marketplace]
+      security:
+        - supabaseAuth: []
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [active, sold, expired, all]
+            default: all
+      responses:
+        200:
+          description: User's listings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MarketplaceListing'
+        401:
+          description: Unauthorized
+
+  /api/marketplace/categories:
+    get:
+      summary: Get all marketplace categories with counts
+      tags: [Marketplace]
+      responses:
+        200:
+          description: List of categories
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    category:
+                      type: string
+                    count:
+                      type: integer
+
+  /api/messages:
+    get:
+      summary: Get user's messages (inbox)
+      tags: [Messages]
+      security:
+        - supabaseAuth: []
+      parameters:
+        - name: filter
+          in: query
+          schema:
+            type: string
+            enum: [all, unread, archived]
+            default: all
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+      responses:
+        200:
+          description: List of messages
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  messages:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Message'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+        401:
+          description: Unauthorized
+
+    post:
+      summary: Send a message to another user
+      tags: [Messages]
+      security:
+        - supabaseAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateMessageInput'
+      responses:
+        201:
+          description: Message sent
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        400:
+          description: Validation error
+        401:
+          description: Unauthorized
+
+  /api/messages/{messageId}:
+    get:
+      summary: Get a specific message
+      tags: [Messages]
+      security:
+        - supabaseAuth: []
+      parameters:
+        - name: messageId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Message details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        404:
+          description: Message not found
+        401:
+          description: Unauthorized
+
+    patch:
+      summary: Mark message as read/archived
+      tags: [Messages]
+      security:
+        - supabaseAuth: []
+      parameters:
+        - name: messageId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                isRead:
+                  type: boolean
+                isArchived:
+                  type: boolean
+      responses:
+        200:
+          description: Message updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        404:
+          description: Message not found
+        401:
+          description: Unauthorized
+
+  /api/messages/conversation/{userId}:
+    get:
+      summary: Get conversation thread with a specific user
+      tags: [Messages]
+      security:
+        - supabaseAuth: []
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Conversation messages
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Message'
+        401:
+          description: Unauthorized
+
+components:
+  securitySchemes:
+    supabaseAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    MarketplaceListing:
+      type: object
+      properties:
+        id:
+          type: string
+        sellerId:
+          type: string
+        seller:
+          $ref: '#/components/schemas/UserProfile'
+        title:
+          type: string
+        description:
+          type: string
+        category:
+          type: string
+          enum: [fish, plant, equipment, tank, accessory, other]
+        subcategory:
+          type: string
+        price:
+          type: number
+          format: float
+        currency:
+          type: string
+        condition:
+          type: string
+          enum: [new, like_new, good, fair]
+        imageUrls:
+          type: array
+          items:
+            type: string
+        location:
+          type: string
+        willingToShip:
+          type: boolean
+        status:
+          type: string
+          enum: [active, sold, expired, removed]
+        viewCount:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        expiresAt:
+          type: string
+          format: date-time
+
+    ListingDetail:
+      allOf:
+        - $ref: '#/components/schemas/MarketplaceListing'
+        - type: object
+          properties:
+            sellerReputation:
+              type: integer
+            sellerResponseRate:
+              type: string
+
+    CreateListingInput:
+      type: object
+      required:
+        - title
+        - description
+        - category
+        - price
+        - condition
+        - location
+      properties:
+        title:
+          type: string
+          minLength: 10
+          maxLength: 100
+        description:
+          type: string
+          minLength: 20
+          maxLength: 2000
+        category:
+          type: string
+          enum: [fish, plant, equipment, tank, accessory, other]
+        subcategory:
+          type: string
+        price:
+          type: number
+          format: float
+          minimum: 0
+        condition:
+          type: string
+          enum: [new, like_new, good, fair]
+        imageUrls:
+          type: array
+          items:
+            type: string
+          maxItems: 5
+        location:
+          type: string
+        willingToShip:
+          type: boolean
+          default: false
+
+    UpdateListingInput:
+      type: object
+      properties:
+        title:
+          type: string
+          minLength: 10
+          maxLength: 100
+        description:
+          type: string
+          minLength: 20
+          maxLength: 2000
+        price:
+          type: number
+          format: float
+          minimum: 0
+        condition:
+          type: string
+          enum: [new, like_new, good, fair]
+        imageUrls:
+          type: array
+          items:
+            type: string
+          maxItems: 5
+        willingToShip:
+          type: boolean
+        status:
+          type: string
+          enum: [active, sold, expired, removed]
+
+    Message:
+      type: object
+      properties:
+        id:
+          type: string
+        senderId:
+          type: string
+        sender:
+          $ref: '#/components/schemas/UserProfile'
+        recipientId:
+          type: string
+        recipient:
+          $ref: '#/components/schemas/UserProfile'
+        listingId:
+          type: string
+        listing:
+          type: object
+          properties:
+            title:
+              type: string
+            imageUrl:
+              type: string
+        subject:
+          type: string
+        content:
+          type: string
+        isRead:
+          type: boolean
+        isArchived:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+
+    CreateMessageInput:
+      type: object
+      required:
+        - recipientId
+        - content
+      properties:
+        recipientId:
+          type: string
+        listingId:
+          type: string
+        subject:
+          type: string
+        content:
+          type: string
+          minLength: 1
+          maxLength: 2000
+
+    UserProfile:
+      type: object
+      properties:
+        id:
+          type: string
+        displayName:
+          type: string
+        photoUrl:
+          type: string
+        reputationScore:
+          type: integer
+
+    Pagination:
+      type: object
+      properties:
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+        totalPages:
+          type: integer

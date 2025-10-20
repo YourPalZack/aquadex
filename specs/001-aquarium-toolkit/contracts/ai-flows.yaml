@@ -1,0 +1,657 @@
+openapi: 3.0.0
+info:
+  title: AI Tools & Genkit Flows API
+  version: 1.0.0
+  description: API for AI-powered features including product finders, food recommendations, and treatment suggestions
+
+paths:
+  /api/ai/fish-finder:
+    post:
+      summary: Find compatible fish for an aquarium setup
+      tags: [AI Tools]
+      security:
+        - supabaseAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FishFinderInput'
+      responses:
+        200:
+          description: Fish recommendations
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FishFinderResult'
+        400:
+          description: Invalid input
+        401:
+          description: Unauthorized
+
+  /api/ai/plant-finder:
+    post:
+      summary: Find compatible plants for an aquarium
+      tags: [AI Tools]
+      security:
+        - supabaseAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PlantFinderInput'
+      responses:
+        200:
+          description: Plant recommendations
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlantFinderResult'
+        400:
+          description: Invalid input
+        401:
+          description: Unauthorized
+
+  /api/ai/tank-finder:
+    post:
+      summary: Find suitable tank sizes and types
+      tags: [AI Tools]
+      security:
+        - supabaseAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TankFinderInput'
+      responses:
+        200:
+          description: Tank recommendations
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TankFinderResult'
+        400:
+          description: Invalid input
+        401:
+          description: Unauthorized
+
+  /api/ai/filter-finder:
+    post:
+      summary: Find appropriate filtration systems
+      tags: [AI Tools]
+      security:
+        - supabaseAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FilterFinderInput'
+      responses:
+        200:
+          description: Filter recommendations
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FilterFinderResult'
+        400:
+          description: Invalid input
+        401:
+          description: Unauthorized
+
+  /api/ai/lighting-finder:
+    post:
+      summary: Find suitable lighting for aquarium type
+      tags: [AI Tools]
+      security:
+        - supabaseAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LightingFinderInput'
+      responses:
+        200:
+          description: Lighting recommendations
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LightingFinderResult'
+        400:
+          description: Invalid input
+        401:
+          description: Unauthorized
+
+  /api/ai/food-recommendations:
+    post:
+      summary: Get food recommendations for livestock
+      tags: [AI Tools]
+      security:
+        - supabaseAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FoodRecommendationInput'
+      responses:
+        200:
+          description: Food recommendations with purchase links
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FoodRecommendationResult'
+        400:
+          description: Invalid input
+        401:
+          description: Unauthorized
+
+  /api/ai/treatment-recommendations:
+    post:
+      summary: Get treatment product recommendations for water issues
+      tags: [AI Tools]
+      security:
+        - supabaseAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TreatmentRecommendationInput'
+      responses:
+        200:
+          description: Treatment recommendations
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TreatmentRecommendationResult'
+        400:
+          description: Invalid input
+        401:
+          description: Unauthorized
+
+  /api/ai/deals-finder:
+    post:
+      summary: Find deals and discounts for aquarium products
+      tags: [AI Tools]
+      security:
+        - supabaseAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DealsFinderInput'
+      responses:
+        200:
+          description: Available deals
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DealsFinderResult'
+        400:
+          description: Invalid input
+        401:
+          description: Unauthorized
+
+components:
+  securitySchemes:
+    supabaseAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    FishFinderInput:
+      type: object
+      required:
+        - tankSize
+        - waterType
+      properties:
+        tankSize:
+          type: number
+          format: float
+          description: Tank size in gallons
+        waterType:
+          type: string
+          enum: [freshwater, saltwater, brackish]
+        experienceLevel:
+          type: string
+          enum: [beginner, intermediate, advanced]
+        temperament:
+          type: string
+          enum: [peaceful, semi-aggressive, aggressive]
+        existingFish:
+          type: array
+          items:
+            type: string
+          description: Species already in tank
+        budget:
+          type: string
+          enum: [low, medium, high]
+        schooling:
+          type: boolean
+          description: Prefer schooling fish
+
+    FishFinderResult:
+      type: object
+      properties:
+        recommendations:
+          type: array
+          items:
+            type: object
+            properties:
+              speciesName:
+                type: string
+              commonName:
+                type: string
+              description:
+                type: string
+              compatibility:
+                type: number
+                format: float
+                description: Compatibility score (0-1)
+              careLevel:
+                type: string
+                enum: [easy, moderate, difficult]
+              adultSize:
+                type: string
+              minTankSize:
+                type: number
+              temperament:
+                type: string
+              diet:
+                type: string
+              lifespan:
+                type: string
+              imageUrl:
+                type: string
+              purchaseLinks:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PurchaseLink'
+
+    PlantFinderInput:
+      type: object
+      required:
+        - tankSize
+        - lightingLevel
+      properties:
+        tankSize:
+          type: number
+          format: float
+        lightingLevel:
+          type: string
+          enum: [low, medium, high]
+        co2Injection:
+          type: boolean
+        substrate:
+          type: string
+          enum: [sand, gravel, soil, bare]
+        waterType:
+          type: string
+          enum: [freshwater, brackish]
+        growthRate:
+          type: string
+          enum: [slow, moderate, fast]
+        placement:
+          type: string
+          enum: [foreground, midground, background, floating]
+
+    PlantFinderResult:
+      type: object
+      properties:
+        recommendations:
+          type: array
+          items:
+            type: object
+            properties:
+              speciesName:
+                type: string
+              commonName:
+                type: string
+              description:
+                type: string
+              compatibility:
+                type: number
+                format: float
+              careLevel:
+                type: string
+              lightingRequirement:
+                type: string
+              co2Required:
+                type: boolean
+              growthRate:
+                type: string
+              placement:
+                type: string
+              height:
+                type: string
+              imageUrl:
+                type: string
+              purchaseLinks:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PurchaseLink'
+
+    TankFinderInput:
+      type: object
+      required:
+        - desiredLivestock
+      properties:
+        desiredLivestock:
+          type: array
+          items:
+            type: string
+        spaceAvailable:
+          type: string
+          enum: [small, medium, large, unlimited]
+        budget:
+          type: string
+          enum: [low, medium, high, unlimited]
+        experienceLevel:
+          type: string
+          enum: [beginner, intermediate, advanced]
+        waterType:
+          type: string
+          enum: [freshwater, saltwater, reef]
+
+    TankFinderResult:
+      type: object
+      properties:
+        recommendations:
+          type: array
+          items:
+            type: object
+            properties:
+              size:
+                type: number
+                format: float
+              dimensions:
+                type: string
+              type:
+                type: string
+              rationale:
+                type: string
+              estimatedCost:
+                type: string
+              maintenanceLevel:
+                type: string
+              purchaseLinks:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PurchaseLink'
+
+    FilterFinderInput:
+      type: object
+      required:
+        - tankSize
+        - waterType
+      properties:
+        tankSize:
+          type: number
+          format: float
+        waterType:
+          type: string
+          enum: [freshwater, saltwater, reef, planted]
+        stockingLevel:
+          type: string
+          enum: [low, medium, high]
+        budget:
+          type: string
+          enum: [low, medium, high]
+        noisePreference:
+          type: string
+          enum: [silent, quiet, moderate, any]
+
+    FilterFinderResult:
+      type: object
+      properties:
+        recommendations:
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                enum: [canister, hob, sponge, internal, wet-dry]
+              brand:
+                type: string
+              model:
+                type: string
+              flowRate:
+                type: string
+              mediaTypes:
+                type: array
+                items:
+                  type: string
+              noiseLevel:
+                type: string
+              maintenanceFrequency:
+                type: string
+              estimatedCost:
+                type: string
+              rationale:
+                type: string
+              purchaseLinks:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PurchaseLink'
+
+    LightingFinderInput:
+      type: object
+      required:
+        - tankSize
+        - tankType
+      properties:
+        tankSize:
+          type: number
+          format: float
+        tankType:
+          type: string
+          enum: [freshwater, planted, reef, fowlr]
+        tankDimensions:
+          type: object
+          properties:
+            length:
+              type: number
+            width:
+              type: number
+            depth:
+              type: number
+        budget:
+          type: string
+          enum: [low, medium, high]
+        plantTypes:
+          type: array
+          items:
+            type: string
+        coralTypes:
+          type: array
+          items:
+            type: string
+
+    LightingFinderResult:
+      type: object
+      properties:
+        recommendations:
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                enum: [led, t5, metal_halide]
+              brand:
+                type: string
+              model:
+                type: string
+              spectrum:
+                type: string
+              par:
+                type: string
+              wattage:
+                type: number
+              features:
+                type: array
+                items:
+                  type: string
+              estimatedCost:
+                type: string
+              rationale:
+                type: string
+              purchaseLinks:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PurchaseLink'
+
+    FoodRecommendationInput:
+      type: object
+      required:
+        - livestock
+      properties:
+        livestock:
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+              species:
+                type: string
+              quantity:
+                type: integer
+        feedingFrequency:
+          type: string
+          enum: [once_daily, twice_daily, multiple_times]
+        budget:
+          type: string
+          enum: [low, medium, high]
+
+    FoodRecommendationResult:
+      type: object
+      properties:
+        recommendations:
+          type: array
+          items:
+            type: object
+            properties:
+              productName:
+                type: string
+              brand:
+                type: string
+              type:
+                type: string
+                enum: [flakes, pellets, frozen, live, dried]
+              suitableFor:
+                type: array
+                items:
+                  type: string
+              ingredients:
+                type: string
+              feedingInstructions:
+                type: string
+              purchaseLinks:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PurchaseLink'
+
+    TreatmentRecommendationInput:
+      type: object
+      required:
+        - waterTestId
+      properties:
+        waterTestId:
+          type: string
+        tankSize:
+          type: number
+          format: float
+
+    TreatmentRecommendationResult:
+      type: object
+      properties:
+        recommendations:
+          type: array
+          items:
+            type: object
+            properties:
+              parameter:
+                type: string
+              issue:
+                type: string
+              severity:
+                type: string
+              productName:
+                type: string
+              dosage:
+                type: string
+              instructions:
+                type: string
+              safetyWarnings:
+                type: array
+                items:
+                  type: string
+              purchaseLinks:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PurchaseLink'
+
+    DealsFinderInput:
+      type: object
+      properties:
+        category:
+          type: string
+          enum: [fish, plant, equipment, tank, food, treatment, all]
+        keywords:
+          type: array
+          items:
+            type: string
+        maxPrice:
+          type: number
+          format: float
+
+    DealsFinderResult:
+      type: object
+      properties:
+        deals:
+          type: array
+          items:
+            type: object
+            properties:
+              title:
+                type: string
+              description:
+                type: string
+              originalPrice:
+                type: string
+              salePrice:
+                type: string
+              discountPercent:
+                type: number
+              vendor:
+                type: string
+              url:
+                type: string
+              expiresAt:
+                type: string
+                format: date-time
+              imageUrl:
+                type: string
+
+    PurchaseLink:
+      type: object
+      properties:
+        vendor:
+          type: string
+        url:
+          type: string
+        price:
+          type: string
+        availability:
+          type: string
+        rating:
+          type: number
+          format: float

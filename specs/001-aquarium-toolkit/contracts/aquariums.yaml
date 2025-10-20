@@ -1,0 +1,614 @@
+openapi: 3.0.0
+info:
+  title: Aquarium Management API
+  version: 1.0.0
+  description: API for managing aquarium profiles including CRUD operations and livestock/equipment
+
+paths:
+  /api/aquariums:
+    get:
+      summary: Get all aquariums for the authenticated user
+      tags: [Aquariums]
+      security:
+        - supabaseAuth: []
+      parameters:
+        - name: isActive
+          in: query
+          schema:
+            type: boolean
+          description: Filter by active/inactive aquariums
+      responses:
+        200:
+          description: List of user's aquariums
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Aquarium'
+        401:
+          description: Unauthorized
+
+    post:
+      summary: Create a new aquarium profile
+      tags: [Aquariums]
+      security:
+        - supabaseAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAquariumInput'
+      responses:
+        201:
+          description: Aquarium created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Aquarium'
+        400:
+          description: Validation error
+        401:
+          description: Unauthorized
+
+  /api/aquariums/{aquariumId}:
+    get:
+      summary: Get a specific aquarium by ID
+      tags: [Aquariums]
+      security:
+        - supabaseAuth: []
+      parameters:
+        - name: aquariumId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Aquarium details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AquariumDetail'
+        404:
+          description: Aquarium not found
+        401:
+          description: Unauthorized
+
+    patch:
+      summary: Update an aquarium
+      tags: [Aquariums]
+      security:
+        - supabaseAuth: []
+      parameters:
+        - name: aquariumId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateAquariumInput'
+      responses:
+        200:
+          description: Aquarium updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Aquarium'
+        400:
+          description: Validation error
+        404:
+          description: Aquarium not found
+        401:
+          description: Unauthorized
+
+    delete:
+      summary: Delete an aquarium (soft delete)
+      tags: [Aquariums]
+      security:
+        - supabaseAuth: []
+      parameters:
+        - name: aquariumId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        204:
+          description: Aquarium deleted
+        404:
+          description: Aquarium not found
+        401:
+          description: Unauthorized
+
+  /api/aquariums/{aquariumId}/livestock:
+    get:
+      summary: Get all livestock in an aquarium
+      tags: [Livestock]
+      security:
+        - supabaseAuth: []
+      parameters:
+        - name: aquariumId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: isAlive
+          in: query
+          schema:
+            type: boolean
+          description: Filter by living/deceased livestock
+        - name: type
+          in: query
+          schema:
+            type: string
+            enum: [fish, invertebrate, plant, coral]
+      responses:
+        200:
+          description: List of livestock
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Livestock'
+        401:
+          description: Unauthorized
+
+    post:
+      summary: Add livestock to an aquarium
+      tags: [Livestock]
+      security:
+        - supabaseAuth: []
+      parameters:
+        - name: aquariumId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateLivestockInput'
+      responses:
+        201:
+          description: Livestock added
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Livestock'
+        400:
+          description: Validation error
+        401:
+          description: Unauthorized
+
+  /api/aquariums/{aquariumId}/livestock/{livestockId}:
+    patch:
+      summary: Update livestock information
+      tags: [Livestock]
+      security:
+        - supabaseAuth: []
+      parameters:
+        - name: aquariumId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: livestockId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateLivestockInput'
+      responses:
+        200:
+          description: Livestock updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Livestock'
+        404:
+          description: Livestock not found
+        401:
+          description: Unauthorized
+
+    delete:
+      summary: Remove livestock from aquarium
+      tags: [Livestock]
+      security:
+        - supabaseAuth: []
+      parameters:
+        - name: aquariumId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: livestockId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        204:
+          description: Livestock removed
+        404:
+          description: Livestock not found
+        401:
+          description: Unauthorized
+
+  /api/aquariums/{aquariumId}/equipment:
+    get:
+      summary: Get all equipment in an aquarium
+      tags: [Equipment]
+      security:
+        - supabaseAuth: []
+      parameters:
+        - name: aquariumId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: isActive
+          in: query
+          schema:
+            type: boolean
+      responses:
+        200:
+          description: List of equipment
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Equipment'
+        401:
+          description: Unauthorized
+
+    post:
+      summary: Add equipment to an aquarium
+      tags: [Equipment]
+      security:
+        - supabaseAuth: []
+      parameters:
+        - name: aquariumId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateEquipmentInput'
+      responses:
+        201:
+          description: Equipment added
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Equipment'
+        400:
+          description: Validation error
+        401:
+          description: Unauthorized
+
+components:
+  securitySchemes:
+    supabaseAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Supabase JWT token from authentication
+
+  schemas:
+    Aquarium:
+      type: object
+      properties:
+        id:
+          type: string
+        userId:
+          type: string
+        name:
+          type: string
+        size:
+          type: number
+          format: float
+        sizeUnit:
+          type: string
+          enum: [gallons, liters]
+        type:
+          type: string
+          enum: [freshwater, saltwater, planted, reef]
+        setupDate:
+          type: string
+          format: date-time
+        location:
+          type: string
+        description:
+          type: string
+        imageUrls:
+          type: array
+          items:
+            type: string
+        isActive:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    AquariumDetail:
+      allOf:
+        - $ref: '#/components/schemas/Aquarium'
+        - type: object
+          properties:
+            livestock:
+              type: array
+              items:
+                $ref: '#/components/schemas/Livestock'
+            equipment:
+              type: array
+              items:
+                $ref: '#/components/schemas/Equipment'
+            latestTest:
+              $ref: '#/components/schemas/WaterTest'
+
+    CreateAquariumInput:
+      type: object
+      required:
+        - name
+        - size
+        - type
+        - setupDate
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        size:
+          type: number
+          format: float
+          minimum: 0.1
+        sizeUnit:
+          type: string
+          enum: [gallons, liters]
+          default: gallons
+        type:
+          type: string
+          enum: [freshwater, saltwater, planted, reef]
+        setupDate:
+          type: string
+          format: date-time
+        location:
+          type: string
+          maxLength: 200
+        description:
+          type: string
+          maxLength: 1000
+        imageUrls:
+          type: array
+          items:
+            type: string
+
+    UpdateAquariumInput:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        size:
+          type: number
+          format: float
+          minimum: 0.1
+        sizeUnit:
+          type: string
+          enum: [gallons, liters]
+        type:
+          type: string
+          enum: [freshwater, saltwater, planted, reef]
+        setupDate:
+          type: string
+          format: date-time
+        location:
+          type: string
+          maxLength: 200
+        description:
+          type: string
+          maxLength: 1000
+        imageUrls:
+          type: array
+          items:
+            type: string
+        isActive:
+          type: boolean
+
+    Livestock:
+      type: object
+      properties:
+        id:
+          type: string
+        aquariumId:
+          type: string
+        type:
+          type: string
+          enum: [fish, invertebrate, plant, coral]
+        speciesName:
+          type: string
+        commonName:
+          type: string
+        quantity:
+          type: integer
+        dateAdded:
+          type: string
+          format: date-time
+        source:
+          type: string
+        notes:
+          type: string
+        imageUrl:
+          type: string
+        isAlive:
+          type: boolean
+        dateRemoved:
+          type: string
+          format: date-time
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    CreateLivestockInput:
+      type: object
+      required:
+        - type
+        - speciesName
+        - commonName
+        - quantity
+      properties:
+        type:
+          type: string
+          enum: [fish, invertebrate, plant, coral]
+        speciesName:
+          type: string
+        commonName:
+          type: string
+        quantity:
+          type: integer
+          minimum: 1
+        dateAdded:
+          type: string
+          format: date-time
+        source:
+          type: string
+        notes:
+          type: string
+        imageUrl:
+          type: string
+
+    UpdateLivestockInput:
+      type: object
+      properties:
+        quantity:
+          type: integer
+          minimum: 0
+        notes:
+          type: string
+        imageUrl:
+          type: string
+        isAlive:
+          type: boolean
+        dateRemoved:
+          type: string
+          format: date-time
+
+    Equipment:
+      type: object
+      properties:
+        id:
+          type: string
+        aquariumId:
+          type: string
+        type:
+          type: string
+          enum: [filter, heater, light, pump, skimmer, co2, wavemaker, other]
+        brand:
+          type: string
+        model:
+          type: string
+        installDate:
+          type: string
+          format: date-time
+        lastServiceDate:
+          type: string
+          format: date-time
+        specifications:
+          type: object
+          additionalProperties: true
+        notes:
+          type: string
+        imageUrl:
+          type: string
+        isActive:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    CreateEquipmentInput:
+      type: object
+      required:
+        - type
+        - brand
+        - model
+        - installDate
+      properties:
+        type:
+          type: string
+          enum: [filter, heater, light, pump, skimmer, co2, wavemaker, other]
+        brand:
+          type: string
+        model:
+          type: string
+        installDate:
+          type: string
+          format: date-time
+        specifications:
+          type: object
+          additionalProperties: true
+        notes:
+          type: string
+        imageUrl:
+          type: string
+
+    WaterTest:
+      type: object
+      properties:
+        id:
+          type: string
+        aquariumId:
+          type: string
+        testDate:
+          type: string
+          format: date-time
+        parameters:
+          type: object
+        imageUrl:
+          type: string
+        stripBrand:
+          type: string
+        entryMethod:
+          type: string
+          enum: [ai, manual]
+        overallConfidence:
+          type: number
+          format: float
+        notes:
+          type: string
+        hasWarnings:
+          type: boolean
+        hasCritical:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time

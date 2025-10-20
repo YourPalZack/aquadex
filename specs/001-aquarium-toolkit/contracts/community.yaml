@@ -1,0 +1,513 @@
+openapi: 3.0.0
+info:
+  title: Community Q&A API
+  version: 1.0.0
+  description: API for community questions, answers, voting, and reputation system
+
+paths:
+  /api/community/questions:
+    get:
+      summary: Get list of questions with filters
+      tags: [Community]
+      parameters:
+        - name: sort
+          in: query
+          schema:
+            type: string
+            enum: [recent, popular, unanswered]
+            default: recent
+        - name: tag
+          in: query
+          schema:
+            type: string
+          description: Filter by tag
+        - name: search
+          in: query
+          schema:
+            type: string
+          description: Search in title and content
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+            maximum: 50
+      responses:
+        200:
+          description: List of questions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  questions:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Question'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+
+    post:
+      summary: Create a new question
+      tags: [Community]
+      security:
+        - supabaseAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateQuestionInput'
+      responses:
+        201:
+          description: Question created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Question'
+        400:
+          description: Validation error
+        401:
+          description: Unauthorized
+
+  /api/community/questions/{questionId}:
+    get:
+      summary: Get a specific question with answers
+      tags: [Community]
+      parameters:
+        - name: questionId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Question details with answers
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuestionDetail'
+        404:
+          description: Question not found
+
+    patch:
+      summary: Update a question (author only)
+      tags: [Community]
+      security:
+        - supabaseAuth: []
+      parameters:
+        - name: questionId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateQuestionInput'
+      responses:
+        200:
+          description: Question updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Question'
+        403:
+          description: Not the author
+        404:
+          description: Question not found
+        401:
+          description: Unauthorized
+
+    delete:
+      summary: Delete a question (author or moderator)
+      tags: [Community]
+      security:
+        - supabaseAuth: []
+      parameters:
+        - name: questionId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        204:
+          description: Question deleted
+        403:
+          description: Insufficient permissions
+        404:
+          description: Question not found
+        401:
+          description: Unauthorized
+
+  /api/community/questions/{questionId}/answers:
+    post:
+      summary: Post an answer to a question
+      tags: [Community]
+      security:
+        - supabaseAuth: []
+      parameters:
+        - name: questionId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAnswerInput'
+      responses:
+        201:
+          description: Answer created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Answer'
+        400:
+          description: Validation error
+        404:
+          description: Question not found
+        401:
+          description: Unauthorized
+
+  /api/community/answers/{answerId}:
+    patch:
+      summary: Update an answer (author only)
+      tags: [Community]
+      security:
+        - supabaseAuth: []
+      parameters:
+        - name: answerId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                content:
+                  type: string
+      responses:
+        200:
+          description: Answer updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Answer'
+        403:
+          description: Not the author
+        404:
+          description: Answer not found
+        401:
+          description: Unauthorized
+
+    delete:
+      summary: Delete an answer (author or moderator)
+      tags: [Community]
+      security:
+        - supabaseAuth: []
+      parameters:
+        - name: answerId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        204:
+          description: Answer deleted
+        403:
+          description: Insufficient permissions
+        404:
+          description: Answer not found
+        401:
+          description: Unauthorized
+
+  /api/community/questions/{questionId}/vote:
+    post:
+      summary: Vote on a question (upvote or downvote)
+      tags: [Community]
+      security:
+        - supabaseAuth: []
+      parameters:
+        - name: questionId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - voteType
+              properties:
+                voteType:
+                  type: string
+                  enum: [up, down, remove]
+      responses:
+        200:
+          description: Vote recorded
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  voteCount:
+                    type: integer
+        404:
+          description: Question not found
+        401:
+          description: Unauthorized
+
+  /api/community/answers/{answerId}/vote:
+    post:
+      summary: Vote on an answer (upvote or downvote)
+      tags: [Community]
+      security:
+        - supabaseAuth: []
+      parameters:
+        - name: answerId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - voteType
+              properties:
+                voteType:
+                  type: string
+                  enum: [up, down, remove]
+      responses:
+        200:
+          description: Vote recorded
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  voteCount:
+                    type: integer
+        404:
+          description: Answer not found
+        401:
+          description: Unauthorized
+
+  /api/community/answers/{answerId}/accept:
+    post:
+      summary: Accept an answer (question author only)
+      tags: [Community]
+      security:
+        - supabaseAuth: []
+      parameters:
+        - name: answerId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Answer accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Answer'
+        403:
+          description: Not the question author
+        404:
+          description: Answer not found
+        401:
+          description: Unauthorized
+
+  /api/community/tags:
+    get:
+      summary: Get popular tags
+      tags: [Community]
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 50
+      responses:
+        200:
+          description: List of tags with usage count
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    tag:
+                      type: string
+                    count:
+                      type: integer
+
+components:
+  securitySchemes:
+    supabaseAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    Question:
+      type: object
+      properties:
+        id:
+          type: string
+        authorId:
+          type: string
+        author:
+          $ref: '#/components/schemas/UserProfile'
+        title:
+          type: string
+        content:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        viewCount:
+          type: integer
+        voteCount:
+          type: integer
+        answerCount:
+          type: integer
+        hasAcceptedAnswer:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        lastActivityAt:
+          type: string
+          format: date-time
+
+    QuestionDetail:
+      allOf:
+        - $ref: '#/components/schemas/Question'
+        - type: object
+          properties:
+            answers:
+              type: array
+              items:
+                $ref: '#/components/schemas/Answer'
+
+    CreateQuestionInput:
+      type: object
+      required:
+        - title
+        - content
+      properties:
+        title:
+          type: string
+          minLength: 10
+          maxLength: 200
+        content:
+          type: string
+          minLength: 20
+          maxLength: 10000
+        tags:
+          type: array
+          items:
+            type: string
+          maxItems: 5
+
+    UpdateQuestionInput:
+      type: object
+      properties:
+        title:
+          type: string
+          minLength: 10
+          maxLength: 200
+        content:
+          type: string
+          minLength: 20
+          maxLength: 10000
+        tags:
+          type: array
+          items:
+            type: string
+          maxItems: 5
+
+    Answer:
+      type: object
+      properties:
+        id:
+          type: string
+        questionId:
+          type: string
+        authorId:
+          type: string
+        author:
+          $ref: '#/components/schemas/UserProfile'
+        content:
+          type: string
+        voteCount:
+          type: integer
+        isAccepted:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    CreateAnswerInput:
+      type: object
+      required:
+        - content
+      properties:
+        content:
+          type: string
+          minLength: 20
+          maxLength: 10000
+
+    UserProfile:
+      type: object
+      properties:
+        id:
+          type: string
+        displayName:
+          type: string
+        photoUrl:
+          type: string
+        reputationScore:
+          type: integer
+
+    Pagination:
+      type: object
+      properties:
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+        totalPages:
+          type: integer
