@@ -2,20 +2,39 @@
 'use client';
 
 import { useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import ImageUploadForm from '@/components/dashboard/ImageUploadForm';
 import AnalysisResults from '@/components/dashboard/AnalysisResults';
 import TreatmentRecommendations from '@/components/dashboard/TreatmentRecommendations';
+import { AquariumSelector } from '@/components/aquariums/aquarium-selector';
 import type { AnalyzeTestStripOutput, RecommendTreatmentProductsOutput } from '@/types';
 import { Card, CardDescription, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { FileScan, Sparkles } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 export default function AnalyzePage() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const aquariumIdFromUrl = searchParams.get('aquariumId');
+  
+  const [selectedAquariumId, setSelectedAquariumId] = useState<string>(aquariumIdFromUrl || '');
   const [analysisResult, setAnalysisResult] = useState<AnalyzeTestStripOutput | null>(null);
   const [recommendations, setRecommendations] = useState<RecommendTreatmentProductsOutput | null>(null);
+
+  const handleAquariumChange = (aquariumId: string) => {
+    setSelectedAquariumId(aquariumId);
+    // Update URL with aquarium ID
+    const url = new URL(window.location.href);
+    url.searchParams.set('aquariumId', aquariumId);
+    router.push(url.pathname + url.search, { scroll: false });
+  };
 
   const handleAnalysisComplete = (data: { analysis: AnalyzeTestStripOutput; recommendations: RecommendTreatmentProductsOutput | null }) => {
     setAnalysisResult(data.analysis);
     setRecommendations(data.recommendations);
+    
+    // TODO: Save test result to database with aquarium ID
+    console.log('Test result for aquarium:', selectedAquariumId, data.analysis);
   };
 
   return (
@@ -33,9 +52,29 @@ export default function AnalyzePage() {
             </CardHeader>
         </Card>
 
+        {/* Aquarium Selection */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Select Aquarium</CardTitle>
+            <CardDescription>
+              Choose which aquarium you're testing water for
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <AquariumSelector 
+              value={selectedAquariumId}
+              onValueChange={handleAquariumChange}
+              label="Aquarium"
+            />
+          </CardContent>
+        </Card>
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
           <div className="lg:col-span-1">
-            <ImageUploadForm onAnalysisComplete={handleAnalysisComplete} />
+            <ImageUploadForm 
+              onAnalysisComplete={handleAnalysisComplete}
+              disabled={!selectedAquariumId}
+            />
           </div>
           
           <div className="lg:col-span-2 space-y-8">
