@@ -183,7 +183,7 @@ A fishkeeper wants to buy or sell used aquarium equipment, fish, plants, or othe
 - **FR-008**: System MUST allow users to capture or upload photos of water test strips
 - **FR-009**: System MUST analyze test strip images using AI to extract parameter values (pH, ammonia, nitrite, nitrate, KH, GH, chlorine)
 - **FR-010**: System MUST display analyzed parameters with numeric values, units, and status indicators (safe/warning/critical)
-- **FR-011**: System MUST provide confidence scores for AI analysis and allow manual value adjustment when confidence is low
+- **FR-011**: System MUST provide confidence scores for AI analysis and allow manual value adjustment when confidence score is below 75%
 - **FR-012**: System MUST save test results with timestamp and association to specific aquarium
 - **FR-013**: System MUST allow users to manually enter test results without photo upload
 - **FR-014**: System MUST support multiple test strip brands by identifying brand from photo or user selection
@@ -203,7 +203,7 @@ A fishkeeper wants to buy or sell used aquarium equipment, fish, plants, or othe
 - **FR-022**: System MUST generate treatment recommendations when parameters are out of safe range
 - **FR-023**: System MUST calculate dosages based on the specific aquarium's size
 - **FR-024**: System MUST provide product suggestions with purchase links to multiple vendors
-- **FR-025**: System MUST warn users about treatment compatibility issues and safety precautions
+- **FR-025**: System MUST warn users about treatment compatibility issues and safety precautions (see Appendix A: Treatment Compatibility Matrix for dangerous combinations including copper+invertebrates, certain water conditioners with oxidizers, and medication interactions)
 - **FR-026**: System MUST prioritize recommendations by severity of water quality issues
 - **FR-027**: System MUST explain the purpose and expected results of each recommended treatment
 
@@ -257,8 +257,8 @@ A fishkeeper wants to buy or sell used aquarium equipment, fish, plants, or othe
 **Data & Performance**
 
 - **FR-060**: System MUST persist all user data (profiles, aquariums, tests, settings) permanently until user deletion
-- **FR-061**: System MUST respond to user interactions within 2 seconds under normal load
-- **FR-062**: System MUST process test strip image analysis within 10 seconds
+- **FR-061**: System MUST respond to user interactions within 2 seconds under normal load (up to 100 concurrent users with 95th percentile response time at 2 seconds)
+- **FR-062**: System MUST process test strip image analysis within 10 seconds for 85% of requests, with 15-second timeout for remaining cases
 - **FR-063**: System MUST be accessible on mobile devices (phones and tablets) with responsive design
 - **FR-064**: System MUST work reliably with slow internet connections (3G) for core features
 - **FR-065**: System MUST handle graceful degradation when AI services are temporarily unavailable
@@ -359,4 +359,40 @@ The following features are explicitly excluded from this specification:
 13. **Social Feed**: Instagram-style social feed of aquarium photos and updates
 14. **Fish Disease Diagnosis**: AI-powered fish disease identification from photos
 15. **Competition/Contest Features**: Aquarium competitions or "tank of the month" contests
+
+---
+
+## Appendices
+
+### Appendix A: Treatment Compatibility Matrix
+
+The following combinations represent DANGEROUS interactions that must trigger safety warnings per FR-025:
+
+**CRITICAL - Toxic Combinations:**
+- **Copper-based treatments + Invertebrates**: Copper sulfate, chelated copper (e.g., Cupramine) are lethal to snails, shrimp, crabs, and corals at therapeutic doses
+- **Potassium Permanganate + Organic Compounds**: Reacts violently with Seachem Prime, API Stress Coat, or any reducing agents - risk of fire/chemical burns
+- **Formalin/Formaldehyde + High Temperature**: Toxic at >80°F / 27°C - respiratory failure in fish
+- **Methylene Blue + UV Sterilizers/Strong Lighting**: Degrades rapidly, produces toxic byproducts
+
+**HIGH RISK - Medication Interactions:**
+- **Multiple Antibiotics Simultaneously**: Kanamycin + Erythromycin causes liver damage in fish
+- **Malachite Green + Salt**: Amplifies toxicity - do NOT combine
+- **Praziquantel + Copper**: Both stress liver - space treatments 7+ days apart
+
+**MODERATE RISK - Water Chemistry Conflicts:**
+- **pH Down + Ammonia Removers**: Creates unstable pH swings - dose separately by 12 hours
+- **Water Conditioner (dechlorinator) + Oxidizers**: Neutralizes chlorine dioxide, iodine treatments - wait 24 hours
+- **Carbon Filtration + Medications**: Removes therapeutic compounds - remove carbon during treatment
+
+**INVERTEBRATE SENSITIVITIES:**
+- Avoid ANY: Copper, malachite green, formalin, praziquantel with shrimp/snails/corals
+- Safe alternatives: Hydrogen peroxide (low dose), manual removal, biological controls
+
+**REFERENCE DOSAGES (per FR-023 tank-size calculations):**
+- Copper sulfate: 0.15-0.20 ppm for fish-only systems
+- Methylene blue: 2-5 ppm depending on tank volume
+- API General Cure: 1 packet per 10 gallons
+- Seachem Paraguard: 5 mL per 10 gallons daily
+
+**IMPLEMENTATION NOTE**: AI recommendation flow (src/ai/flows/recommend-treatment-products.ts) must check aquarium livestock types and active equipment (UV sterilizers) before suggesting treatments.
 
