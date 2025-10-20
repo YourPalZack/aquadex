@@ -325,7 +325,10 @@ export function AquariumDetails({ aquarium, livestock = [], equipment = [], wate
               
               {/* Advanced Water Charts */}
               {waterTests.length >= 2 && (
-                <AdvancedWaterCharts tests={waterTests} aquariumType={aquarium.waterType} />
+                <div className="space-y-6">
+                  <AdvancedWaterCharts tests={waterTests} aquariumType={aquarium.waterType} />
+                  <MultiParameterChart tests={waterTests} title="Multi-Parameter Analysis" />
+                </div>
               )}
               
               {/* Water Test List */}

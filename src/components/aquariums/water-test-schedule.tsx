@@ -11,7 +11,7 @@ import { Switch } from '@/components/ui/switch';
 import { Calendar, Clock, Bell, BellOff, AlertTriangle, CheckCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
-import type { Aquarium } from '@/types';
+import type { Aquarium } from '@/types/aquarium';
 
 interface WaterTestScheduleProps {
   aquarium: Aquarium;
