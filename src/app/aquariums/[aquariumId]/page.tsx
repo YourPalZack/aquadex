@@ -7,7 +7,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { format, differenceInDays, isFuture, isPast, isToday } from 'date-fns';
 import type { Aquarium, TestResult, SourceWaterType } from '@/types';
-import { mockAquariumsData } from '@/app/aquariums/page'; 
+import { mockAquariumsData } from '@/types'; 
 import { mockTestResults }  from '@/app/history/page'; 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';

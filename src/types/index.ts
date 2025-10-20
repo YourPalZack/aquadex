@@ -9,13 +9,13 @@ import {
     HeartHandshake, 
     Gift, 
     MessageSquare,
-    type ElementType, 
     ShoppingCart, 
     SearchCheck, 
     Store as StoreIcon, 
     Star 
 } from 'lucide-react';
 import { subDays, addDays } from 'date-fns';
+import type { ElementType } from 'react';
 
 
 export interface TestResult {
@@ -591,6 +591,6 @@ export const mockLocalFishStoresData: LocalFishStore[] = [
     isFeatured: false,
   },
 ];
-    
 
-    
+// Export aquarium management types
+export * from './aquarium';
