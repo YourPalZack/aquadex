@@ -21,6 +21,7 @@ import type { Aquarium, Livestock, Equipment, WaterTest } from '@/types/aquarium
 import { format } from 'date-fns';
 import { WaterTestList } from './water-test-list';
 import { AdvancedWaterCharts } from './advanced-water-charts';
+import { MultiParameterChart } from './multi-parameter-chart';
 import { WaterTestSchedule } from './water-test-schedule';
 
 interface AquariumDetailsProps {
