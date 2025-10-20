@@ -29,7 +29,7 @@ export function prepareExportData(
 
   waterTests.forEach(test => {
     const aquariumName = aquariumLookup[test.aquariumId] || `Aquarium ${test.aquariumId}`;
-    const testDate = format(test.testedAt, 'yyyy-MM-dd HH:mm');
+    const testDate = format(test.testDate, 'yyyy-MM-dd HH:mm');
     
     test.parameters.forEach(param => {
       exportData.push({
@@ -137,7 +137,7 @@ export function exportAsPDF(
     yPosition += 10;
 
     // Sort tests by date (newest first)
-    tests.sort((a, b) => new Date(b.testedAt).getTime() - new Date(a.testedAt).getTime());
+    tests.sort((a, b) => new Date(b.testDate).getTime() - new Date(a.testDate).getTime());
 
     tests.forEach(test => {
       // Check if we need a new page
