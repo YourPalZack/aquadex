@@ -10,7 +10,7 @@ import { WaterTestCard } from './water-test-card';
 import { ExportWaterTests } from './export-water-tests';
 import { Button } from '@/components/ui/button';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { Droplet, Plus } from 'lucide-react';
+import { Droplet, Plus, GitCompareArrows } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { deleteWaterTest } from '@/lib/actions/water-test';
 import { useToast } from '@/hooks/use-toast';
@@ -99,6 +99,14 @@ export function WaterTestList({ tests, aquariumId, showActions = true, aquariumN
               Water Quality History ({tests.length})
             </h3>
             <div className="flex gap-2">
+              {tests.length >= 2 && (
+                <Button variant="outline" asChild>
+                  <Link href="/water-tests/compare">
+                    <GitCompareArrows className="h-4 w-4 mr-2" />
+                    Compare
+                  </Link>
+                </Button>
+              )}
               {tests.length > 0 && (
                 <ExportWaterTests 
                   waterTests={tests} 

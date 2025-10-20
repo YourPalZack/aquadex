@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { Droplet, Filter, Plus, Calendar } from 'lucide-react';
+import { Droplet, Filter, Plus, Calendar, GitCompareArrows } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { deleteWaterTest } from '@/lib/actions/water-test';
 import { useToast } from '@/hooks/use-toast';
@@ -169,6 +169,15 @@ export function WaterTestsPageContent({
                   ))}
                 </SelectContent>
               </Select>
+              
+              {filteredTests.length >= 2 && (
+                <Button variant="outline" asChild>
+                  <Link href="/water-tests/compare">
+                    <GitCompareArrows className="h-4 w-4 mr-2" />
+                    Compare Tests
+                  </Link>
+                </Button>
+              )}
               
               {filteredTests.length > 0 && (
                 <ExportWaterTests 
