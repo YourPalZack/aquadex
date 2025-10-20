@@ -5,6 +5,16 @@
 **Status**: Draft  
 **Input**: User description: "The primary goal of AquaDex is to provide aquarium enthusiasts with a comprehensive toolkit for managing their aquariums effectively. This includes features for water analysis, tracking, AI-powered insights, and community engagement."
 
+## Clarifications
+
+### Session 2025-10-20
+
+- Q: When a user performs actions across multiple features (e.g., creates aquarium → logs water test → receives marketplace recommendations), how should their identity and preferences be managed? → A: Single session token with role-based access control (RBAC) - user roles: standard, verified_seller, moderator, admin (Note: Migrate away from Firebase to cost-effective alternative like Supabase Auth or NextAuth.js with Neon PostgreSQL session storage)
+- Q: How should data ownership and access be enforced when one feature needs data created in another (e.g., treatment recommendations accessing aquarium size)? → A: Row-level security (RLS) with user_id foreign keys on all tables - PostgreSQL policies enforce ownership
+- Q: What level of checklist detail should be added to each user story for comprehensive implementation guidance? → A: Detailed checklists with setup, development, testing, and deployment steps for each user story (10-15 items covering database setup, API endpoints, UI components, integration tests, deployment verification)
+- Q: When Genkit AI services fail or timeout, how should the system handle user requests for test strip analysis and product recommendations? → A: Queue requests with automatic retry (max 3 attempts, exponential backoff) + immediately show manual entry option
+- Q: What data retention strategy should be implemented for sensitive data like test strip photos, messages, or inactive accounts? → A: Tiered retention: Test strip images (90 days), messages (1 year), core data (aquarium profiles, test results, indefinite) + user export/delete controls in account settings
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Aquarium Profile Management (Priority: P1)
@@ -22,6 +32,25 @@ A fishkeeper wants to create and manage profiles for their aquariums, tracking b
 3. **Given** an aquarium profile, **When** the user adds fish or equipment details, **Then** this information is saved and displayed in the profile
 4. **Given** an aquarium profile, **When** the user edits any details, **Then** the changes are saved and reflected immediately
 5. **Given** an aquarium profile, **When** the user deletes it, **Then** the profile and associated data are removed with confirmation
+
+**Implementation Checklist**:
+
+- [ ] **Setup**: Create database tables (users, aquariums, livestock, equipment) with user_id foreign keys and RLS policies
+- [ ] **Setup**: Configure authentication middleware for session token validation and RBAC role checking
+- [ ] **Setup**: Set up image storage bucket with appropriate access policies for aquarium photos
+- [ ] **Development**: Implement aquarium CRUD API endpoints (/api/aquariums - POST, GET, PUT, DELETE) with user ownership validation
+- [ ] **Development**: Build aquarium creation form component with validation (Zod schema for name, size, type, date)
+- [ ] **Development**: Build aquarium list view with responsive grid layout and summary cards
+- [ ] **Development**: Build aquarium detail view with tabs for info, livestock, equipment, photos
+- [ ] **Development**: Implement livestock management UI (add/edit/delete fish, plants, invertebrates)
+- [ ] **Development**: Implement equipment management UI (add/edit/delete filters, heaters, lights)
+- [ ] **Development**: Add image upload component with preview and validation (max 5MB, EXIF stripping)
+- [ ] **Testing**: Unit tests for aquarium validation schemas and data models
+- [ ] **Testing**: Integration tests for aquarium CRUD operations with RLS enforcement
+- [ ] **Testing**: E2E tests for complete user journey (signup → create aquarium → add livestock → edit → delete)
+- [ ] **Testing**: Accessibility testing for keyboard navigation and screen reader support (WCAG 2.1 AA)
+- [ ] **Deployment**: Verify RLS policies prevent cross-user data access in production
+- [ ] **Deployment**: Confirm image uploads work with production storage bucket and URLs resolve correctly
 
 ---
 
@@ -41,6 +70,25 @@ A fishkeeper needs to test their aquarium water regularly and wants to quickly a
 4. **Given** test strip analysis with low confidence, **When** results are displayed, **Then** the user is notified of potential inaccuracy and can manually adjust values
 5. **Given** completed test analysis, **When** the user saves results, **Then** they are associated with the specific aquarium and timestamped
 
+**Implementation Checklist**:
+
+- [ ] **Setup**: Create water_tests table with aquarium_id foreign key, parameter columns, and RLS policies
+- [ ] **Setup**: Configure Genkit AI flow for test strip image analysis with brand detection
+- [ ] **Setup**: Set up image storage bucket for test strip photos with automatic cleanup policies
+- [ ] **Setup**: Configure test strip brand database (API, Tetra, Seachem) with color scale mappings
+- [ ] **Development**: Implement test strip upload/capture UI component with camera access and file validation
+- [ ] **Development**: Build AI analysis API endpoint (/api/water-tests/analyze) with 15-second timeout
+- [ ] **Development**: Create results display component with color-coded badges (#10b981 green, #f59e0b amber, #ef4444 red)
+- [ ] **Development**: Implement manual adjustment UI for low-confidence results (<75% threshold)
+- [ ] **Development**: Build parameter explanation tooltips with actionable guidance for warnings/critical
+- [ ] **Development**: Add manual test entry form as fallback when AI unavailable
+- [ ] **Testing**: Unit tests for parameter status calculation (safe/warning/critical thresholds)
+- [ ] **Testing**: Integration tests for AI analysis flow with mock test strip images (3+ brands)
+- [ ] **Testing**: Test confidence threshold logic (<75% triggers manual adjustment UI)
+- [ ] **Testing**: Verify 85% of analyses complete within 10 seconds (performance benchmark)
+- [ ] **Deployment**: Confirm AI service fallback works when Genkit unavailable
+- [ ] **Deployment**: Verify color contrast ratios meet WCAG AA standards in production theme
+
 ---
 
 ### User Story 3 - Historical Tracking & Trends (Priority: P2)
@@ -58,6 +106,24 @@ A fishkeeper wants to view their water testing history over time to identify pat
 3. **Given** trend data, **When** parameters show concerning patterns (e.g., rising nitrates), **Then** the system highlights this trend with explanatory text
 4. **Given** test history, **When** the user filters by date range, **Then** only tests within that period are displayed
 5. **Given** test history, **When** the user exports data, **Then** they receive a downloadable file with all test results in a standard format
+
+**Implementation Checklist**:
+
+- [ ] **Setup**: Index water_tests table by aquarium_id and test_date for efficient queries
+- [ ] **Setup**: Configure Recharts library for trend visualization components
+- [ ] **Development**: Build test history list view with pagination and date range filters
+- [ ] **Development**: Implement trend chart component with dual-axis support for multiple parameters
+- [ ] **Development**: Create trend analysis algorithm (20% over 7 days, 50% over 30 days thresholds)
+- [ ] **Development**: Build parameter statistics calculator (avg, min, max, trend direction)
+- [ ] **Development**: Implement CSV export functionality with proper formatting
+- [ ] **Development**: Implement PDF export with formatted tables and embedded chart images
+- [ ] **Development**: Add concerning trend highlighting UI with explanatory tooltips
+- [ ] **Testing**: Unit tests for trend detection algorithm with various data patterns
+- [ ] **Testing**: Integration tests for history queries with RLS verification
+- [ ] **Testing**: Test export functionality generates valid CSV and PDF files
+- [ ] **Testing**: Verify charts render correctly with missing data points
+- [ ] **Deployment**: Confirm history loads within 2 seconds for aquariums with 100+ tests
+- [ ] **Deployment**: Verify exported files download correctly on mobile devices
 
 ---
 
@@ -77,6 +143,25 @@ A fishkeeper discovers a water quality issue and needs guidance on how to fix it
 4. **Given** product recommendations, **When** the user clicks a product, **Then** they are directed to purchase options
 5. **Given** recommendations, **When** displayed, **Then** users see warnings about treatment interactions and safety precautions
 
+**Implementation Checklist**:
+
+- [ ] **Setup**: Create treatment_recommendations table linked to water_tests with RLS policies
+- [ ] **Setup**: Configure Genkit AI flow for treatment recommendations based on water parameters
+- [ ] **Setup**: Build Treatment Compatibility Matrix database (Appendix A combinations)
+- [ ] **Setup**: Set up product affiliate link tracking (Amazon, Chewy, Petco partnerships)
+- [ ] **Development**: Implement severity calculation (CRITICAL: pH <6.0/>8.5, ammonia >0.25ppm; WARNING: nitrite >0.1ppm, nitrate >40ppm)
+- [ ] **Development**: Build dosage calculator based on tank size (gallons/liters conversion)
+- [ ] **Development**: Create compatibility checker for livestock (copper+invertebrates warnings)
+- [ ] **Development**: Implement treatment recommendation UI with priority sorting
+- [ ] **Development**: Add safety warning modals for dangerous combinations (Appendix A)
+- [ ] **Development**: Build product card component with purchase links and dosage instructions
+- [ ] **Testing**: Unit tests for severity level calculation with edge cases
+- [ ] **Testing**: Integration tests for compatibility matrix warnings (all Appendix A combinations)
+- [ ] **Testing**: Test dosage calculations for various tank sizes (10-200 gallons)
+- [ ] **Testing**: Verify affiliate links open correctly and track conversions
+- [ ] **Deployment**: Confirm AI recommendations align with Treatment Compatibility Matrix
+- [ ] **Deployment**: Verify emergency response protocols display for CRITICAL combinations
+
 ---
 
 ### User Story 5 - Maintenance Reminders & Scheduling (Priority: P3)
@@ -94,6 +179,25 @@ A fishkeeper wants to be reminded about regular maintenance tasks like water cha
 3. **Given** a maintenance reminder, **When** the user completes the task, **Then** they can mark it complete and the next occurrence is automatically scheduled
 4. **Given** multiple aquariums, **When** viewing the maintenance calendar, **Then** all upcoming tasks across all tanks are displayed chronologically
 5. **Given** a maintenance task, **When** the user postpones it, **Then** the reminder is rescheduled to a user-specified date
+
+**Implementation Checklist**:
+
+- [ ] **Setup**: Create maintenance_tasks table with aquarium_id, frequency, next_due_date, and RLS policies
+- [ ] **Setup**: Create maintenance_history table for tracking completions with timestamps
+- [ ] **Setup**: Configure email service (Resend or SendGrid) for reminder notifications
+- [ ] **Setup**: Set up cron job or scheduled function to check due tasks daily at 9 AM user timezone
+- [ ] **Development**: Build maintenance task creation form with frequency presets
+- [ ] **Development**: Implement notification system (email + in-app) 1 day before and on due date
+- [ ] **Development**: Create task completion UI with notes field and auto-reschedule logic
+- [ ] **Development**: Build maintenance calendar view with multi-aquarium support
+- [ ] **Development**: Add postpone functionality with date picker
+- [ ] **Development**: Implement maintenance history view component (past 50 completions)
+- [ ] **Testing**: Unit tests for next occurrence calculation (weekly, bi-weekly, monthly)
+- [ ] **Testing**: Integration tests for notification sending at correct times
+- [ ] **Testing**: Test auto-reschedule logic when tasks marked complete
+- [ ] **Testing**: Verify calendar shows all tasks across user's aquariums with RLS
+- [ ] **Deployment**: Confirm cron job runs reliably in production timezone-aware
+- [ ] **Deployment**: Verify email notifications not flagged as spam (SPF/DKIM records)
 
 ---
 
@@ -113,6 +217,25 @@ A fishkeeper is setting up a new tank or upgrading equipment and wants intellige
 4. **Given** multiple product searches, **When** the user views a fish species, **Then** compatible tank mates and incompatible species are highlighted
 5. **Given** product recommendations, **When** the user selects an item, **Then** they can access purchase links from multiple vendors
 
+**Implementation Checklist**:
+
+- [ ] **Setup**: Create species_compatibility database with aggression levels (1-5 scale)
+- [ ] **Setup**: Create equipment_specifications database with capacity ranges
+- [ ] **Setup**: Configure Genkit AI flows for fish, plant, filter, lighting, and tank recommendations
+- [ ] **Setup**: Build product vendor API integrations (Amazon Product API, pet store affiliates)
+- [ ] **Development**: Implement fish finder with compatibility matrix (compatible/caution/incompatible)
+- [ ] **Development**: Build plant finder with care requirements (lighting 1-5, difficulty 1-5)
+- [ ] **Development**: Create filtration finder with capacity matching algorithm
+- [ ] **Development**: Implement lighting finder with tank size and type considerations
+- [ ] **Development**: Build product card components with vendor price comparison
+- [ ] **Development**: Add "add to aquarium" functionality linking to livestock/equipment tables
+- [ ] **Testing**: Unit tests for compatibility calculations (aggression levels, water parameters)
+- [ ] **Testing**: Integration tests for AI recommendation flows with various tank specs
+- [ ] **Testing**: Test equipment capacity matching (filter GPH for tank gallons)
+- [ ] **Testing**: Verify purchase links resolve correctly for all vendor integrations
+- [ ] **Deployment**: Confirm AI recommendations match actual product availability
+- [ ] **Deployment**: Verify vendor affiliate tracking codes included in all links
+
 ---
 
 ### User Story 7 - Community Forum & Q&A (Priority: P3)
@@ -130,6 +253,28 @@ A fishkeeper has questions about aquarium care or wants to share experiences wit
 3. **Given** community content, **When** a user searches for keywords, **Then** relevant past questions and answers are displayed
 4. **Given** inappropriate content, **When** a user reports it, **Then** moderators are notified and can take action
 5. **Given** a user's profile, **When** viewed, **Then** their questions, answers, and reputation score are displayed
+
+**Implementation Checklist**:
+
+- [ ] **Setup**: Create questions, answers, votes, reports tables with user_id RLS policies
+- [ ] **Setup**: Create moderator role permissions in RBAC system
+- [ ] **Setup**: Set up notification system for answer notifications and moderator alerts
+- [ ] **Setup**: Index questions and answers for full-text search (PostgreSQL tsvector)
+- [ ] **Development**: Build question creation form with title, content, tags (multi-select)
+- [ ] **Development**: Implement answer posting UI with rich text editor (markdown support)
+- [ ] **Development**: Create voting system (upvote/downvote) with optimistic UI updates
+- [ ] **Development**: Build accepted answer marking (only question author can mark)
+- [ ] **Development**: Implement reputation calculation (10×accepted + 2×upvotes + 1×questions)
+- [ ] **Development**: Create content moderation dashboard for moderators (flag review queue)
+- [ ] **Development**: Build search interface with keyword and tag filtering
+- [ ] **Development**: Implement user profile page with activity history
+- [ ] **Testing**: Unit tests for reputation calculation formula
+- [ ] **Testing**: Integration tests for voting system with concurrent vote handling
+- [ ] **Testing**: Test moderation flow (report → moderator review → action taken)
+- [ ] **Testing**: Verify search returns relevant results ranked by votes and recency
+- [ ] **Testing**: Test RLS prevents users from voting multiple times on same content
+- [ ] **Deployment**: Confirm notification emails sent within 5 minutes of new answers
+- [ ] **Deployment**: Verify moderator dashboard only accessible to moderator/admin roles
 
 ---
 
@@ -149,20 +294,43 @@ A fishkeeper wants to buy or sell used aquarium equipment, fish, plants, or othe
 4. **Given** a user's own listings, **When** viewing, **Then** they can edit details, mark items as sold, or remove listings
 5. **Given** marketplace activity, **When** users engage in transactions, **Then** both parties can leave feedback and ratings
 
+**Implementation Checklist**:
+
+- [ ] **Setup**: Create marketplace_listings, messages, transactions, ratings tables with RLS policies
+- [ ] **Setup**: Implement verified_seller role with email + phone verification workflow
+- [ ] **Setup**: Configure image storage with compression for listing photos (max 5 images per listing)
+- [ ] **Setup**: Create categories taxonomy (fish, plants, equipment, tanks) with subcategories
+- [ ] **Development**: Build seller verification flow (email confirmation, phone SMS code, optional ID upload)
+- [ ] **Development**: Implement listing creation form with photo upload, pricing, location
+- [ ] **Development**: Create marketplace browse interface with category filtering and search
+- [ ] **Development**: Build messaging system (inbox, compose, thread view) linking to listings
+- [ ] **Development**: Implement listing management dashboard (edit, mark sold, delete)
+- [ ] **Development**: Create transaction rating system (5-star + optional text review, 500 char max)
+- [ ] **Development**: Add seller profile page with ratings, active listings, transaction history
+- [ ] **Development**: Implement location-based search (distance radius filter)
+- [ ] **Testing**: Unit tests for seller verification logic (email + phone required)
+- [ ] **Testing**: Integration tests for messaging system with read/unread status
+- [ ] **Testing**: Test listing visibility (only verified sellers can create, all users can browse)
+- [ ] **Testing**: Verify image upload compression reduces file sizes appropriately
+- [ ] **Testing**: Test RLS ensures sellers can only edit/delete their own listings
+- [ ] **Deployment**: Confirm phone verification SMS delivery in production
+- [ ] **Deployment**: Verify listing photos load quickly on mobile (image CDN caching)
+- [ ] **Deployment**: Test location search works with user geolocation permissions
+
 ---
 
 ### Edge Cases
 
-- What happens when a test strip photo is too blurry or poorly lit for accurate analysis?
-- How does the system handle users trying to upload non-test-strip images?
-- What happens when a user creates a reminder but later deletes the associated aquarium?
-- How does the system handle extremely large or unusual tank sizes that fall outside normal parameters?
-- What happens when AI services are temporarily unavailable during test strip analysis?
-- How does the system handle users entering parameters manually that conflict with photo analysis?
-- What happens when a user has no aquarium profiles but tries to record a water test?
-- How does the system handle different test strip brands with varying color scales?
-- What happens when a user tries to delete an aquarium that has extensive historical data?
-- How does the system handle concurrent test entries for the same aquarium?
+- What happens when a test strip photo is too blurry or poorly lit for accurate analysis? → **Queue for retry (3 attempts), show manual entry immediately, display image quality tips (good lighting, flat surface, no shadows)**
+- How does the system handle users trying to upload non-test-strip images? → **Validate image content, reject with helpful error message, suggest capturing test strip again**
+- What happens when a user creates a reminder but later deletes the associated aquarium? → **Cascade delete all reminders for that aquarium, send confirmation notification listing affected reminders**
+- How does the system handle extremely large or unusual tank sizes that fall outside normal parameters? → **Accept custom sizes, flag for review if >1000 gallons, adjust AI recommendations with wider safety margins**
+- What happens when AI services are temporarily unavailable during test strip analysis? → **Queue request with retry (max 3 attempts: 2s, 4s, 8s exponential backoff), immediately show manual entry form, notify user when retry succeeds or fails**
+- How does the system handle users entering parameters manually that conflict with photo analysis? → **Prioritize manual entry, mark as "user-corrected", store original AI values for quality improvement**
+- What happens when a user has no aquarium profiles but tries to record a water test? → **Prompt to create aquarium first, offer quick-create modal without leaving test flow**
+- How does the system handle different test strip brands with varying color scales? → **Auto-detect brand from photo (logo/layout), allow manual brand selection if confidence <75%, maintain brand-specific color calibration database**
+- What happens when a user tries to delete an aquarium that has extensive historical data? → **Show confirmation with data count (X tests, Y livestock, Z reminders), offer export before deletion, soft-delete with 30-day recovery window**
+- How does the system handle concurrent test entries for the same aquarium? → **Allow concurrent entries, timestamp each independently, display in chronological order, no conflict resolution needed**
 
 ## Requirements *(mandatory)*
 
@@ -248,34 +416,36 @@ A fishkeeper wants to buy or sell used aquarium equipment, fish, plants, or othe
 **User Management & Authentication**
 
 - **FR-054**: System MUST allow users to create accounts with email and password
-- **FR-055**: System MUST authenticate users via email/password or social login (Google)
+- **FR-055**: System MUST authenticate users via email/password or social login (Google) using session token with RBAC (roles: standard, verified_seller, moderator, admin)
 - **FR-056**: System MUST allow users to reset passwords via email
 - **FR-057**: System MUST allow users to manage profile information (display name, photo, location)
-- **FR-058**: System MUST maintain user sessions across browser sessions until logout
-- **FR-059**: System MUST protect all user data and aquarium information behind authentication
+- **FR-058**: System MUST maintain user sessions with server-side token validation across browser sessions until logout
+- **FR-059**: System MUST protect all user data and aquarium information behind authentication with role-based access control enforcing permissions per feature (e.g., verified_seller required for marketplace listing creation, moderator for community content moderation)
+- **FR-060**: System MUST provide account settings with data export (JSON format), account deletion (immediate purge with 30-day audit log retention), and data retention preferences (opt-in to keep test strip images >90 days)
 
 **Data & Performance**
 
-- **FR-060**: System MUST persist all user data (profiles, aquariums, tests, settings) permanently until user deletion
+- **FR-060**: System MUST persist all user data (profiles, aquariums, tests, settings) with tiered retention policy: test strip images (90 days auto-deletion), marketplace messages (1 year), core data (aquarium profiles, test results - indefinite until user deletion) with row-level security (RLS) enforcing user_id ownership on all tables
 - **FR-061**: System MUST respond to user interactions within 2 seconds under normal load (up to 100 concurrent users with 95th percentile response time at 2 seconds)
 - **FR-062**: System MUST process test strip image analysis within 10 seconds for 85% of requests, with 15-second timeout for remaining cases
 - **FR-063**: System MUST be accessible on mobile devices (phones and tablets) with responsive design
 - **FR-064**: System MUST work reliably with slow internet connections (3G) for core features (aquarium profile CRUD, manual test entry, test history viewing; excludes AI analysis, image uploads, marketplace browsing)
-- **FR-065**: System MUST handle graceful degradation when AI services are temporarily unavailable
+- **FR-065**: System MUST handle graceful degradation when AI services are temporarily unavailable by queuing analysis requests with automatic retry (max 3 attempts with exponential backoff: 2s, 4s, 8s) while immediately displaying manual entry form as fallback option
+- **FR-066**: System MUST provide user data export functionality (JSON format with all user data) and account deletion with immediate data purge (except legally required audit logs retained 30 days)
 
 ### Key Entities
 
-- **User**: Represents a fishkeeper using the platform; attributes include email, display name, profile photo, location, join date, reputation score, and notification preferences
-- **Aquarium**: Represents a fish tank profile; attributes include name, owner (User), size, unit (gallons/liters), type (freshwater/saltwater/planted/reef), setup date, location, description, photos, and current status
-- **WaterTest**: Represents a water quality test result; attributes include aquarium (Aquarium), test date, parameters (pH, ammonia, nitrite, nitrate, KH, GH, chlorine, temperature), image URL, confidence scores, notes, and entry method (AI/manual)
-- **Livestock**: Represents fish, invertebrates, plants, or coral in an aquarium; attributes include aquarium (Aquarium), type (fish/invertebrate/plant/coral), species name, common name, quantity, date added, source, and notes
-- **Equipment**: Represents aquarium equipment; attributes include aquarium (Aquarium), type (filter/heater/light/pump/other), brand, model, installation date, last service date, and notes
-- **MaintenanceTask**: Represents a recurring maintenance reminder; attributes include aquarium (Aquarium), task type (water change/filter clean/test water/other), frequency (days), last completed date, next due date, enabled status, and notes
-- **TreatmentRecommendation**: Represents an AI-generated treatment suggestion; attributes include water test (WaterTest), issue (elevated parameter), product name, dosage calculation, purchase links, priority, and safety warnings
-- **Question**: Represents a community forum question; attributes include author (User), title, content, tags, view count, vote count, posted date, last activity date, and accepted answer
-- **Answer**: Represents a response to a question; attributes include question (Question), author (User), content, vote count, is accepted flag, posted date, and last edited date
-- **MarketplaceListing**: Represents an item for sale/trade; attributes include seller (User), title, description, price, category, condition, photos, location, status (active/sold/expired), posted date, and view count
-- **Message**: Represents communication between users; attributes include sender (User), recipient (User), subject, content, related listing (MarketplaceListing), sent date, and read status
+- **User**: Represents a fishkeeper using the platform; attributes include id (UUID primary key), email, display name, profile photo, location, join date, reputation score, role (standard/verified_seller/moderator/admin), and notification preferences
+- **Aquarium**: Represents a fish tank profile; attributes include id (UUID primary key), user_id (foreign key with RLS policy), name, size, unit (gallons/liters), type (freshwater/saltwater/planted/reef), setup date, location, description, photos, and current status
+- **WaterTest**: Represents a water quality test result; attributes include id (UUID primary key), aquarium_id (foreign key), user_id (inherited via aquarium.user_id for RLS), test date, parameters (pH, ammonia, nitrite, nitrate, KH, GH, chlorine, temperature), image URL, confidence scores, notes, and entry method (AI/manual)
+- **Livestock**: Represents fish, invertebrates, plants, or coral in an aquarium; attributes include id (UUID primary key), aquarium_id (foreign key), user_id (inherited via aquarium.user_id for RLS), type (fish/invertebrate/plant/coral), species name, common name, quantity, date added, source, and notes
+- **Equipment**: Represents aquarium equipment; attributes include id (UUID primary key), aquarium_id (foreign key), user_id (inherited via aquarium.user_id for RLS), type (filter/heater/light/pump/other), brand, model, installation date, last service date, and notes
+- **MaintenanceTask**: Represents a recurring maintenance reminder; attributes include id (UUID primary key), aquarium_id (foreign key), user_id (inherited via aquarium.user_id for RLS), task type (water change/filter clean/test water/other), frequency (days), last completed date, next due date, enabled status, and notes
+- **TreatmentRecommendation**: Represents an AI-generated treatment suggestion; attributes include id (UUID primary key), water_test_id (foreign key), user_id (inherited via water_test for RLS), issue (elevated parameter), product name, dosage calculation, purchase links, priority, and safety warnings
+- **Question**: Represents a community forum question; attributes include id (UUID primary key), author_id (foreign key to User with RLS), title, content, tags, view count, vote count, posted date, last activity date, and accepted answer
+- **Answer**: Represents a response to a question; attributes include id (UUID primary key), question_id (foreign key), author_id (foreign key to User with RLS), content, vote count, is accepted flag, posted date, and last edited date
+- **MarketplaceListing**: Represents an item for sale/trade; attributes include id (UUID primary key), seller_id (foreign key to User with RLS), title, description, price, category, condition, photos, location, status (active/sold/expired), posted date, and view count
+- **Message**: Represents communication between users; attributes include id (UUID primary key), sender_id (foreign key to User), recipient_id (foreign key to User), subject, content, related_listing_id (foreign key), sent date, and read status (RLS allows access when user_id = sender_id OR user_id = recipient_id)
 
 ## Success Criteria *(mandatory)*
 
@@ -325,15 +495,16 @@ A fishkeeper wants to buy or sell used aquarium equipment, fish, plants, or othe
 5. **English Language**: Initial launch assumes English-speaking users; localization can be added later based on demand
 6. **Water Parameter Ranges**: We assume standard safe ranges for common aquarium types (freshwater tropical, saltwater reef, planted tanks)
 7. **Email Access**: We assume users have email accounts for authentication and notification delivery
-8. **Free Tier Services**: We assume Firebase free tier and Neon PostgreSQL free tier are sufficient for initial user base (under 10,000 users)
+8. **Free Tier Services**: We assume Neon PostgreSQL free tier is sufficient for initial user base (under 10,000 users); Supabase Auth/Storage or alternative cost-effective services for authentication and file storage
 9. **Product Availability**: We assume recommended products are generally available through major online retailers and local stores
 10. **Community Moderation**: We assume community will generally self-moderate with upvotes/downvotes, with manual moderator intervention for serious issues only
+11. **Data Retention Compliance**: We assume users understand and accept tiered retention policy (test strip images 90 days, messages 1 year, core data indefinite) as disclosed in terms of service and privacy policy
 
 ## Dependencies
 
-1. **Firebase Authentication**: Required for user authentication and session management
-2. **Neon PostgreSQL**: Required for storing all structured data (profiles, tests, community content)
-3. **Firebase Storage**: Required for storing uploaded images (test strips, aquarium photos, listing images)
+1. **Authentication Service**: Required for user authentication and session management (migrate from Firebase to Supabase Auth or NextAuth.js with Neon PostgreSQL for cost optimization)
+2. **Neon PostgreSQL**: Required for storing all structured data (profiles, tests, community content, user sessions, RBAC roles)
+3. **Object Storage**: Required for storing uploaded images (test strips, aquarium photos, listing images) - evaluate Supabase Storage or Cloudflare R2 as Firebase Storage alternatives
 4. **Google AI / Genkit**: Required for test strip analysis and product recommendation AI flows
 5. **Email Service Provider**: Required for sending reminder notifications and password reset emails
 6. **Mobile Device Cameras**: Users must have device with camera capability for test strip photo capture
@@ -359,6 +530,37 @@ The following features are explicitly excluded from this specification:
 13. **Social Feed**: Instagram-style social feed of aquarium photos and updates
 14. **Fish Disease Diagnosis**: AI-powered fish disease identification from photos
 15. **Competition/Contest Features**: Aquarium competitions or "tank of the month" contests
+
+---
+
+## Data Retention Policy
+
+The following retention periods apply to optimize storage costs while preserving valuable user data:
+
+### Automatic Deletion (Cost Optimization)
+- **Test Strip Images**: Auto-deleted after 90 days (test result data preserved)
+- **Marketplace Messages**: Auto-deleted after 1 year (listing history preserved)
+- **Marketplace Listing Photos**: Deleted when listing marked sold/expired + 30 days
+- **Temporary Upload Files**: Deleted within 24 hours if not associated with saved record
+
+### Indefinite Retention (Core Data)
+- **User Accounts**: Until user-initiated deletion
+- **Aquarium Profiles**: Until user deletion or account deletion
+- **Water Test Results**: Until user deletion (numeric data only after image deletion)
+- **Livestock/Equipment Records**: Until user deletion or aquarium deletion
+- **Community Content** (questions/answers): Until user deletion or content removal
+- **Reputation Scores**: Until user account deletion
+
+### User Controls (Account Settings)
+- **Export All Data**: JSON file with complete user data downloadable anytime
+- **Delete Account**: Immediate purge of all user data (30-day audit log retention for security)
+- **Opt-in Extended Retention**: Keep test strip images >90 days (available for premium users)
+- **Selective Deletion**: Delete specific aquariums, tests, or community posts
+
+### Compliance Notes
+- Audit logs retained 30 days post-deletion for security/fraud prevention (GDPR legitimate interest)
+- Anonymized analytics data (no PII) retained indefinitely for product improvement
+- Users notified 14 days before automatic deletion of test strip images (email reminder)
 
 ---
 
