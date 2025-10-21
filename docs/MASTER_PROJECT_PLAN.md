@@ -34,41 +34,41 @@ This document outlines the complete roadmap to deliver a fully functional, inter
 
 ## Phase 1: Foundation & Core Infrastructure (Priority: CRITICAL)
 
-### 1.1 Firebase Setup & Integration
+### 1.1 Supabase Setup & Integration
 **Timeline: 1-2 days**
 
-#### Firebase Services to Configure:
+#### Supabase Services to Configure:
 - [ ] **Authentication**
   - Email/password authentication
   - Google OAuth integration
   - User session management
   - Password reset functionality
 
-- [ ] **Firestore Database**
-  - User profiles collection
-  - Aquariums collection with subcollections
-  - Marketplace listings collection
-  - Q&A questions and answers collections
-  - Test results collection
+- [ ] **PostgreSQL Database**
+  - User profiles table
+  - Aquariums table with relationships
+  - Marketplace listings table
+  - Q&A questions and answers tables
+  - Test results table
 
-- [ ] **Firebase Storage**
+- [ ] **Supabase Storage**
   - Image uploads for aquariums
   - Test strip photos
   - Marketplace listing images
   - User profile photos
 
-- [ ] **Firebase Functions** (Optional for Phase 1)
+- [ ] **Edge Functions** (Optional for Phase 1)
   - Email notifications
   - Image processing triggers
 
 #### Implementation Tasks:
 ```
-□ Install and configure Firebase SDK
-□ Set up Firebase project and environments
-□ Create Firestore security rules
-□ Implement authentication context
-□ Create database helper functions
-□ Set up image upload utilities
+□ Configure Supabase client and environment
+□ Set up Supabase project and database
+□ Create Row Level Security (RLS) policies
+□ Implement authentication context with Supabase Auth
+□ Create database helper functions using Supabase client
+□ Set up storage bucket and upload utilities
 ```
 
 ### 1.2 User Authentication Integration
@@ -76,8 +76,8 @@ This document outlines the complete roadmap to deliver a fully functional, inter
 
 #### Tasks:
 ```
-□ Connect SignInForm to Firebase Auth
-□ Connect SignUpForm to Firebase Auth
+□ Connect SignInForm to Supabase Auth
+□ Connect SignUpForm to Supabase Auth
 □ Implement password reset flow
 □ Create authentication state management
 □ Add protected route middleware
@@ -87,34 +87,42 @@ This document outlines the complete roadmap to deliver a fully functional, inter
 ### 1.3 Database Schema Implementation
 **Timeline: 1-2 days**
 
-#### Core Collections:
-```typescript
-// Users collection
-users/{uid} {
-  displayName: string
-  email: string
-  photoURL?: string
-  createdAt: timestamp
-  settings: object
-}
+#### Core PostgreSQL Tables:
+```sql
+-- Users table
+CREATE TABLE users (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  email VARCHAR UNIQUE NOT NULL,
+  display_name VARCHAR,
+  photo_url VARCHAR,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  settings JSONB DEFAULT '{}'
+);
 
-// Aquariums collection
-aquariums/{id} {
-  userId: string
-  name: string
-  type: 'freshwater' | 'saltwater' | 'planted'
-  size: number
-  setupDate: timestamp
-  // ... other fields
-}
+-- Aquariums table
+CREATE TABLE aquariums (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  name VARCHAR NOT NULL,
+  type VARCHAR CHECK (type IN ('freshwater', 'saltwater', 'brackish')),
+  volume_gallons INTEGER,
+  setup_date DATE,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
 
-// Test results subcollection
-aquariums/{id}/tests/{testId} {
-  parameters: object
-  timestamp: timestamp
-  imageUrl?: string
-  // ... other fields
-}
+-- Water tests table
+CREATE TABLE water_tests (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  aquarium_id UUID REFERENCES aquariums(id) ON DELETE CASCADE,
+  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  test_date TIMESTAMPTZ DEFAULT NOW(),
+  parameters JSONB NOT NULL,
+  notes TEXT,
+  image_url VARCHAR,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
 ```
 
 ---
@@ -135,10 +143,10 @@ aquariums/{id}/tests/{testId} {
 
 #### Components to Enhance:
 ```
-□ ImageUploadForm - connect to Firebase Storage
+□ ImageUploadForm - connect to Supabase Storage
 □ AnalysisResults - connect to AI analysis
 □ TreatmentRecommendations - connect to product APIs
-□ HistoryTable - connect to Firestore
+□ HistoryTable - connect to Supabase database
 ```
 
 ### 2.2 Aquarium Management Enhancement
@@ -146,10 +154,10 @@ aquariums/{id}/tests/{testId} {
 
 #### Implementation Tasks:
 ```
-□ Connect AquariumForm to Firestore
+□ Connect AquariumForm to Supabase database
 □ Create AquariumDetailView component
-□ Implement parameter tracking
-□ Add photo upload functionality
+□ Implement parameter tracking with PostgreSQL
+□ Add photo upload functionality to Supabase Storage
 □ Create maintenance scheduling
 ```
 
