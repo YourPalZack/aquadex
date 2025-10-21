@@ -26,7 +26,8 @@ export const config = {
   },
   
   ai: {
-    apiKey: process.env.GOOGLE_AI_API_KEY,
+    // Support both GEMINI_API_KEY and GOOGLE_AI_API_KEY for backwards compatibility
+    apiKey: process.env.GEMINI_API_KEY || process.env.GOOGLE_AI_API_KEY,
   },
   
   // Performance targets
