@@ -57,7 +57,7 @@ export default function SignUpForm() {
     }
 
     try {
-      // TODO: Implement Firebase authentication
+      // TODO: Implement Supabase authentication
       console.log("Sign up attempt:", { 
         username: formData.username,
         email: formData.email,
@@ -68,7 +68,7 @@ export default function SignUpForm() {
       await new Promise(resolve => setTimeout(resolve, 1000))
       
       // For now, just log the attempt
-      alert("Sign up functionality will be implemented with Firebase Auth")
+      alert("Sign up functionality will be implemented with Supabase Auth")
     } catch (err) {
       setError("Failed to create account. Please try again.")
     } finally {

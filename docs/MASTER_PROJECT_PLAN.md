@@ -190,8 +190,8 @@ CREATE TABLE water_tests (
 
 #### Implementation Tasks:
 ```
-□ Connect QuestionForm to Firestore
-□ Implement real-time question updates
+□ Connect QuestionForm to Supabase database
+□ Implement real-time question updates with Supabase realtime
 □ Add ReportButton and ReportDialog components
 □ Create moderation system
 □ Add voting and reputation system
@@ -206,12 +206,12 @@ CREATE TABLE water_tests (
 □ Create seller verification workflow
 □ Build listing management system (MyListingsTable)
 □ Add payment integration (Stripe/PayPal)
-□ Implement search and filtering
+□ Implement search and filtering with PostgreSQL
 ```
 
 #### Components to Complete:
 ```
-□ MyListingsTable component with real data
+□ MyListingsTable component with real data from Supabase
 □ Enhanced MarketplaceListingForm
 □ Seller dashboard functionality
 □ Transaction management
@@ -224,8 +224,8 @@ CREATE TABLE water_tests (
 ```
 □ Create EditProfileForm component
 □ Implement NotificationSettingsForm
-□ Connect profile pages to Firebase
-□ Add notification system
+□ Connect profile pages to Supabase
+□ Add notification system with Supabase realtime
 □ Build user dashboard
 ```
 
@@ -273,42 +273,43 @@ CREATE TABLE water_tests (
 ### Environment Setup
 ```
 □ Node.js 18+ installed
-□ Firebase CLI configured
-□ Environment variables configured
+□ Supabase CLI configured (optional)
+□ Environment variables configured (.env.local)
 □ Google AI API keys
 □ Amazon Product Advertising API access
 ```
 
-### Dependencies to Add
+### Dependencies (Already Installed)
 ```bash
-# Firebase
-npm install firebase
+# Database & Auth (✅ Already installed)
+@supabase/supabase-js
+@supabase/ssr
 
-# AI/ML
-npm install @google/generative-ai
+# AI/ML (✅ Already installed) 
+@genkit-ai/googleai
+@google/generative-ai
 
-# Image processing
-npm install sharp
+# Image processing (✅ Already installed)
+sharp
 
-# Forms and validation
-npm install react-hook-form @hookform/resolvers zod
+# Forms and validation (✅ Already installed)
+react-hook-form
+@hookform/resolvers 
+zod
 
-# State management
-npm install zustand
+# Date handling (✅ Already installed)
+date-fns
 
-# Date handling
-npm install date-fns
-
-# Charts (for analytics)
-npm install recharts
+# Charts for analytics (✅ Already installed)
+recharts
 ```
 
 ### Configuration Files Needed
 ```
-□ firebase.config.js
-□ .env.local (with API keys)
-□ next.config.js updates
-□ vercel.json (for deployment)
+□ supabase/config.ts
+□ .env.local (with Supabase keys)
+□ Database migrations/schema
+□ RLS policies for security
 ```
 
 ---

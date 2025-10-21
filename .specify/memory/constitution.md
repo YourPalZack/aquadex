@@ -45,8 +45,8 @@ All features MUST be built using modular, reusable React components following Ne
 ### II. Cloud-Native & Browser-First
 
 The application MUST be fully functional and testable in the browser without local service dependencies. This requires:
-- Use of serverless cloud databases (Neon PostgreSQL as primary database)
-- Firebase services for authentication, storage, and hosting where appropriate
+- Use of serverless cloud databases (Supabase PostgreSQL as primary database)
+- Supabase services for authentication, storage, and real-time features
 - All AI flows MUST be executable via API routes
 - No localhost-only dependencies in production code paths
 - Environment variables for all external service configurations
@@ -101,9 +101,9 @@ All UI components and pages MUST be:
 
 - **Framework**: Next.js 15+ with App Router (server and client components)
 - **Language**: TypeScript 5+ with strict mode
-- **Database**: Neon PostgreSQL (serverless, cloud-hosted)
-- **Authentication**: Firebase Authentication
-- **Storage**: Firebase Storage (for images)
+- **Database**: Supabase PostgreSQL (serverless, cloud-hosted)
+- **Authentication**: Supabase Auth
+- **Storage**: Supabase Storage (for images)
 - **AI/ML**: Genkit with Google AI integration
 - **Styling**: Tailwind CSS + Shadcn UI components
 - **Forms**: React Hook Form + Zod validation

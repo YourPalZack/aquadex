@@ -33,7 +33,7 @@ export default function ForgotPasswordForm() {
     }
 
     try {
-      // TODO: Implement Firebase password reset
+      // TODO: Implement Supabase password reset
       console.log("Password reset request for:", email)
       
       // Simulate API call

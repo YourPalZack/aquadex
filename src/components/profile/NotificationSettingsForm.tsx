@@ -97,7 +97,7 @@ export default function NotificationSettingsForm({
     setSuccess(false)
 
     try {
-      // TODO: Implement Firebase settings update
+      // TODO: Implement Supabase settings update
       console.log("Notification settings update:", settings)
       
       // Simulate API call

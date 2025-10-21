@@ -54,7 +54,7 @@ export default function ResetPasswordForm({ token }: ResetPasswordFormProps) {
     }
 
     try {
-      // TODO: Implement Firebase password reset with token
+      // TODO: Implement Supabase password reset with token
       console.log("Password reset attempt:", { 
         token,
         password: "***"

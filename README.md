@@ -33,9 +33,9 @@ Visit [http://localhost:9002](http://localhost:9002) to see the application.
 
 - **Framework:** Next.js 15 with App Router
 - **Language:** TypeScript (strict mode)
-- **Database:** Neon PostgreSQL (serverless)
-- **Auth:** Firebase Authentication
-- **Storage:** Firebase Storage
+- **Database:** Supabase PostgreSQL (serverless)
+- **Auth:** Supabase Auth
+- **Storage:** Supabase Storage
 - **AI:** Genkit with Google AI
 - **Styling:** Tailwind CSS + Shadcn UI
 - **Forms:** React Hook Form + Zod

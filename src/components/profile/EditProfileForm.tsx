@@ -77,7 +77,7 @@ export default function EditProfileForm({
     }
 
     try {
-      // TODO: Implement Firebase profile update
+      // TODO: Implement Supabase profile update
       console.log("Profile update:", formData)
       
       // Simulate API call
@@ -95,7 +95,7 @@ export default function EditProfileForm({
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
-      // TODO: Implement image upload to Firebase Storage
+      // TODO: Implement image upload to Supabase Storage
       console.log("Image upload:", file)
       
       // For now, create a preview URL
