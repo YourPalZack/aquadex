@@ -14,14 +14,15 @@ import {
 import { LogOut, Settings, User, SidebarOpenIcon, LayoutGrid } from 'lucide-react';
 import Logo from './Logo';
 import { SidebarTrigger, useSidebar } from '@/components/ui/sidebar';
-import { useMockAuth } from '@/lib/mock/auth';
+import { useAuth } from '@/contexts/AuthContext';
 import React from 'react';
 
 
 export default function AppHeader() {
   const { isMobile, openMobile, setOpenMobile } = useSidebar();
   const [mounted, setMounted] = React.useState(false);
-  const { user, isAuthenticated } = useMockAuth();
+  const { user, userProfile, signOut } = useAuth();
+  const isAuthenticated = !!user;
 
   React.useEffect(() => {
     setMounted(true);
@@ -44,15 +45,15 @@ export default function AppHeader() {
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-10 w-10 rounded-full">
                   <Avatar className="h-10 w-10">
-                    <AvatarImage src={user?.photoUrl || `https://avatar.vercel.sh/${user?.email}.png`} alt={user?.displayName || 'User'} />
-                    <AvatarFallback>{user?.displayName?.charAt(0).toUpperCase() || 'U'}</AvatarFallback>
+                    <AvatarImage src={userProfile?.photo_url || `https://avatar.vercel.sh/${user?.email}.png`} alt={userProfile?.display_name || 'User'} />
+                    <AvatarFallback>{userProfile?.display_name?.charAt(0).toUpperCase() || user?.email?.charAt(0).toUpperCase() || 'U'}</AvatarFallback>
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56" align="end" forceMount>
                 <DropdownMenuLabel className="font-normal">
                   <div className="flex flex-col space-y-1">
-                    <p className="text-sm font-medium leading-none">{user?.displayName}</p>
+                    <p className="text-sm font-medium leading-none">{userProfile?.display_name || user?.email}</p>
                     {user?.email && (
                         <p className="text-xs leading-none text-muted-foreground">
                         {user.email}
@@ -78,7 +79,7 @@ export default function AppHeader() {
                   <span>Settings</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>
+                <DropdownMenuItem onClick={signOut}>
                   <LogOut className="mr-2 h-4 w-4" />
                   <span>Log out</span>
                 </DropdownMenuItem>
