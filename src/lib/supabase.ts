@@ -93,19 +93,52 @@ export type Database = {
           aquarium_id: string
           user_id: string
           test_date: string
-          parameters: any
+          temperature: number | null
+          ph: number | null
+          ammonia: number | null
+          nitrite: number | null
+          nitrate: number | null
+          gh: number | null
+          kh: number | null
+          tds: number | null
+          salinity: number | null
+          alkalinity: number | null
+          phosphate: number | null
+          chlorine: number | null
+          copper: number | null
+          iron: number | null
+          calcium: number | null
+          magnesium: number | null
           notes: string | null
-          image_url: string | null
+          test_kit_used: string | null
+          photo_url: string | null
           created_at: string
+          updated_at: string
         }
         Insert: {
           id?: string
           aquarium_id: string
           user_id: string
-          test_date: string
-          parameters: any
+          test_date?: string
+          temperature?: number | null
+          ph?: number | null
+          ammonia?: number | null
+          nitrite?: number | null
+          nitrate?: number | null
+          gh?: number | null
+          kh?: number | null
+          tds?: number | null
+          salinity?: number | null
+          alkalinity?: number | null
+          phosphate?: number | null
+          chlorine?: number | null
+          copper?: number | null
+          iron?: number | null
+          calcium?: number | null
+          magnesium?: number | null
           notes?: string | null
-          image_url?: string | null
+          test_kit_used?: string | null
+          photo_url?: string | null
           created_at?: string
         }
         Update: {
@@ -113,10 +146,26 @@ export type Database = {
           aquarium_id?: string
           user_id?: string
           test_date?: string
-          parameters?: any
+          temperature?: number | null
+          ph?: number | null
+          ammonia?: number | null
+          nitrite?: number | null
+          nitrate?: number | null
+          gh?: number | null
+          kh?: number | null
+          tds?: number | null
+          salinity?: number | null
+          alkalinity?: number | null
+          phosphate?: number | null
+          chlorine?: number | null
+          copper?: number | null
+          iron?: number | null
+          calcium?: number | null
+          magnesium?: number | null
           notes?: string | null
-          image_url?: string | null
-          created_at?: string
+          test_kit_used?: string | null
+          photo_url?: string | null
+          updated_at?: string
         }
       }
       marketplace_listings: {
