@@ -73,61 +73,84 @@ Reference: `.specify/memory/constitution.md` version 1.0.0
 ### Documentation (this feature)
 
 ```
-specs/[###-feature]/
+specs/002-local-store-directory/
 ├── plan.md              # This file (/speckit.plan command output)
 ├── research.md          # Phase 0 output (/speckit.plan command)
 ├── data-model.md        # Phase 1 output (/speckit.plan command)
 ├── quickstart.md        # Phase 1 output (/speckit.plan command)
 ├── contracts/           # Phase 1 output (/speckit.plan command)
+│   ├── api-routes.md    # Next.js API route specifications
+│   └── server-actions.md # Server action signatures
+├── checklists/
+│   └── requirements.md  # Already created - spec validation
 └── tasks.md             # Phase 2 output (/speckit.tasks command - NOT created by /speckit.plan)
 ```
 
 ### Source Code (repository root)
-<!--
-  ACTION REQUIRED: Replace the placeholder tree below with the concrete layout
-  for this feature. Delete unused options and expand the chosen structure with
-  real paths (e.g., apps/admin, packages/something). The delivered plan must
-  not include Option labels.
--->
 
 ```
-# [REMOVE IF UNUSED] Option 1: Single project (DEFAULT)
 src/
-├── models/
-├── services/
-├── cli/
-└── lib/
+├── app/
+│   ├── local-fish-stores/              # Main directory page
+│   │   ├── page.tsx                    # Store directory listing with search
+│   │   ├── loading.tsx                 # Loading skeleton
+│   │   ├── error.tsx                   # Error boundary
+│   │   └── [storeSlug]/                # Individual store pages
+│   │       ├── page.tsx                # Store profile view
+│   │       ├── loading.tsx
+│   │       └── error.tsx
+│   ├── store-signup/                   # Store owner registration
+│   │   └── page.tsx
+│   ├── store-dashboard/                # Store owner management (auth required)
+│   │   ├── page.tsx                    # Dashboard overview
+│   │   ├── profile/
+│   │   │   └── page.tsx                # Edit store profile
+│   │   └── deals/
+│   │       ├── page.tsx                # Manage deals
+│   │       └── new/
+│   │           └── page.tsx            # Create new deal
+│   └── discounts-deals/                # Already exists, enhance for stores
+│       └── page.tsx                    # Aggregate deals from all stores
+│
+├── components/
+│   └── local-fish-stores/              # New feature components
+│       ├── StoreCard.tsx               # Store listing card with distance
+│       ├── StoreProfile.tsx            # Full store profile display
+│       ├── StoreSearchForm.tsx         # Location + filter search
+│       ├── StoreMap.tsx                # Map view with markers
+│       ├── StoreGallery.tsx            # Image gallery component
+│       ├── BusinessHoursDisplay.tsx    # Hours with open/closed status
+│       ├── DealCard.tsx                # Individual deal display
+│       ├── DealForm.tsx                # Create/edit deal form
+│       ├── DealsList.tsx               # List of deals with filters
+│       ├── StoreSignupForm.tsx         # Store registration form
+│       └── StoreDashboard.tsx          # Dashboard layout
+│
+├── lib/
+│   ├── actions/
+│   │   ├── store-supabase.ts           # Store CRUD server actions
+│   │   └── deal-supabase.ts            # Deal CRUD server actions
+│   └── db/
+│       └── schema/
+│           ├── stores.ts               # Drizzle schema for stores
+│           └── deals.ts                # Drizzle schema for deals
+│
+├── types/
+│   └── index.ts                        # Add Store, Deal, StoreCategory types
+│
+└── hooks/
+    ├── use-geolocation.tsx             # Hook for user location
+    └── use-store-search.tsx            # Hook for store search state
 
-tests/
-├── contract/
-├── integration/
-└── unit/
-
-# [REMOVE IF UNUSED] Option 2: Web application (when "frontend" + "backend" detected)
-backend/
-├── src/
-│   ├── models/
-│   ├── services/
-│   └── api/
-└── tests/
-
-frontend/
-├── src/
-│   ├── components/
-│   ├── pages/
-│   └── services/
-└── tests/
-
-# [REMOVE IF UNUSED] Option 3: Mobile + API (when "iOS/Android" detected)
-api/
-└── [same as backend above]
-
-ios/ or android/
-└── [platform-specific structure: feature modules, UI flows, platform tests]
+database/
+└── migrations/
+    ├── XXXX_create_stores_table.sql
+    ├── XXXX_create_deals_table.sql
+    ├── XXXX_add_postgis_extension.sql
+    └── XXXX_create_store_indexes.sql
 ```
 
-**Structure Decision**: [Document the selected structure and reference the real
-directories captured above]
+**Structure Decision**: Using Next.js App Router structure (Option 2 variant). All pages in `src/app/` directory following Next.js 15 conventions. Components organized by feature domain in `src/components/local-fish-stores/`. Server actions in `src/lib/actions/` for database operations. Database schema using Drizzle ORM in `src/lib/db/schema/`. This aligns with existing AquaDex architecture.
 
 ## Complexity Tracking
 
