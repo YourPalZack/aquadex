@@ -5,7 +5,9 @@
 ### Core Documents
 - **[spec.md](./spec.md)** - Feature specification (31 requirements, 4 user stories)
 - **[plan.md](./plan.md)** - Implementation plan (architecture & phases)
+- **[tasks.md](./tasks.md)** - Implementation tasks (100 tasks organized by user story) ✨ NEW
 - **[PLANNING_COMPLETE.md](./PLANNING_COMPLETE.md)** - Phase 0 & 1 completion report
+- **[TASKS_GENERATED.md](./TASKS_GENERATED.md)** - Task generation summary ✨ NEW
 
 ### Technical Design
 - **[research.md](./research.md)** - Technical decisions (Mapbox, PostGIS, etc.)
@@ -22,18 +24,19 @@
 
 **Purpose**: Local fish store directory with deals/discounts  
 **Branch**: `002-local-store-directory`  
-**Status**: Planning Complete (Phase 0 & 1) - Ready for `/speckit.tasks`
+**Status**: Tasks Generated (100 tasks) - Ready to Implement ✅
 
 ### Priority Breakdown
-- **P1 (MVP)**: Store registration + directory search
-- **P2**: Deal creation and management  
-- **P3**: Deal discovery aggregation
+- **P1 (MVP)**: Store registration + directory search (30 tasks)
+- **P2**: Deal creation and management (21 tasks)
+- **P3**: Deal discovery aggregation (11 tasks)
+- **Setup + Foundation**: 13 tasks
+- **Polish**: 25 tasks
 
 ### Estimated Timeline
-- P1: 2-3 days
-- P2: 1-2 days
-- P3: 1 day
-- **Total**: 4-6 days
+- **MVP (P1 only)**: 3-4 days (51 tasks)
+- **+ P2 (Deals)**: +2 days (72 tasks total)
+- **Complete (All)**: 6-7 days (100 tasks total)
 
 ---
 
