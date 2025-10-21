@@ -3,20 +3,40 @@ import { getWaterTests } from '@/lib/actions/water-test';
 import { getAquariums } from '@/lib/actions/aquarium';
 import { WaterTestsPageContent } from '@/components/aquariums/water-tests-page-content';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Droplet, Loader2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Droplet, Loader2, Beaker, Plus } from 'lucide-react';
+import Link from 'next/link';
 
 export default async function WaterTestsPage() {
   return (
     <div className="container mx-auto py-8 px-4 max-w-6xl">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-4xl font-bold mb-2 flex items-center">
-          <Droplet className="h-8 w-8 mr-3 text-primary" />
-          Water Test History
-        </h1>
-        <p className="text-muted-foreground">
-          View and manage all your water quality test results across all aquariums.
-        </p>
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-4">
+          <div>
+            <h1 className="text-4xl font-bold mb-2 flex items-center">
+              <Droplet className="h-8 w-8 mr-3 text-primary" />
+              Water Test History
+            </h1>
+            <p className="text-muted-foreground">
+              View and manage all your water quality test results across all aquariums.
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button asChild variant="outline" className="gap-2">
+              <Link href="/water-tests/compare">
+                <Plus className="h-4 w-4" />
+                Compare Tests
+              </Link>
+            </Button>
+            <Button asChild className="gap-2">
+              <Link href="/water-tests/batch-entry">
+                <Beaker className="h-4 w-4" />
+                Batch Entry
+              </Link>
+            </Button>
+          </div>
+        </div>
       </div>
 
       <Suspense fallback={<LoadingState />}>
