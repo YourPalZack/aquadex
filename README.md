@@ -1,6 +1,17 @@
 # AquaDex - The Fishkeeper's Toolkit
 
-Welcome to AquaDex! A cloud-native Next.js application designed to be the ultimate toolkit for aquarium enthusiasts.
+Welcome to AquaDex! A production-ready Next.js application designed to be the ultimate toolkit for aquarium enthusiasts. Built with 100% free-tier services (Supabase + Google Gemini).
+
+## ✅ Status: Production Ready!
+
+- ✅ 49 pages fully functional
+- ✅ Complete backend integration with Supabase
+- ✅ AI-powered features with Google Gemini (free tier)
+- ✅ User authentication & profile management
+- ✅ Image storage & management
+- ✅ Water testing with 20+ parameters
+- ✅ Aquarium management toolkit
+- ✅ $0/month operating cost
 
 ## 🚀 Quick Start
 
@@ -9,25 +20,34 @@ Welcome to AquaDex! A cloud-native Next.js application designed to be the ultima
 npm install
 
 # Set up environment variables
-cp .env.example .env.local
-# Edit .env.local with your actual credentials
+cp .env.local.example .env.local
+# Edit .env.local with your Supabase and Gemini API keys
 
-# Set up database (see docs/NEON_SETUP.md)
-npx prisma migrate dev
+# Run the Supabase SQL scripts
+# 1. Go to your Supabase project SQL Editor
+# 2. Run database/schema.sql
+# 3. Run database/storage-buckets.sql
 
 # Run development server
 npm run dev
 ```
 
-Visit [http://localhost:9002](http://localhost:9002) to see the application.
+Visit [http://localhost:3000](http://localhost:3000) to see the application.
 
 ## 📚 Documentation
 
-- **[Project Constitution](./.specify/memory/constitution.md)** - Core principles and governance
-- **[Project Documentation](./docs/ProjectDocumentation.md)** - Complete feature overview
-- **[Neon Database Setup](./docs/NEON_SETUP.md)** - Cloud database configuration
-- **[Master Project Plan](./docs/MASTER_PROJECT_PLAN.md)** - Implementation roadmap
-- **[AI Agent Guide](./docs/AgentKnowledge.md)** - For AI-assisted development
+### Setup Guides
+- **[Deployment Checklist](./DEPLOYMENT_CHECKLIST.md)** - Complete deployment guide
+- **[Environment Variables](./.env.local.example)** - Required configuration
+- **[Database Schema](./database/schema.sql)** - PostgreSQL setup
+- **[Storage Setup](./database/storage-buckets.sql)** - Supabase storage configuration
+
+### Feature Documentation
+- **[Backend Integration Complete](./docs/BACKEND_INTEGRATION_COMPLETE.md)** - Implementation summary
+- **[AI Integration](./docs/AI_INTEGRATION_COMPLETE.md)** - AI features overview
+- **[AI Setup Guide](./docs/AI_SETUP_FREE.md)** - Free tier configuration
+- **[Project Documentation](./docs/ProjectDocumentation.md)** - Complete feature list
+- **[Master Project Plan](./docs/MASTER_PROJECT_PLAN.md)** - Development roadmap
 
 ## 🛠️ Tech Stack
 
