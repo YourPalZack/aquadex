@@ -129,7 +129,7 @@ Users want to discover the best current deals from local stores without visiting
 - **FR-021**: Store owners MUST be able to view, edit, and deactivate their active deals at any time
 - **FR-022**: System MUST display a visual indicator on store listings when they have active deals
 - **FR-023**: System MUST show deal details including discount amount, valid dates, terms/conditions, and applicable products
-- **FR-024**: System MUST limit the number of concurrent active deals per store to [NEEDS CLARIFICATION: What is a reasonable limit to prevent spam? Suggest 10 active deals maximum]
+- **FR-024**: System MUST limit the number of concurrent active deals per store to 10 active deals maximum
 - **FR-025**: Users MUST be able to view all deals from a specific store on the store's profile page
 - **FR-026**: System MUST aggregate all active deals across stores in a dedicated deals discovery page
 - **FR-027**: Users MUST be able to filter and sort deals by category, discount percentage, distance, and expiration date
