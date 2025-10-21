@@ -1,10 +1,19 @@
-
+import type { Metadata } from 'next';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import Logo from "@/components/layout/Logo";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, BarChart3, BotMessageSquare, ShoppingBag, Users2, UploadCloud, CalendarClock } from "lucide-react";
+
+export const metadata: Metadata = {
+  title: 'AquaDex - Smart Aquarium Management Toolkit',
+  description: 'The ultimate toolkit for aquarium enthusiasts. Analyze water tests with AI, track parameters, find compatible fish, discover aquarium products, and connect with the community.',
+  openGraph: {
+    title: 'AquaDex - Smart Aquarium Management Toolkit',
+    description: 'AI-powered aquarium management for fishkeepers',
+  },
+};
 
 export default function LandingPage() {
   return (

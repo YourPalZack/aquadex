@@ -16,8 +16,41 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'AquaDex - The Fishkeepers Toolkit',
-  description: 'AquaDex - The Fishkeepers Toolkit for smart aquarium management.',
+  metadataBase: new URL('https://aquadex.app'),
+  title: {
+    default: 'AquaDex - The Fishkeepers Toolkit',
+    template: '%s | AquaDex',
+  },
+  description: 'Comprehensive aquarium management toolkit for fishkeepers. Track water tests, manage aquariums, find compatible fish, discover products with AI-powered tools, and connect with the aquarium community.',
+  keywords: ['aquarium', 'fishkeeping', 'water testing', 'fish finder', 'aquarium management', 'planted tank', 'reef tank', 'aquarium community'],
+  authors: [{ name: 'AquaDex Team' }],
+  creator: 'AquaDex',
+  publisher: 'AquaDex',
+  openGraph: {
+    type: 'website',
+    locale: 'en_US',
+    url: 'https://aquadex.app',
+    title: 'AquaDex - The Fishkeepers Toolkit',
+    description: 'Smart aquarium management with AI-powered tools for water testing, fish compatibility, and more.',
+    siteName: 'AquaDex',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'AquaDex - The Fishkeepers Toolkit',
+    description: 'Smart aquarium management with AI-powered tools',
+    creator: '@aquadex',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
 };
 
 export default function RootLayout({
