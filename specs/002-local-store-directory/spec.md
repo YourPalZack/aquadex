@@ -106,9 +106,9 @@ Users want to discover the best current deals from local stores without visiting
 - **FR-004**: System MUST prevent duplicate registrations using the same email address
 - **FR-005**: Store owners MUST be able to edit their profile information at any time after registration
 - **FR-006**: Store profiles MUST include fields for business description, specialties, accepted payment methods, and social media links
-- **FR-007**: System MUST allow store owners to upload a profile image and up to [NEEDS CLARIFICATION: How many additional photos should stores be allowed? Suggest 5-10 gallery images]
+- **FR-007**: System MUST allow store owners to upload a profile image and up to 5 additional gallery images
 - **FR-008**: System MUST allow store owners to temporarily deactivate their profile without permanent deletion
-- **FR-009**: System MUST retain inactive store data for [NEEDS CLARIFICATION: How long should inactive store data be retained? Suggest 90 days before requiring re-verification]
+- **FR-009**: System MUST retain inactive store data for 90 days before requiring re-verification
 
 **Directory Search & Discovery**
 
