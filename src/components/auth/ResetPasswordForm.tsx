@@ -1,18 +1,16 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import { useAuth } from "@/contexts/AuthContext"
 
-interface ResetPasswordFormProps {
-  token?: string
-}
-
-export default function ResetPasswordForm({ token }: ResetPasswordFormProps) {
+export default function ResetPasswordForm() {
   const [formData, setFormData] = useState({
     password: "",
     confirmPassword: ""
@@ -20,6 +18,20 @@ export default function ResetPasswordForm({ token }: ResetPasswordFormProps) {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
   const [success, setSuccess] = useState(false)
+  
+  const { updatePassword } = useAuth()
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  
+  // Check if we have the necessary tokens from the URL
+  useEffect(() => {
+    const accessToken = searchParams.get('access_token')
+    const refreshToken = searchParams.get('refresh_token')
+    
+    if (!accessToken || !refreshToken) {
+      setError("Invalid reset link. Please request a new password reset.")
+    }
+  }, [searchParams])
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
@@ -54,18 +66,26 @@ export default function ResetPasswordForm({ token }: ResetPasswordFormProps) {
     }
 
     try {
-      // TODO: Implement Supabase password reset with token
-      console.log("Password reset attempt:", { 
-        token,
-        password: "***"
-      })
-      
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      
+      await updatePassword(formData.password)
       setSuccess(true)
-    } catch (err) {
-      setError("Failed to reset password. The link may have expired.")
+      
+      // Redirect to sign in page after successful password reset
+      setTimeout(() => {
+        router.push('/auth/signin')
+      }, 3000)
+    } catch (err: any) {
+      console.error("Password reset error:", err)
+      
+      // Handle specific Supabase errors
+      if (err.message?.includes("New password should be different")) {
+        setError("Please choose a different password from your current one.")
+      } else if (err.message?.includes("Password should be at least")) {
+        setError("Password must be at least 6 characters long.")
+      } else if (err.message?.includes("Invalid or expired")) {
+        setError("Reset link has expired. Please request a new password reset.")
+      } else {
+        setError("Failed to reset password. Please try again or request a new reset link.")
+      }
     } finally {
       setIsLoading(false)
     }

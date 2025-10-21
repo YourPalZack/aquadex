@@ -7,12 +7,15 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import { useAuth } from "@/contexts/AuthContext"
 
 export default function ForgotPasswordForm() {
   const [email, setEmail] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
   const [success, setSuccess] = useState(false)
+  
+  const { resetPassword } = useAuth()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -33,15 +36,19 @@ export default function ForgotPasswordForm() {
     }
 
     try {
-      // TODO: Implement Supabase password reset
-      console.log("Password reset request for:", email)
-      
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      
+      await resetPassword(email)
       setSuccess(true)
-    } catch (err) {
-      setError("Failed to send reset email. Please try again.")
+    } catch (err: any) {
+      console.error("Password reset error:", err)
+      
+      // Handle specific Supabase errors
+      if (err.message?.includes("Invalid email")) {
+        setError("Please enter a valid email address.")
+      } else if (err.message?.includes("Rate limit")) {
+        setError("Too many requests. Please wait a moment before trying again.")
+      } else {
+        setError("Failed to send reset email. Please try again.")
+      }
     } finally {
       setIsLoading(false)
     }

@@ -1,12 +1,14 @@
 "use client"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import { useAuth } from "@/contexts/AuthContext"
 
 export default function SignUpForm() {
   const [formData, setFormData] = useState({
@@ -17,6 +19,10 @@ export default function SignUpForm() {
   })
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
+  const [success, setSuccess] = useState("")
+  
+  const { signUp } = useAuth()
+  const router = useRouter()
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
@@ -57,20 +63,35 @@ export default function SignUpForm() {
     }
 
     try {
-      // TODO: Implement Supabase authentication
-      console.log("Sign up attempt:", { 
-        username: formData.username,
-        email: formData.email,
-        password: "***"
+      await signUp(formData.email, formData.password, {
+        display_name: formData.username,
+        full_name: formData.username
       })
       
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000))
+      setSuccess("Account created successfully! Please check your email to confirm your account before signing in.")
       
-      // For now, just log the attempt
-      alert("Sign up functionality will be implemented with Supabase Auth")
-    } catch (err) {
-      setError("Failed to create account. Please try again.")
+      // Reset form
+      setFormData({
+        username: "",
+        email: "",
+        password: "",
+        confirmPassword: ""
+      })
+    } catch (err: any) {
+      console.error("Sign up error:", err)
+      
+      // Handle specific Supabase auth errors
+      if (err.message?.includes("User already registered")) {
+        setError("An account with this email already exists. Please sign in instead.")
+      } else if (err.message?.includes("Password should be at least")) {
+        setError("Password must be at least 6 characters long.")
+      } else if (err.message?.includes("Invalid email")) {
+        setError("Please enter a valid email address.")
+      } else if (err.message?.includes("Signup is disabled")) {
+        setError("Account creation is currently disabled. Please try again later.")
+      } else {
+        setError("Failed to create account. Please try again.")
+      }
     } finally {
       setIsLoading(false)
     }
@@ -89,6 +110,12 @@ export default function SignUpForm() {
           {error && (
             <Alert variant="destructive">
               <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+          
+          {success && (
+            <Alert>
+              <AlertDescription>{success}</AlertDescription>
             </Alert>
           )}
           

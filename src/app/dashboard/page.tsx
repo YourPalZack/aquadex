@@ -4,6 +4,8 @@
 import { useState, useEffect } from 'react';
 import type { Aquarium, TestResult, UserProfile } from '@/types'; 
 import { mockCurrentUser, mockAquariumsData } from '@/types'; // Updated import path for mockAquariumsData
+import { useAuth } from '@/contexts/AuthContext';
+import ProtectedRoute from '@/components/auth/ProtectedRoute';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Lightbulb, Droplet, CalendarDays, Timer, AlertTriangle, BellRing, Eye, Info, History as HistoryIcon, ListPlus } from 'lucide-react';
 import Link from 'next/link';
@@ -59,10 +61,11 @@ interface RecentTestResult extends TestResult {
   aquariumName?: string;
 }
 
-export default function DashboardPage() {
+function DashboardContent() {
   const [aquariums, setAquariums] = useState<Aquarium[]>([]);
   const [recentTests, setRecentTests] = useState<RecentTestResult[]>([]);
-  const currentUser = mockCurrentUser; // Use the mock current user
+  const { user, userProfile } = useAuth();
+  const currentUser = userProfile || mockCurrentUser; // Use real user profile or fallback to mock
 
   useEffect(() => {
     setAquariums(mockAquariumsData);
@@ -248,7 +251,7 @@ export default function DashboardPage() {
                         </div>
                     </Button>
                 </Link>
-                {currentUser.isSellerApproved && (
+                {(currentUser as any)?.isSellerApproved && (
                     <Link href="/marketplace/add-listing" passHref>
                         <Button variant="default" className="w-full justify-start text-left h-auto py-3 bg-primary/90 hover:bg-primary text-primary-foreground">
                             <div className="flex flex-col">
@@ -263,5 +266,13 @@ export default function DashboardPage() {
         </Card>
       </div>
     </div>
+  );
+}
+
+export default function DashboardPage() {
+  return (
+    <ProtectedRoute>
+      <DashboardContent />
+    </ProtectedRoute>
   );
 }
