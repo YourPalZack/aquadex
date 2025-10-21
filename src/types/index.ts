@@ -613,5 +613,226 @@ export const mockLocalFishStoresData: LocalFishStore[] = [
   },
 ];
 
+// ============================================================================
+// Local Fish Store Directory Types
+// ============================================================================
+
+/**
+ * Store specialty categories for filtering
+ */
+export type StoreCategory = 
+  | 'freshwater'
+  | 'saltwater' 
+  | 'plants'
+  | 'reptiles'
+  | 'general';
+
+/**
+ * Deal discount types
+ */
+export type DiscountType = 
+  | 'percentage'
+  | 'fixed_amount'
+  | 'bogo'
+  | 'freebie';
+
+/**
+ * Store verification status
+ */
+export type VerificationStatus = 
+  | 'pending'
+  | 'verified'
+  | 'rejected';
+
+/**
+ * Deal status
+ */
+export type DealStatus = 
+  | 'draft'
+  | 'active'
+  | 'expired';
+
+/**
+ * Business hours structure for a single day
+ */
+export interface DayHours {
+  open: string;  // "09:00"
+  close: string; // "18:00"
+  closed?: boolean;
+}
+
+/**
+ * Business hours for all days of the week
+ */
+export interface BusinessHours {
+  monday: DayHours;
+  tuesday: DayHours;
+  wednesday: DayHours;
+  thursday: DayHours;
+  friday: DayHours;
+  saturday: DayHours;
+  sunday: DayHours;
+  exceptions?: {
+    date: string;
+    open: string;
+    close: string;
+    closed: boolean;
+  }[];
+}
+
+/**
+ * Social media links
+ */
+export interface SocialLinks {
+  facebook?: string;
+  instagram?: string;
+  twitter?: string;
+}
+
+/**
+ * Store profile entity
+ */
+export interface Store {
+  id: string;
+  user_id: string;
+  business_name: string;
+  slug: string;
+  location: {
+    type: 'Point';
+    coordinates: [number, number]; // [longitude, latitude]
+  };
+  street_address: string;
+  city: string;
+  state: string;
+  postal_code: string;
+  country: string;
+  latitude: number;  // Denormalized for quick access
+  longitude: number; // Denormalized for quick access
+  phone: string | null;
+  email: string | null;
+  website: string | null;
+  social_links: SocialLinks | null;
+  business_hours: BusinessHours;
+  description: string | null;
+  categories: StoreCategory[];
+  profile_image_url: string | null;
+  gallery_images: string[];
+  verification_status: VerificationStatus;
+  verified_at: string | null;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+/**
+ * Deal/Discount entity
+ */
+export interface Deal {
+  id: string;
+  store_id: string;
+  title: string;
+  description: string;
+  discount_type: DiscountType;
+  discount_value: number;
+  original_price: number | null;
+  sale_price: number | null;
+  terms_conditions: string | null;
+  start_date: string;
+  end_date: string;
+  is_active: boolean;
+  status: DealStatus;
+  view_count: number;
+  created_at: string;
+  updated_at: string;
+}
+
+/**
+ * Store with associated deals
+ */
+export interface StoreWithDeals extends Store {
+  deals: Deal[];
+}
+
+/**
+ * Store with distance from user (for search results)
+ */
+export interface StoreWithDistance extends Store {
+  distance_miles: number;
+}
+
+/**
+ * Store search parameters
+ */
+export interface StoreSearchParams {
+  latitude: number;
+  longitude: number;
+  radius_miles?: number; // Default: 25
+  categories?: StoreCategory[];
+  is_open_now?: boolean;
+  limit?: number;
+  offset?: number;
+}
+
+/**
+ * Store search result
+ */
+export interface StoreSearchResult {
+  stores: StoreWithDistance[];
+  total_count: number;
+  has_more: boolean;
+}
+
+/**
+ * Deal search parameters
+ */
+export interface DealSearchParams {
+  latitude?: number;
+  longitude?: number;
+  radius_miles?: number;
+  categories?: StoreCategory[];
+  discount_type?: DiscountType;
+  sort_by?: 'discount_value' | 'expiration_date' | 'distance';
+  limit?: number;
+  offset?: number;
+}
+
+/**
+ * Store form data (for creation/update)
+ */
+export interface StoreFormData {
+  business_name: string;
+  owner_name?: string;
+  email: string;
+  phone: string;
+  website?: string;
+  description?: string;
+  address: {
+    street: string;
+    city: string;
+    state: string;
+    zip: string;
+    country?: string;
+  };
+  business_hours: BusinessHours;
+  categories: StoreCategory[];
+  payment_methods?: string[];
+  social_links?: SocialLinks;
+}
+
+/**
+ * Deal form data (for creation/update)
+ */
+export interface DealFormData {
+  title: string;
+  description: string;
+  discount_type: DiscountType;
+  discount_value: number;
+  original_price?: number;
+  sale_price?: number;
+  terms_conditions?: string;
+  start_date: string;
+  end_date: string;
+}
+
 // Export aquarium management types
 export * from './aquarium';
