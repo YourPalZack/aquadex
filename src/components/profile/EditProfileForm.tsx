@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useTransition } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -9,6 +9,9 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import { updateUserProfile, uploadProfilePhoto } from "@/lib/actions/profile-supabase"
+import { Loader2, Upload } from "lucide-react"
+import { useToast } from "@/hooks/use-toast"
 
 interface ProfileData {
   displayName: string
@@ -38,9 +41,11 @@ export default function EditProfileForm({
     experienceLevel: initialData?.experienceLevel || "",
     photoURL: initialData?.photoURL || ""
   })
-  const [isLoading, setIsLoading] = useState(false)
+  const [isPending, startTransition] = useTransition()
   const [error, setError] = useState("")
   const [success, setSuccess] = useState(false)
+  const [isUploadingPhoto, setIsUploadingPhoto] = useState(false)
+  const { toast } = useToast()
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
@@ -59,44 +64,93 @@ export default function EditProfileForm({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setIsLoading(true)
     setError("")
     setSuccess(false)
 
     // Basic validation
     if (!formData.displayName || !formData.email) {
       setError("Display name and email are required")
-      setIsLoading(false)
       return
     }
 
     if (!formData.email.includes("@")) {
       setError("Please enter a valid email address")
-      setIsLoading(false)
       return
     }
 
-    try {
-      // TODO: Implement Supabase profile update
-      console.log("Profile update:", formData)
-      
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      
-      setSuccess(true)
-      onSave?.(formData)
-    } catch (err) {
-      setError("Failed to update profile. Please try again.")
-    } finally {
-      setIsLoading(false)
-    }
+    startTransition(async () => {
+      try {
+        const formDataToSend = new FormData()
+        formDataToSend.append('display_name', formData.displayName)
+        formDataToSend.append('full_name', formData.displayName)
+        formDataToSend.append('bio', formData.bio)
+        formDataToSend.append('location', formData.location)
+        formDataToSend.append('experience_level', formData.experienceLevel)
+        
+        const result = await updateUserProfile(formDataToSend)
+        
+        if (result.success) {
+          setSuccess(true)
+          toast({
+            title: "Profile Updated",
+            description: result.message,
+          })
+          onSave?.(formData)
+        } else {
+          setError(result.error || result.message)
+          toast({
+            title: "Error",
+            description: result.error || result.message,
+            variant: "destructive"
+          })
+        }
+      } catch (err) {
+        setError("Failed to update profile. Please try again.")
+        toast({
+          title: "Error",
+          description: "Failed to update profile. Please try again.",
+          variant: "destructive"
+        })
+      }
+    })
   }
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
-      // TODO: Implement image upload to Supabase Storage
-      console.log("Image upload:", file)
+      setIsUploadingPhoto(true)
+      
+      try {
+        const formData = new FormData()
+        formData.append('photo', file)
+        
+        const result = await uploadProfilePhoto(formData)
+        
+        if (result.success && result.url) {
+          setFormData(prev => ({
+            ...prev,
+            photoURL: result.url
+          }))
+          toast({
+            title: "Photo Uploaded",
+            description: result.message,
+          })
+        } else {
+          toast({
+            title: "Upload Failed",
+            description: result.error || result.message,
+            variant: "destructive"
+          })
+        }
+      } catch (error) {
+        toast({
+          title: "Upload Failed",
+          description: "Failed to upload photo. Please try again.",
+          variant: "destructive"
+        })
+      } finally {
+        setIsUploadingPhoto(false)
+      }
       
       // For now, create a preview URL
       const reader = new FileReader()
@@ -234,12 +288,17 @@ export default function EditProfileForm({
           </div>
           
           <div className="flex gap-3 pt-4">
-            <Button type="submit" disabled={isLoading}>
-              {isLoading ? "Saving..." : "Save Changes"}
+            <Button type="submit" disabled={isPending || isUploadingPhoto}>
+              {isPending ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Saving...
+                </>
+              ) : "Save Changes"}
             </Button>
             
             {onCancel && (
-              <Button type="button" variant="outline" onClick={onCancel}>
+              <Button type="button" variant="outline" onClick={onCancel} disabled={isPending}>
                 Cancel
               </Button>
             )}
