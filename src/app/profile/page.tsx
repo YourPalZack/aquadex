@@ -37,8 +37,10 @@ export default function ProfilePage() {
                 </CardDescription>
               )}
             </div>
-            <Button variant="outline" size="sm" className="ml-auto mt-4 md:mt-0 self-start md:self-center">
-              <Edit3 className="w-4 h-4 mr-2" /> Edit Profile
+            <Button variant="outline" size="sm" className="ml-auto mt-4 md:mt-0 self-start md:self-center" asChild>
+              <Link href="/profile/settings">
+                <Edit3 className="w-4 h-4 mr-2" /> Edit Profile
+              </Link>
             </Button>
           </div>
         </CardHeader>
