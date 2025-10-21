@@ -23,8 +23,9 @@ The Local Fish Store Directory enables local aquarium stores to create verified 
 - React Hook Form (form management)
 - Tailwind CSS + Shadcn UI (styling)
 - Lucide React (icons)
-- [NEEDS CLARIFICATION: Mapping service - Google Maps API, Mapbox, or Leaflet?]
-- [NEEDS CLARIFICATION: Geocoding service - Google Geocoding API, Mapbox, or PostGIS?]
+- Mapbox GL JS 3.1+ with react-map-gl 7.1+ (mapping, 50k loads/month free)
+- Mapbox Geocoding API (address to coordinates, 100k requests/month free)
+- PostGIS extension (geospatial distance queries)
 
 **Storage**: Supabase PostgreSQL with PostGIS extension for geospatial queries, Supabase Storage for store images  
 **Authentication**: Supabase Auth with email/password and email verification  
@@ -156,8 +157,227 @@ database/
 
 *Fill ONLY if Constitution Check has violations that must be justified*
 
-| Violation | Why Needed | Simpler Alternative Rejected Because |
-|-----------|------------|-------------------------------------|
-| [e.g., 4th project] | [current need] | [why 3 projects insufficient] |
-| [e.g., Repository pattern] | [specific problem] | [why direct DB access insufficient] |
+**None**. All constitution principles followed without exceptions.
+
+## Implementation Phases
+
+### Phase 0: Research (COMPLETED)
+**Completion Date**: October 20, 2025  
+**Output**: `research.md`
+
+✅ **Completed Research**:
+- Mapping service selection: Mapbox chosen (generous free tier, unified with geocoding)
+- Geocoding service: Mapbox Geocoding API (100k requests/month free)
+- Distance calculation: PostGIS ST_Distance with geography type (accuracy + performance)
+- Email verification: Supabase Auth with is_store_owner flag
+- Deal expiration: Database view (MVP) with path to pg_cron for automation
+- Image storage: Supabase Storage + Next.js Image optimization
+
+**Key Decisions**:
+1. Use Mapbox GL JS over Google Maps (no credit card required, 50k map loads/month free)
+2. Use PostGIS spatial queries over client-side Haversine (better performance at scale)
+3. Use Supabase Auth email verification over custom tokens (built-in, secure)
+4. Use database views for deal expiration in MVP (simple), upgrade to pg_cron later
+5. Use Supabase Storage over Cloudinary (unified platform, 1GB free)
+
+### Phase 1: Design & Contracts (COMPLETED)
+**Completion Date**: October 20, 2025  
+**Output**: `data-model.md`, `contracts/server-actions.md`, `quickstart.md`
+
+✅ **Completed Design**:
+- Database schema: 2 main tables (`stores` with 21 fields, `deals` with 14 fields)
+- PostGIS integration: `location` as GEOGRAPHY(POINT,4326) with GiST spatial index
+- RLS policies: Public read verified stores, owners CRUD own stores/deals
+- TypeScript interfaces: Store, Deal, BusinessHours, StoreCategory types
+- Server actions: 15+ actions for CRUD, search, geocoding (createStoreAction, searchStoresAction, etc.)
+- Migration SQL: Complete with constraints, indexes, triggers
+- Development setup: Environment variables, dependencies, Mapbox config
+
+**Constitution Re-Check**: ✅ **PASSED** (all 6 principles validated in Constitution Check section)
+
+### Phase 2: Task Breakdown (PENDING)
+**Command**: `/speckit.tasks` (user must run after Phase 1 completion)  
+**Output**: `tasks.md`
+
+**Expected Tasks** (will be auto-generated from user stories):
+- User Story 1 (P1): Store owner signup and profile creation
+  - Task: Create stores table migration with PostGIS
+  - Task: Implement createStoreAction with geocoding
+  - Task: Build StoreSignupForm component
+  - Task: Create /store-signup page
+  - Task: Add email verification flow
+  
+- User Story 2 (P1): Directory search and filtering
+  - Task: Implement searchStoresAction with radius query
+  - Task: Build StoreSearchForm component
+  - Task: Build StoreCard component
+  - Task: Create /local-fish-stores page
+  - Task: Integrate Mapbox map view
+  
+- User Story 3 (P2): Deal creation and management
+  - Task: Create deals table migration
+  - Task: Implement deal server actions
+  - Task: Build DealForm component
+  - Task: Create /store-dashboard/deals page
+  
+- User Story 4 (P3): Deal discovery aggregation
+  - Task: Enhance /discounts-deals page
+  - Task: Implement searchDealsAction with aggregation
+  - Task: Build deal filtering UI
+
+**Estimated Timeline**: 4-6 days total (P1: 2-3 days, P2: 1-2 days, P3: 1 day)
+
+### Phase 3: Implementation (NOT STARTED)
+**Start Condition**: After Phase 2 tasks.md created and reviewed  
+**Output**: Working feature code in repository
+
+**Implementation Order** (by priority):
+1. **P1 MVP** (Store Registration + Directory):
+   - Database migrations (stores table with PostGIS)
+   - Server actions for store CRUD and search
+   - Store signup flow with email verification
+   - Store directory page with search and filters
+   - Individual store profile pages
+   - Map integration with Mapbox
+   
+2. **P2 Deal Management**:
+   - Database migrations (deals table)
+   - Server actions for deal CRUD
+   - Store dashboard with deal management
+   - Deal creation/editing forms
+   - Deal display on store profiles
+   
+3. **P3 Deal Discovery**:
+   - Enhanced /discounts-deals page
+   - Deal aggregation across stores
+   - Location-based deal filtering
+   - Deal sorting and pagination
+
+**Testing Strategy**:
+- Unit tests for server actions (validation, error handling)
+- Integration tests for database queries (PostGIS distance calculations)
+- E2E tests for critical flows (store signup, store search, deal creation)
+- Manual testing for map interactions and image uploads
+
+### Phase 4: Quality Assurance (NOT STARTED)
+**Start Condition**: After Phase 3 implementation complete  
+**Quality Gates** (per constitution):
+- [ ] All TypeScript strict mode errors resolved
+- [ ] Zod validation on all form inputs
+- [ ] RLS policies tested and working
+- [ ] Performance: Store search under 2s for 500+ stores
+- [ ] Performance: Map renders 50+ markers smoothly
+- [ ] Mobile responsive (320px to 1920px tested)
+- [ ] Email verification flow working end-to-end
+- [ ] Image uploads working with 5MB limit enforced
+- [ ] 10-deal limit enforced via trigger
+- [ ] Geocoding accuracy verified (test known addresses)
+- [ ] Distance calculations verified (spot-check PostGIS results)
+
+## Dependencies & Risks
+
+### External Dependencies
+1. **Mapbox API** (Maps + Geocoding)
+   - Risk: Free tier limits (50k map loads, 100k geocoding requests/month)
+   - Mitigation: Monitor usage, implement caching, upgrade if needed
+   - Fallback: Switch to OpenStreetMap + Nominatim (lower UX)
+
+2. **Supabase PostGIS Extension**
+   - Risk: PostGIS not enabled or not available
+   - Mitigation: Verify extension in project setup, document enablement
+   - Fallback: Use Haversine formula client-side (slower)
+
+3. **Supabase Storage**
+   - Risk: 1GB free tier limit for images
+   - Mitigation: Image compression, Next.js optimization, monitor usage
+   - Fallback: Cloudinary or AWS S3 (requires code changes)
+
+### Internal Dependencies
+1. **Existing Authentication System**
+   - Dependency: Supabase Auth already configured
+   - Risk: Low - existing auth used by other features
+
+2. **Existing UI Components**
+   - Dependency: shadcn/ui components (Card, Form, Button, etc.)
+   - Risk: Low - components already in use
+
+### Technical Risks
+1. **PostGIS Query Performance**
+   - Risk: Spatial queries slow with 1000+ stores
+   - Mitigation: GiST indexes on location column, limit search radius to 100 miles
+   - Monitoring: Log query times, optimize if >2s
+
+2. **Map Rendering Performance**
+   - Risk: Lag with 100+ markers on map
+   - Mitigation: Limit markers to 50 visible, use clustering for dense areas
+   - Monitoring: Test on mobile devices
+
+3. **Email Verification Reliability**
+   - Risk: Verification emails not delivered
+   - Mitigation: Use Supabase built-in email (tested), add retry mechanism
+   - Monitoring: Track verification completion rate
+
+4. **Deal Expiration Accuracy**
+   - Risk: Expired deals still showing
+   - Mitigation: MVP uses database view (queries filter), upgrade to pg_cron for automation
+   - Monitoring: Spot-check expired deals
+
+### Timeline Risks
+- **Risk**: P1 MVP takes longer than 3 days
+  - Mitigation: Start with store signup only, defer search to separate PR
+  
+- **Risk**: Mapbox integration complex
+  - Mitigation: Follow quickstart.md examples, use react-map-gl abstraction
+
+## Success Criteria
+
+### MVP (P1) Success Criteria (from spec.md)
+- [ ] Store owners can successfully sign up and create verified profiles
+- [ ] Store profiles display all required information (name, address, hours, contact)
+- [ ] Users can search for stores within specified radius of their location
+- [ ] Search results show distance from user and filter by category
+- [ ] Individual store pages load with complete details
+- [ ] Gallery images display properly
+- [ ] Email verification works end-to-end
+
+### P2 Success Criteria
+- [ ] Store owners can create/edit/delete deals from dashboard
+- [ ] Deal validation enforces all business rules (dates, limits)
+- [ ] Deals display on store profile pages
+- [ ] Deal status (active/expired) calculated correctly
+
+### P3 Success Criteria
+- [ ] /discounts-deals page shows aggregated deals from all stores
+- [ ] Filtering by location, category, discount type works
+- [ ] Sorting options work correctly
+
+### Performance Criteria
+- [ ] Store search completes in <2s for 500+ stores
+- [ ] Store profile page loads in <3s
+- [ ] Map renders 50+ markers without lag
+- [ ] Image gallery loads optimized images
+
+### Quality Criteria (Constitution Compliance)
+- [ ] All TypeScript interfaces defined with strict mode
+- [ ] Zod schemas validate all user inputs
+- [ ] Components are modular and reusable
+- [ ] Mobile responsive on 320px to 1920px screens
+- [ ] RLS policies prevent unauthorized access
+- [ ] Error boundaries handle failures gracefully
+
+## Next Steps
+
+1. ✅ **Phase 0 Complete**: Research decisions documented in `research.md`
+2. ✅ **Phase 1 Complete**: Design and contracts documented in `data-model.md`, `contracts/server-actions.md`, `quickstart.md`
+3. ⏳ **Phase 2 Required**: User must run `/speckit.tasks` command to generate `tasks.md`
+4. ⏳ **Phase 3 Pending**: Implementation starts after tasks breakdown reviewed
+5. ⏳ **Phase 4 Pending**: QA and testing after implementation
+
+**Ready for Task Breakdown**: Yes - all Phase 0 and Phase 1 deliverables complete.
+
+---
+
+**Last Updated**: October 20, 2025  
+**Plan Version**: 1.0  
+**Status**: Phase 1 Complete - Ready for `/speckit.tasks`
 

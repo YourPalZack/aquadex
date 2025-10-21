@@ -4,6 +4,7 @@ Auto-generated from all feature plans. Last updated: 2025-10-20
 
 ## Active Technologies
 - TypeScript 5.3+ (strict mode), Node.js 20+ + Next.js 15.2+, React 18.3+, Supabase 2.39+, Drizzle ORM 0.30+, Genkit 1.8+, Zod 3.24+ (001-aquarium-toolkit)
+- Supabase PostgreSQL with PostGIS extension for geospatial queries, Supabase Storage for store images (002-local-store-directory)
 
 ## Project Structure
 ```
@@ -18,6 +19,7 @@ npm test && npm run lint
 TypeScript 5.3+ (strict mode), Node.js 20+: Follow standard conventions
 
 ## Recent Changes
+- 002-local-store-directory: Added TypeScript 5.3+ (strict mode), Node.js 20+
 - 001-aquarium-toolkit: Added TypeScript 5.3+ (strict mode), Node.js 20+
 - 001-aquarium-toolkit: Added TypeScript 5.3+ (strict mode), Node.js 20+ + Next.js 15.2+, React 18.3+, Supabase 2.39+, Drizzle ORM 0.30+, Genkit 1.8+, Zod 3.24+
 
