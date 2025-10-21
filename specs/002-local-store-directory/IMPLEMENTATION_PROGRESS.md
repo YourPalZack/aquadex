@@ -3,7 +3,7 @@
 **Feature**: Local Fish Store Directory  
 **Branch**: `002-local-store-directory`  
 **Started**: October 21, 2025  
-**Status**: In Progress
+**Status**: In Progress (18/100 tasks - 18%)
 
 ---
 
@@ -84,9 +84,58 @@
 
 ---
 
-### ⏳ Phase 3: User Story 1 - Store Registration (Not Started - 0/11 tasks)
+### ✅ Phase 3: User Story 1 - Store Registration (In Progress - 7/11 tasks)
 
-Ready to begin after Phase 2 manual tasks complete.
+- [x] **T014**: Create `StoreSignupForm` component  
+  - `src/components/local-fish-stores/StoreSignupForm.tsx`
+  - React Hook Form + Zod validation (540+ lines)
+  - Business info, address, hours, categories, social links
+  - Integrated with createStoreAction server action
+  
+- [x] **T015**: Create `BusinessHoursDisplay` component
+  - `src/components/local-fish-stores/BusinessHoursDisplay.tsx`
+  - Open/closed status calculation
+  - Compact and full views
+  - Today's hours highlighting
+  
+- [x] **T016**: Create `StoreGallery` component
+  - `src/components/local-fish-stores/StoreGallery.tsx`
+  - Image carousel with thumbnails
+  - Lightbox modal for full-size viewing
+  - Next.js Image optimization
+  
+- [x] **T017**: Implement `createStoreAction` server action
+  - `src/lib/actions/store-supabase.ts`
+  - Geocoding integration
+  - Unique slug generation
+  - Supabase auth and database insertion
+  
+- [x] **T018**: Implement `uploadStoreImageAction` server action
+  - 5MB file size limit validation
+  - Image type validation (JPEG, PNG, WebP)
+  - Supabase Storage upload
+  - Gallery limit enforcement (max 5 images)
+  
+- [x] **T019**: Implement `updateStoreAction` server action
+  - Address change detection and re-geocoding
+  - Partial update support
+  - Ownership verification
+  
+- [x] **T020**: Implement `deleteStoreImageAction` server action
+  - Storage file deletion
+  - Gallery array update
+  - Ownership verification
+
+- [ ] **T021**: Create store signup page ⏳ **Next**
+  - `src/app/store-signup/page.tsx`
+  
+- [ ] **T022**: Implement email verification flow
+  
+- [ ] **T023**: Create store dashboard/profile page
+  
+- [ ] **T024**: Add form validation error handling enhancements
+
+**Status**: Components and server actions complete. Ready to build pages.
 
 ---
 
@@ -149,22 +198,29 @@ Continue with Phase 3 (User Story 1):
 - `src/lib/db/schema/stores.ts`
 - `src/lib/db/schema/deals.ts`
 - `src/lib/db/schema/index.ts`
+- `src/components/local-fish-stores/StoreSignupForm.tsx` (540+ lines)
+- `src/components/local-fish-stores/BusinessHoursDisplay.tsx`
+- `src/components/local-fish-stores/StoreGallery.tsx`
+- `src/components/local-fish-stores/index.ts` (barrel exports)
+- `src/lib/actions/store-supabase.ts` (500+ lines)
 
 ---
 
 ## Progress Summary
 
 - ✅ **Setup Complete**: 4/4 tasks (100%)
-- ⏳ **Foundational**: 7/9 tasks (78%) - 2 manual tasks pending
-- ⏳ **User Story 1**: 0/11 tasks (0%)
+- ✅ **Foundational**: 7/9 tasks (78%) - 2 manual tasks pending
+- ⏳ **User Story 1**: 7/11 tasks (64%)
 - ⏳ **User Story 2**: 0/19 tasks (0%)
 - ⏳ **User Story 3**: 0/21 tasks (0%)
 - ⏳ **User Story 4**: 0/11 tasks (0%)
 - ⏳ **Polish**: 0/25 tasks (0%)
 
-**Overall**: 11/100 tasks complete (11%)
+**Overall**: 18/100 tasks complete (18%)
 
-**Commits**: 3 commits on branch `002-local-store-directory`
+**Commits**: 3+ commits on branch `002-local-store-directory`
+
+**Files Created**: 15 files (migrations, schemas, components, actions)
 
 ---
 
