@@ -4,7 +4,7 @@ import { getAquariums } from '@/lib/actions/aquarium';
 import { WaterTestsPageContent } from '@/components/aquariums/water-tests-page-content';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Droplet, Loader2, Beaker, Plus } from 'lucide-react';
+import { Droplet, Loader2, Beaker, Plus, BarChart3 } from 'lucide-react';
 import Link from 'next/link';
 
 export default async function WaterTestsPage() {
@@ -23,6 +23,12 @@ export default async function WaterTestsPage() {
             </p>
           </div>
           <div className="flex items-center gap-2">
+            <Button asChild variant="outline" className="gap-2">
+              <Link href="/water-tests/analytics">
+                <BarChart3 className="h-4 w-4" />
+                Analytics
+              </Link>
+            </Button>
             <Button asChild variant="outline" className="gap-2">
               <Link href="/water-tests/compare">
                 <Plus className="h-4 w-4" />
