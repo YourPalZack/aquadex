@@ -3,19 +3,19 @@
 
 import { useState, useEffect } from 'react';
 import type { Aquarium, TestResult, UserProfile } from '@/types'; 
-import { mockCurrentUser, mockAquariumsData } from '@/types'; // Updated import path for mockAquariumsData
 import { useAuth } from '@/contexts/AuthContext';
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
-import { Lightbulb, Droplet, CalendarDays, Timer, AlertTriangle, BellRing, Eye, Info, History as HistoryIcon, ListPlus } from 'lucide-react';
+import { Lightbulb, Droplet, CalendarDays, Timer, AlertTriangle, BellRing, Eye, Info, History as HistoryIcon, ListPlus, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-// import { mockAquariumsData } from '@/app/aquariums/page'; // Removed old import
-import { mockTestResults } from '@/app/history/page';
+import { getUserAquariumsAction } from '@/lib/actions/aquarium-supabase';
+import { getUserWaterTestsAction } from '@/lib/actions/water-test-supabase';
 import { format, differenceInDays, isPast, isToday, isFuture } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
+import { useToast } from '@/hooks/use-toast';
 
 const ReminderStatus: React.FC<{ reminderDate?: Date; type: 'Water Change' | 'Feeding'; className?: string }> = ({ reminderDate, type, className }) => {
   if (!reminderDate) return null;
@@ -64,26 +64,101 @@ interface RecentTestResult extends TestResult {
 function DashboardContent() {
   const [aquariums, setAquariums] = useState<Aquarium[]>([]);
   const [recentTests, setRecentTests] = useState<RecentTestResult[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const { user, userProfile } = useAuth();
-  const currentUser = userProfile || mockCurrentUser; // Use real user profile or fallback to mock
+  const { toast } = useToast();
 
   useEffect(() => {
-    setAquariums(mockAquariumsData);
+    async function loadDashboardData() {
+      if (!user) return;
+      
+      setIsLoading(true);
+      try {
+        // Fetch aquariums
+        const aquariumsResult = await getUserAquariumsAction();
+        if (aquariumsResult.success && aquariumsResult.data) {
+          // Transform database aquariums to match Aquarium type
+          const transformedAquariums: Aquarium[] = aquariumsResult.data.map((aq: any) => ({
+            id: aq.id,
+            name: aq.name,
+            type: aq.type,
+            volumeGallons: aq.size_gallons,
+            volumeLiters: aq.size_liters,
+            setupDate: aq.setup_date,
+            userId: aq.user_id,
+            equipment: aq.equipment || {},
+            livestock: aq.livestock || [],
+            plants: aq.plants || [],
+            substrate: aq.substrate,
+            filtration: aq.filtration,
+            lighting: aq.lighting,
+            heater: aq.heater,
+            notes: aq.notes,
+            photoUrl: aq.photo_url,
+            nextWaterChangeReminder: aq.next_water_change ? new Date(aq.next_water_change) : undefined,
+            nextFeedingReminder: aq.next_feeding_reminder ? new Date(aq.next_feeding_reminder) : undefined,
+            isActive: aq.is_active,
+          }));
+          setAquariums(transformedAquariums);
+        }
 
-    const allTests = [...mockTestResults]; 
-    const sortedTests = allTests.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
-    const top5Tests = sortedTests.slice(0, 5).map(test => {
-      const aquarium = mockAquariumsData.find(aq => aq.id === test.aquariumId);
-      return { ...test, aquariumName: aquarium?.name || 'Unassigned Tank' };
-    });
-    setRecentTests(top5Tests);
-  }, []);
+        // Fetch recent water tests
+        const testsResult = await getUserWaterTestsAction(5);
+        if (testsResult.success && testsResult.data) {
+          const transformedTests: RecentTestResult[] = testsResult.data.map((test: any) => {
+            const aquarium = aquariumsResult.data?.find((aq: any) => aq.id === test.aquarium_id);
+            return {
+              id: test.id,
+              aquariumId: test.aquarium_id,
+              aquariumName: aquarium?.name || 'Unknown Tank',
+              userId: test.user_id,
+              timestamp: test.test_date,
+              parameters: `pH: ${test.ph || 'N/A'}, Temp: ${test.temperature || 'N/A'}°F, Ammonia: ${test.ammonia || 'N/A'}ppm`,
+              ph: test.ph,
+              temperature: test.temperature,
+              ammonia: test.ammonia,
+              nitrite: test.nitrite,
+              nitrate: test.nitrate,
+              hardness: test.gh,
+              alkalinity: test.kh,
+              notes: test.notes,
+            };
+          });
+          setRecentTests(transformedTests);
+        }
+      } catch (error) {
+        console.error('Error loading dashboard data:', error);
+        toast({
+          title: 'Error',
+          description: 'Failed to load dashboard data. Please refresh the page.',
+          variant: 'destructive',
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    loadDashboardData();
+  }, [user, toast]);
 
   const truncateText = (text: string | undefined, maxLength: number): string => {
     if (!text) return 'N/A';
     if (text.length <= maxLength) return text;
     return text.substring(0, maxLength) + '...';
   };
+
+  if (isLoading) {
+    return (
+      <div className="container mx-auto py-8 px-2 sm:px-4 md:px-6 lg:px-8">
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="text-center">
+            <Loader2 className="w-12 h-12 animate-spin mx-auto mb-4 text-primary" />
+            <p className="text-muted-foreground">Loading your dashboard...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto py-8 px-2 sm:px-4 md:px-6 lg:px-8">
@@ -251,17 +326,15 @@ function DashboardContent() {
                         </div>
                     </Button>
                 </Link>
-                {(currentUser as any)?.isSellerApproved && (
-                    <Link href="/marketplace/add-listing" passHref>
-                        <Button variant="default" className="w-full justify-start text-left h-auto py-3 bg-primary/90 hover:bg-primary text-primary-foreground">
-                            <div className="flex flex-col">
-                                <span className="font-semibold">Create New Listing</span>
-                                <span className="text-xs text-primary-foreground/80">Sell items on the marketplace.</span>
-                            </div>
-                             <ListPlus className="w-5 h-5 ml-auto" />
-                        </Button>
-                    </Link>
-                )}
+                <Link href="/marketplace/add-listing" passHref>
+                    <Button variant="outline" className="w-full justify-start text-left h-auto py-3">
+                        <div className="flex flex-col">
+                            <span className="font-semibold">Create New Listing</span>
+                            <span className="text-xs text-muted-foreground">Sell items on the marketplace.</span>
+                        </div>
+                        <ListPlus className="w-4 h-4 ml-auto" />
+                    </Button>
+                </Link>
             </CardContent>
         </Card>
       </div>
