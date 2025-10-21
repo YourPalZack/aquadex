@@ -1,18 +1,23 @@
 "use client"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import { useAuth } from "@/contexts/AuthContext"
 
 export default function SignInForm() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
+  
+  const { signIn } = useAuth()
+  const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -33,17 +38,24 @@ export default function SignInForm() {
     }
 
     try {
-            // TODO: Implement Supabase authentication
-      console.log("Sign in attempt:", { email, password: "***" })
+      await signIn(email, password)
       
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000))
+      // Redirect to dashboard on successful sign in
+      router.push("/dashboard")
+    } catch (err: any) {
+      console.error("Sign in error:", err)
       
-      // For now, just log the attempt
-            alert("Sign in functionality will be implemented with Supabase Auth")
-    } catch (err) {
-      setError("Failed to sign in. Please try again.")
-    } finally {
+      // Handle specific Supabase auth errors
+      if (err.message?.includes("Invalid login credentials")) {
+        setError("Invalid email or password. Please try again.")
+      } else if (err.message?.includes("Email not confirmed")) {
+        setError("Please check your email and confirm your account before signing in.")
+      } else if (err.message?.includes("Too many requests")) {
+        setError("Too many sign in attempts. Please wait a moment and try again.")
+      } else {
+        setError("Failed to sign in. Please check your credentials and try again.")
+      }
+      
       setIsLoading(false)
     }
   }
