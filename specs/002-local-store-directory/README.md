@@ -24,7 +24,7 @@
 
 **Purpose**: Local fish store directory with deals/discounts  
 **Branch**: `002-local-store-directory`  
-**Status**: Tasks Generated (100 tasks) - Ready to Implement ✅
+**Status**: Phase 3 in progress – Directory and Store Profiles implemented (URL-driven SSR search, pagination, map popups). Migrations/storage pending for distance and uploads.
 
 ### Priority Breakdown
 - **P1 (MVP)**: Store registration + directory search (30 tasks)
@@ -147,12 +147,12 @@ See [quickstart.md](./quickstart.md) for detailed setup.
 ## ✅ Quality Checklist
 
 ### MVP (P1) Criteria
-- [ ] Store signup working with email verification
-- [ ] Store profiles display all details
-- [ ] Search by location within radius
-- [ ] Distance calculated and displayed
-- [ ] Individual store pages load
-- [ ] Gallery images display
+- [x] Store signup working with email verification (UI + server actions)
+- [x] Store profiles display core details (SSR; hours/gallery wired, data pending)
+- [ ] Search by location within radius (waiting for PostGIS migrations)
+- [ ] Distance calculated and displayed (waiting for PostGIS migrations)
+- [x] Individual store pages load (via slug)
+- [x] Gallery images display (when images exist; storage pending)
 
 ### Performance Targets
 - [ ] Store search: <2s for 500+ stores
@@ -171,18 +171,36 @@ See [quickstart.md](./quickstart.md) for detailed setup.
 
 ## 📋 Next Steps
 
-### Immediate: Phase 2 - Task Breakdown
-**Command**: `/speckit.tasks`  
-**Output**: `tasks.md` with implementation tasks
+### Current Implementation Highlights
+- Directory page (`/local-fish-stores`):
+	- SSR search via server action, driven by URL params: `q`, `categories`, `page`, `pageSize`, `lat`, `lng`, `radius`
+	- Pagination with Prev/Next preserving filters
+	- Results summary “Showing X–Y of Z”
+	- Map with markers and popups (link to detail) when coordinates exist
+- Store profile (`/local-fish-stores/[slug]`):
+	- SSR page via `getStoreBySlugAction`
+	- Business hours and gallery components wired (shown when data exists)
+	- SEO metadata generated for both directory and profile pages
 
-### After Tasks: Phase 3 - Implementation
-1. Database migrations (stores + deals tables)
-2. Server actions (CRUD + search)
-3. UI components (10 components)
-4. Pages (5-7 pages)
-5. Mapbox integration
-6. Image uploads
-7. Testing
+### What’s Pending (Manual + Follow-ups)
+1. Supabase manual steps:
+	 - Run migrations (enables coordinates + distance)
+	 - Create `store-images` storage bucket (enables uploads)
+2. Distance & radius filtering in `searchStoresAction` (PostGIS)
+3. Map clustering and richer popovers
+4. Typecheck/lint cleanup across unrelated legacy files
+5. Deals pages and actions (P2)
+
+### Quick Usage
+- Search URL examples:
+	- `/local-fish-stores?q=seattle`
+	- `/local-fish-stores?categories=freshwater,plants&page=2&pageSize=36`
+	- `/local-fish-stores?q=reef&lat=47.6&lng=-122.3&radius=25`
+
+### Setup Reminders
+1. Add `NEXT_PUBLIC_MAPBOX_TOKEN` to `.env.local`
+2. Install dependencies (Mapbox packages present in `package.json`)
+3. Run Supabase migrations and create storage bucket when ready
 
 ---
 

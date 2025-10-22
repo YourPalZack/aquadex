@@ -117,4 +117,32 @@ export default async function LocalFishStoreProfilePage({ params }: { params: { 
   );
 }
 
+export async function generateMetadata({ params }: { params: { storeSlug: string } }) {
+  const slug = params.storeSlug;
+  const result = await getStoreBySlugAction(slug);
+  if (!result.success) {
+    return {
+      title: 'Store Not Found · Local Fish Stores',
+      description: 'This store does not exist or could not be loaded.',
+    } as const;
+  }
+  const store: any = result.data;
+  const title = `${store.business_name} · ${store.city}, ${store.state}`;
+  const description = store.description?.slice(0, 160) || `View ${store.business_name} in ${store.city}, ${store.state}.`;
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      type: 'article',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+    },
+  } as const;
+}
+
     

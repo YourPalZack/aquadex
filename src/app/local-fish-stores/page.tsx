@@ -140,6 +140,37 @@ async function DirectoryContent({ searchParams }: { searchParams: SearchParams }
   );
 }
 
+export async function generateMetadata({ searchParams }: { searchParams: SearchParams }) {
+  const q = typeof searchParams.q === 'string' && searchParams.q.trim().length ? searchParams.q.trim() : '';
+  const cats = typeof searchParams.categories === 'string' ? searchParams.categories.split(',').filter(Boolean) : [];
+  const page = Number(searchParams.page ?? '1') || 1;
+
+  const parts: string[] = ['Local Fish Stores'];
+  if (q) parts.push(`“${q}”`);
+  if (cats.length) parts.push(`${cats.join(', ')}`);
+  if (page > 1) parts.push(`Page ${page}`);
+
+  const title = parts.join(' · ');
+  const description = q || cats.length
+    ? `Browse aquarium stores${q ? ` matching “${q}”` : ''}${cats.length ? ` in ${cats.join(', ')}` : ''}.`
+    : 'Find aquarium stores near you. Search by name, city, state, zip, and specialties.';
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      type: 'website',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+    },
+  } as const;
+}
+
 export default function LocalFishStoresPage({ searchParams }: { searchParams: SearchParams }) {
   return (
     <div className="container mx-auto py-8">
