@@ -1,7 +1,7 @@
 // Basic Haversine test using Node's built-in test runner
 // Ensures our expected earth-distance logic stays correct in future refactors
-import test from 'node:test'
-import assert from 'node:assert/strict'
+const test = require('node:test')
+const assert = require('node:assert/strict')
 
 // Haversine in kilometers
 function haversineKm(lat1, lon1, lat2, lon2) {
