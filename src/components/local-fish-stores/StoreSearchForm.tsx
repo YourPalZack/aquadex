@@ -15,6 +15,7 @@ const searchSchema = z.object({
   radius: z.number().min(1).max(250).optional(),
   latitude: z.number().optional(),
   longitude: z.number().optional(),
+  pageSize: z.number().min(6).max(60).optional(),
 });
 
 export type StoreSearchValues = z.infer<typeof searchSchema>;
@@ -33,6 +34,7 @@ export function StoreSearchForm({ defaultValues, onSearch }: StoreSearchFormProp
     radius: defaultValues?.radius || 25,
     latitude: defaultValues?.latitude,
     longitude: defaultValues?.longitude,
+    pageSize: defaultValues?.pageSize || 24,
   });
 
   type Cat = 'freshwater'|'saltwater'|'plants'|'reptiles'|'general';
@@ -65,6 +67,10 @@ export function StoreSearchForm({ defaultValues, onSearch }: StoreSearchFormProp
       params.set('lat', String(parsed.data.latitude));
       params.set('lng', String(parsed.data.longitude));
     }
+    if (parsed.data.radius) params.set('radius', String(parsed.data.radius));
+    if (parsed.data.pageSize) params.set('pageSize', String(parsed.data.pageSize));
+    // Reset to first page on new search
+    params.set('page', '1');
     router.push(`${pathname}?${params.toString()}`);
   };
 
@@ -79,7 +85,7 @@ export function StoreSearchForm({ defaultValues, onSearch }: StoreSearchFormProp
   return (
     <Card>
       <CardContent className="p-4">
-        <form onSubmit={submit} className="grid gap-3 md:grid-cols-4 items-end">
+        <form onSubmit={submit} className="grid gap-3 md:grid-cols-5 items-end">
           <div className="md:col-span-2">
             <Label htmlFor="q">Search</Label>
             <div className="relative">
@@ -100,7 +106,25 @@ export function StoreSearchForm({ defaultValues, onSearch }: StoreSearchFormProp
             </div>
           </div>
 
-          <div className="flex gap-2">
+          <div>
+            <Label htmlFor="radius">Radius (mi)</Label>
+            <div className="flex gap-2">
+              <Input id="radius" type="number" min={1} max={250} value={values.radius ?? ''} onChange={(e) => setValues({ ...values, radius: e.target.value ? Number(e.target.value) : undefined })} className="w-24" />
+              <Button type="button" variant="outline" onClick={handleUseLocation}>
+                <MapPin className="h-4 w-4 mr-2" /> Use location
+              </Button>
+            </div>
+          </div>
+
+          <div className="flex gap-2 items-end">
+            <div>
+              <Label htmlFor="pageSize">Per page</Label>
+              <select id="pageSize" className="border rounded h-9 px-2" value={values.pageSize} onChange={(e) => setValues({ ...values, pageSize: Number(e.target.value) })}>
+                {[12,24,36,48].map((n) => (
+                  <option key={n} value={n}>{n}</option>
+                ))}
+              </select>
+            </div>
             <Button type="button" variant="outline" onClick={handleUseLocation}>
               <MapPin className="h-4 w-4 mr-2" /> Use location
             </Button>

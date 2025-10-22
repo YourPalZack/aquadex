@@ -22,8 +22,10 @@ async function DirectoryContent({ searchParams }: { searchParams: SearchParams }
     'freshwater' | 'saltwater' | 'plants' | 'reptiles' | 'general'
   )[];
   const page = Number(searchParams.page ?? '1') || 1;
-  const limit = 24;
+  const pageSizeParam = Number(searchParams.pageSize ?? '24');
+  const limit = pageSizeParam && pageSizeParam > 0 ? Math.min(Math.max(pageSizeParam, 6), 60) : 24;
   const offset = (page - 1) * limit;
+  const radius = Number(searchParams.radius ?? '');
 
   const result = await searchStoresAction({ q, categories: filteredCategories, limit, offset });
   const stores = result.success ? (result as any).data.stores : [];
@@ -47,7 +49,7 @@ async function DirectoryContent({ searchParams }: { searchParams: SearchParams }
       </Card>
 
       <StoreSearchForm
-        defaultValues={{ q, categories: filteredCategories }}
+        defaultValues={{ q, categories: filteredCategories, radius: isNaN(radius) ? undefined : radius, pageSize: limit }}
         onSearch={() => { /* navigation handled inside form via router.push */ }}
       />
 
@@ -91,6 +93,8 @@ async function DirectoryContent({ searchParams }: { searchParams: SearchParams }
                 const params = new URLSearchParams();
                 if (q) params.set('q', q);
                 if (filteredCategories.length) params.set('categories', filteredCategories.join(','));
+                if (!isNaN(radius)) params.set('radius', String(radius));
+                if (limit) params.set('pageSize', String(limit));
                 params.set('page', String(page - 1));
                 return `/local-fish-stores?${params.toString()}`;
               })()}
@@ -111,6 +115,8 @@ async function DirectoryContent({ searchParams }: { searchParams: SearchParams }
                 const params = new URLSearchParams();
                 if (q) params.set('q', q);
                 if (filteredCategories.length) params.set('categories', filteredCategories.join(','));
+                if (!isNaN(radius)) params.set('radius', String(radius));
+                if (limit) params.set('pageSize', String(limit));
                 params.set('page', String(page + 1));
                 return `/local-fish-stores?${params.toString()}`;
               })()}
