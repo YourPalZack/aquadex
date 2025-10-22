@@ -17,6 +17,7 @@ import { Badge } from '@/components/ui/badge';
 import {
   ArrowLeft, DollarSign, Tag, CalendarDays, UserCircle, Info, PackageCheck, MapPin, MessageSquare
 } from 'lucide-react';
+import { Breadcrumbs } from '@/components/shared/Breadcrumbs';
 
 const conditionDisplay: Record<MarketplaceListing['condition'], string> = {
     'new': 'New',
@@ -65,6 +66,15 @@ export default function MarketplaceListingDetailPage() {
   if (!listing) {
     return (
       <div className="container mx-auto py-8 text-center">
+        <h1 className="sr-only">Marketplace Listing Not Found</h1>
+        <Breadcrumbs
+          items={[
+            { label: 'Home', href: '/' },
+            { label: 'Marketplace', href: '/marketplace' },
+            { label: 'Listing Not Found' },
+          ]}
+          className="mb-4"
+        />
         <Card className="max-w-md mx-auto shadow-lg">
           <CardHeader><CardTitle>Listing Not Found</CardTitle></CardHeader>
           <CardContent>
@@ -83,6 +93,15 @@ export default function MarketplaceListingDetailPage() {
 
   return (
     <div className="container mx-auto py-8 space-y-8">
+      <h1 className="sr-only">Marketplace Listing: {listing.title}</h1>
+      <Breadcrumbs
+        items={[
+          { label: 'Home', href: '/' },
+          { label: 'Marketplace', href: '/marketplace' },
+          { label: category?.name || 'Listing' },
+        ]}
+        className="mb-2"
+      />
       <div>
         <Button variant="outline" onClick={() => router.back()} className="mb-6 shadow-sm">
           <ArrowLeft className="mr-2 h-4 w-4" />

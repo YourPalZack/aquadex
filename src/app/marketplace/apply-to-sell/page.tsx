@@ -10,6 +10,7 @@ import { useToast } from '@/hooks/use-toast';
 import type { SellerApplicationFormValues } from '@/types';
 import { useState } from 'react';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Breadcrumbs } from '@/components/shared/Breadcrumbs';
 
 
 export default function ApplyToSellPage() {
@@ -45,6 +46,15 @@ export default function ApplyToSellPage() {
 
   return (
     <div className="container mx-auto py-8">
+      <h1 className="sr-only">Apply to Sell</h1>
+      <Breadcrumbs
+        items={[
+          { label: 'Home', href: '/' },
+          { label: 'Marketplace', href: '/marketplace' },
+          { label: 'Apply to Sell' },
+        ]}
+        className="mb-4"
+      />
       <Card className="max-w-2xl mx-auto shadow-xl">
         <CardHeader className="bg-primary/10">
           <CardTitle className="text-3xl flex items-center text-primary">

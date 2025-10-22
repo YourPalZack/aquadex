@@ -12,6 +12,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ArrowLeft, Search, Package, Info } from 'lucide-react';
 import Link from 'next/link';
+import { Breadcrumbs } from '@/components/shared/Breadcrumbs';
+import { EmptyState } from '@/components/shared/EmptyState';
 
 export default function MarketplaceCategoryPage() {
   const params = useParams();
@@ -51,20 +53,26 @@ export default function MarketplaceCategoryPage() {
      // This check runs before useEffect completes if categorySlug is invalid
      // We can also explicitly check if currentCategory is null after useEffect
     return (
-        <div className="container mx-auto py-8 text-center">
-            <Card>
-                <CardHeader>
-                    <CardTitle className="flex items-center justify-center">
-                        <Package className="w-8 h-8 mr-3 text-destructive" /> Category Not Found
-                    </CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <p>The marketplace category <span className="font-semibold">{categorySlug}</span> does not exist or has no listings.</p>
-                    <Button variant="outline" asChild className="mt-6">
-                        <Link href="/marketplace"><ArrowLeft className="mr-2 h-4 w-4" /> Back to Marketplace Home</Link>
-                    </Button>
-                </CardContent>
-            </Card>
+        <div className="container mx-auto py-8">
+          <h1 className="sr-only">Marketplace Category Not Found</h1>
+          <Breadcrumbs
+            items={[
+              { label: 'Home', href: '/' },
+              { label: 'Marketplace', href: '/marketplace' },
+              { label: 'Category Not Found' },
+            ]}
+            className="mb-4"
+          />
+          <EmptyState
+            title="Category Not Found"
+            description={`The marketplace category "${categorySlug}" does not exist or has no listings.`}
+            icon={<Package className="w-10 h-10" />}
+            action={(
+              <Button variant="outline" asChild>
+                <Link href="/marketplace"><ArrowLeft className="mr-2 h-4 w-4" /> Back to Marketplace Home</Link>
+              </Button>
+            )}
+          />
         </div>
     );
   }
@@ -73,6 +81,15 @@ export default function MarketplaceCategoryPage() {
 
   return (
     <div className="container mx-auto py-8">
+      <h1 className="sr-only">Marketplace Category: {currentCategory?.name}</h1>
+      <Breadcrumbs
+        items={[
+          { label: 'Home', href: '/' },
+          { label: 'Marketplace', href: '/marketplace' },
+          { label: currentCategory?.name || 'Category' },
+        ]}
+        className="mb-4"
+      />
       <div className="mb-6">
         <Button variant="outline" onClick={() => router.push('/marketplace')} className="mb-4">
           <ArrowLeft className="mr-2 h-4 w-4" />
@@ -120,19 +137,18 @@ export default function MarketplaceCategoryPage() {
           ))}
         </div>
       ) : (
-        <Card>
-          <CardContent className="pt-6 text-center text-muted-foreground py-10">
-             <Info className="w-12 h-12 mx-auto mb-3 opacity-50" />
-            <p className="text-xl font-semibold mb-2">No Listings Found</p>
-            <p>
-              {searchTerm 
-                ? `No items match your search "${searchTerm}" in the ${currentCategory?.name || 'current'} category.`
-                : `There are currently no items listed in the ${currentCategory?.name || 'current'} category.`
-              }
-            </p>
-            <p className="mt-2">Check back later or try a different category!</p>
-          </CardContent>
-        </Card>
+        <EmptyState
+          title="No Listings Found"
+          description={searchTerm
+            ? `No items match your search "${searchTerm}" in ${currentCategory?.name || 'this'} category.`
+            : `There are currently no items listed in ${currentCategory?.name || 'this'} category.`}
+          icon={<Info className="w-10 h-10" />}
+          action={(
+            <Button asChild variant="outline">
+              <Link href="/marketplace"><ArrowLeft className="mr-2 h-4 w-4" /> Back to Marketplace Home</Link>
+            </Button>
+          )}
+        />
       )}
     </div>
   );

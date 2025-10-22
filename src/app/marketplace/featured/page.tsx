@@ -15,6 +15,8 @@ import { Star, ShoppingCart, UserCheck, Store as StoreIcon, Info } from 'lucide-
 import Link from 'next/link';
 import { Separator } from '@/components/ui/separator';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Breadcrumbs } from '@/components/shared/Breadcrumbs';
+import { EmptyState } from '@/components/shared/EmptyState';
 
 
 export default function FeaturedMarketplacePage() {
@@ -31,6 +33,15 @@ export default function FeaturedMarketplacePage() {
 
   return (
     <div className="container mx-auto py-8 space-y-12">
+      <h1 className="sr-only">Featured Marketplace</h1>
+      <Breadcrumbs
+        items={[
+          { label: 'Home', href: '/' },
+          { label: 'Marketplace', href: '/marketplace' },
+          { label: 'Featured' },
+        ]}
+        className="mb-2"
+      />
       <Card className="mb-8 bg-primary/10 border-primary/30 shadow-md">
         <CardHeader>
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -102,13 +113,11 @@ export default function FeaturedMarketplacePage() {
       )}
 
       {(featuredListings.length === 0 && featuredSellers.length === 0 && featuredStores.length === 0) && (
-         <Card>
-            <CardContent className="pt-6 text-center text-muted-foreground py-10">
-                <Star className="w-16 h-16 mx-auto mb-4 opacity-50" />
-                <p className="text-xl font-semibold mb-2">No Featured Items Yet</p>
-                <p>Check back soon for featured listings, sellers, and stores!</p>
-            </CardContent>
-        </Card>
+        <EmptyState
+          title="No Featured Items Yet"
+          description="Check back soon for featured listings, sellers, and stores!"
+          icon={<Star className="w-10 h-10" />}
+        />
       )}
 
       <Alert variant="default" className="mt-12 bg-accent/20 border-accent/50">

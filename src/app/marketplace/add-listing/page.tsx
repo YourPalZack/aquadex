@@ -10,6 +10,7 @@ import { useToast } from '@/hooks/use-toast';
 import { ListPlus, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+import { Breadcrumbs } from '@/components/shared/Breadcrumbs';
 
 
 export default function AddMarketplaceListingPage() {
@@ -40,6 +41,15 @@ export default function AddMarketplaceListingPage() {
 
   return (
     <div className="container mx-auto py-8">
+        <h1 className="sr-only">Create Marketplace Listing</h1>
+        <Breadcrumbs
+          items={[
+            { label: 'Home', href: '/' },
+            { label: 'Marketplace', href: '/marketplace' },
+            { label: 'Add Listing' },
+          ]}
+          className="mb-4"
+        />
         <div className="mb-6">
              <Button variant="outline" asChild>
                 <Link href="/marketplace">

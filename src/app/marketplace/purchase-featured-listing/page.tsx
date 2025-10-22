@@ -8,6 +8,7 @@ import Link from "next/link";
 import { ArrowLeft, CheckCircle, DollarSign, Eye, Info, ShoppingCart, Star } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Breadcrumbs } from '@/components/shared/Breadcrumbs';
 
 export default function PurchaseFeaturedListingPage() {
   const { toast } = useToast();
@@ -24,6 +25,15 @@ export default function PurchaseFeaturedListingPage() {
   if (!user.isSellerApproved) {
     return (
       <div className="container mx-auto py-8">
+         <h1 className="sr-only">Purchase Featured Listing</h1>
+         <Breadcrumbs
+           items={[
+             { label: 'Home', href: '/' },
+             { label: 'Marketplace', href: '/marketplace' },
+             { label: 'Purchase Featured' },
+           ]}
+           className="mb-4"
+         />
          <div className="mb-6">
              <Button variant="outline" asChild>
                 <Link href="/marketplace">
@@ -53,6 +63,15 @@ export default function PurchaseFeaturedListingPage() {
 
   return (
     <div className="container mx-auto py-8">
+        <h1 className="sr-only">Purchase Featured Listing</h1>
+        <Breadcrumbs
+          items={[
+            { label: 'Home', href: '/' },
+            { label: 'Marketplace', href: '/marketplace' },
+            { label: 'Purchase Featured' },
+          ]}
+          className="mb-4"
+        />
         <div className="mb-6">
              <Button variant="outline" asChild>
                 <Link href="/marketplace">
