@@ -59,6 +59,7 @@ export default function NotificationSettingsForm({
   const [isLoading, setIsLoading] = useState(false)
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState("")
+  const [srMessage, setSrMessage] = useState("")
 
   const updateEmailSetting = (key: keyof typeof settings.email, value: boolean) => {
     setSettings(prev => ({
@@ -95,6 +96,7 @@ export default function NotificationSettingsForm({
     setIsLoading(true)
     setError("")
     setSuccess(false)
+    setSrMessage("Saving notification preferences…")
 
     try {
       // TODO: Implement Supabase settings update
@@ -104,24 +106,28 @@ export default function NotificationSettingsForm({
       await new Promise(resolve => setTimeout(resolve, 1000))
       
       setSuccess(true)
+      setSrMessage("Notification preferences saved.")
       onSave?.(settings)
     } catch (err) {
       setError("Failed to update notification settings. Please try again.")
+      setSrMessage("Failed to save notification preferences.")
     } finally {
       setIsLoading(false)
     }
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-6" aria-busy={isLoading || undefined}>
+      {/* Live region for screen readers */}
+      <p className="sr-only" aria-live="polite" role="status">{srMessage}</p>
       {error && (
-        <Alert variant="destructive">
+        <Alert variant="destructive" role="alert">
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
       
       {success && (
-        <Alert>
+        <Alert role="status">
           <AlertDescription>Notification settings updated successfully!</AlertDescription>
         </Alert>
       )}
@@ -137,8 +143,8 @@ export default function NotificationSettingsForm({
         <CardContent className="space-y-4">
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
-              <Label htmlFor="test-reminders">Water Test Reminders</Label>
-              <p className="text-sm text-gray-500">
+              <Label id="lbl-test-reminders" htmlFor="test-reminders">Water Test Reminders</Label>
+              <p id="desc-test-reminders" className="text-sm text-gray-500">
                 Get reminded when it's time to test your water parameters
               </p>
             </div>
@@ -146,17 +152,19 @@ export default function NotificationSettingsForm({
               id="test-reminders"
               checked={settings.email.testReminders}
               onCheckedChange={(checked) => updateEmailSetting('testReminders', checked)}
+              aria-labelledby="lbl-test-reminders"
+              aria-describedby="desc-test-reminders"
             />
           </div>
           
           {settings.email.testReminders && (
             <div className="ml-4 space-y-2">
-              <Label htmlFor="test-frequency">Reminder Frequency</Label>
+              <Label id="lbl-test-frequency" htmlFor="test-frequency">Reminder Frequency</Label>
               <Select 
                 value={settings.frequency.testReminders} 
                 onValueChange={(value) => updateFrequency('testReminders', value)}
               >
-                <SelectTrigger className="w-48">
+                <SelectTrigger id="test-frequency" className="w-48" aria-labelledby="lbl-test-frequency">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -173,8 +181,8 @@ export default function NotificationSettingsForm({
           
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
-              <Label htmlFor="maintenance-alerts">Maintenance Alerts</Label>
-              <p className="text-sm text-gray-500">
+              <Label id="lbl-maintenance-alerts" htmlFor="maintenance-alerts">Maintenance Alerts</Label>
+              <p id="desc-maintenance-alerts" className="text-sm text-gray-500">
                 Critical alerts for water changes and equipment maintenance
               </p>
             </div>
@@ -182,6 +190,8 @@ export default function NotificationSettingsForm({
               id="maintenance-alerts"
               checked={settings.email.maintenanceAlerts}
               onCheckedChange={(checked) => updateEmailSetting('maintenanceAlerts', checked)}
+              aria-labelledby="lbl-maintenance-alerts"
+              aria-describedby="desc-maintenance-alerts"
             />
           </div>
           
@@ -189,8 +199,8 @@ export default function NotificationSettingsForm({
           
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
-              <Label htmlFor="marketplace-updates">Marketplace Updates</Label>
-              <p className="text-sm text-gray-500">
+              <Label id="lbl-marketplace-updates" htmlFor="marketplace-updates">Marketplace Updates</Label>
+              <p id="desc-marketplace-updates" className="text-sm text-gray-500">
                 New listings, price alerts, and marketplace activity
               </p>
             </div>
@@ -198,6 +208,8 @@ export default function NotificationSettingsForm({
               id="marketplace-updates"
               checked={settings.email.marketplaceUpdates}
               onCheckedChange={(checked) => updateEmailSetting('marketplaceUpdates', checked)}
+              aria-labelledby="lbl-marketplace-updates"
+              aria-describedby="desc-marketplace-updates"
             />
           </div>
           
@@ -205,8 +217,8 @@ export default function NotificationSettingsForm({
           
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
-              <Label htmlFor="community-digest">Community Digest</Label>
-              <p className="text-sm text-gray-500">
+              <Label id="lbl-community-digest" htmlFor="community-digest">Community Digest</Label>
+              <p id="desc-community-digest" className="text-sm text-gray-500">
                 Weekly summary of Q&A activity and community highlights
               </p>
             </div>
@@ -214,17 +226,19 @@ export default function NotificationSettingsForm({
               id="community-digest"
               checked={settings.email.communityDigest}
               onCheckedChange={(checked) => updateEmailSetting('communityDigest', checked)}
+              aria-labelledby="lbl-community-digest"
+              aria-describedby="desc-community-digest"
             />
           </div>
           
           {settings.email.communityDigest && (
             <div className="ml-4 space-y-2">
-              <Label htmlFor="digest-frequency">Digest Frequency</Label>
+              <Label id="lbl-digest-frequency" htmlFor="digest-frequency">Digest Frequency</Label>
               <Select 
                 value={settings.frequency.communityDigest} 
                 onValueChange={(value) => updateFrequency('communityDigest', value)}
               >
-                <SelectTrigger className="w-48">
+                <SelectTrigger id="digest-frequency" className="w-48" aria-labelledby="lbl-digest-frequency">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -240,8 +254,8 @@ export default function NotificationSettingsForm({
           
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
-              <Label htmlFor="promotions">Promotions & Deals</Label>
-              <p className="text-sm text-gray-500">
+              <Label id="lbl-promotions" htmlFor="promotions">Promotions & Deals</Label>
+              <p id="desc-promotions" className="text-sm text-gray-500">
                 Special offers, discounts, and product recommendations
               </p>
             </div>
@@ -249,6 +263,8 @@ export default function NotificationSettingsForm({
               id="promotions"
               checked={settings.email.promotions}
               onCheckedChange={(checked) => updateEmailSetting('promotions', checked)}
+              aria-labelledby="lbl-promotions"
+              aria-describedby="desc-promotions"
             />
           </div>
         </CardContent>
@@ -265,8 +281,8 @@ export default function NotificationSettingsForm({
         <CardContent className="space-y-4">
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
-              <Label htmlFor="push-enabled">Enable Push Notifications</Label>
-              <p className="text-sm text-gray-500">
+              <Label id="lbl-push-enabled" htmlFor="push-enabled">Enable Push Notifications</Label>
+              <p id="desc-push-enabled" className="text-sm text-gray-500">
                 Allow AquaDex to send push notifications to this device
               </p>
             </div>
@@ -274,6 +290,8 @@ export default function NotificationSettingsForm({
               id="push-enabled"
               checked={settings.push.enabled}
               onCheckedChange={(checked) => updatePushSetting('enabled', checked)}
+              aria-labelledby="lbl-push-enabled"
+              aria-describedby="desc-push-enabled"
             />
           </div>
           
@@ -283,8 +301,8 @@ export default function NotificationSettingsForm({
               
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label htmlFor="push-test-reminders">Test Reminders</Label>
-                  <p className="text-sm text-gray-500">
+                  <Label id="lbl-push-test-reminders" htmlFor="push-test-reminders">Test Reminders</Label>
+                  <p id="desc-push-test-reminders" className="text-sm text-gray-500">
                     Push notifications for water testing reminders
                   </p>
                 </div>
@@ -292,6 +310,8 @@ export default function NotificationSettingsForm({
                   id="push-test-reminders"
                   checked={settings.push.testReminders}
                   onCheckedChange={(checked) => updatePushSetting('testReminders', checked)}
+                  aria-labelledby="lbl-push-test-reminders"
+                  aria-describedby="desc-push-test-reminders"
                 />
               </div>
               
@@ -299,8 +319,8 @@ export default function NotificationSettingsForm({
               
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label htmlFor="push-urgent-alerts">Urgent Alerts</Label>
-                  <p className="text-sm text-gray-500">
+                  <Label id="lbl-push-urgent-alerts" htmlFor="push-urgent-alerts">Urgent Alerts</Label>
+                  <p id="desc-push-urgent-alerts" className="text-sm text-gray-500">
                     Critical water parameter alerts and emergency notifications
                   </p>
                 </div>
@@ -308,6 +328,8 @@ export default function NotificationSettingsForm({
                   id="push-urgent-alerts"
                   checked={settings.push.urgentAlerts}
                   onCheckedChange={(checked) => updatePushSetting('urgentAlerts', checked)}
+                  aria-labelledby="lbl-push-urgent-alerts"
+                  aria-describedby="desc-push-urgent-alerts"
                 />
               </div>
             </>
