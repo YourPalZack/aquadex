@@ -510,3 +510,91 @@ export async function deleteStoreImageAction(storeId: string, imageUrl: string) 
     };
   }
 }
+
+/**
+ * Search stores with optional filters
+ * Note: Distance calculation will be added once PostGIS migrations are applied.
+ */
+export interface SimpleSearchParams {
+  q?: string;
+  categories?: string[];
+  limit?: number;
+  offset?: number;
+}
+
+export async function searchStoresAction(params: SimpleSearchParams) {
+  try {
+    const supabase = await createServerSupabaseClient();
+
+    const limit = params.limit ?? 24;
+    const offset = params.offset ?? 0;
+
+    // Base query: only verified and active stores
+    let query = supabase
+      .from('stores')
+      .select(
+        `id, slug, business_name, city, state, zip, phone, website, categories, gallery_images, verification_status, is_active`
+      , { count: 'exact' })
+      .eq('is_active', true)
+      .eq('verification_status', 'verified' as any)
+      .order('created_at', { ascending: false })
+      .range(offset, offset + limit - 1);
+
+    // Text search
+    if (params.q && params.q.trim().length > 0) {
+      const q = `%${params.q.trim()}%`;
+      // PostgREST doesn't support OR ilike across multiple columns in one call; use filter() with or syntax
+      query = query.or(
+        `business_name.ilike.${q},city.ilike.${q},state.ilike.${q},zip.ilike.${q}`
+      );
+    }
+
+    // Category overlap filter
+    if (params.categories && params.categories.length > 0) {
+      query = query.overlaps('categories' as any, params.categories as any);
+    }
+
+    const { data, error, count } = await query;
+
+    if (error) {
+      return { success: false, error: 'Failed to search stores' };
+    }
+
+    return {
+      success: true,
+      data: {
+        stores: (data || []).map((s) => ({
+          ...s,
+          distance_miles: null as unknown as number | null,
+        })),
+        total_count: count ?? (data?.length ?? 0),
+        has_more: (count ?? 0) > offset + (data?.length ?? 0),
+      },
+    };
+  } catch (err) {
+    return { success: false, error: 'Unexpected error searching stores' };
+  }
+}
+
+/**
+ * Get a store by slug
+ */
+export async function getStoreBySlugAction(slug: string) {
+  try {
+    const supabase = await createServerSupabaseClient();
+
+    const { data, error } = await supabase
+      .from('stores')
+      .select('*')
+      .eq('slug', slug)
+      .single();
+
+    if (error || !data) {
+      return { success: false, error: 'Store not found' };
+    }
+
+    return { success: true, data };
+  } catch (err) {
+    return { success: false, error: 'Unexpected error fetching store' };
+  }
+}

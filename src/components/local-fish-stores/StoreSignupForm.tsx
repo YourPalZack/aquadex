@@ -225,6 +225,7 @@ export function StoreSignupForm({ onSuccess, onError }: StoreSignupFormProps) {
               id="business_name"
               {...register('business_name')}
               placeholder="Joe's Aquarium Shop"
+              aria-invalid={!!errors.business_name || undefined}
             />
             {errors.business_name && (
               <p className="text-sm text-red-600 mt-1">{errors.business_name.message}</p>
@@ -238,6 +239,7 @@ export function StoreSignupForm({ onSuccess, onError }: StoreSignupFormProps) {
               type="email"
               {...register('email')}
               placeholder="contact@joes-aquarium.com"
+              aria-invalid={!!errors.email || undefined}
             />
             {errors.email && (
               <p className="text-sm text-red-600 mt-1">{errors.email.message}</p>
@@ -250,6 +252,7 @@ export function StoreSignupForm({ onSuccess, onError }: StoreSignupFormProps) {
               id="phone"
               {...register('phone')}
               placeholder="5551234567"
+              aria-invalid={!!errors.phone || undefined}
             />
             {errors.phone && (
               <p className="text-sm text-red-600 mt-1">{errors.phone.message}</p>
@@ -296,6 +299,7 @@ export function StoreSignupForm({ onSuccess, onError }: StoreSignupFormProps) {
               id="street"
               {...register('street')}
               placeholder="123 Main Street"
+              aria-invalid={!!errors.street || undefined}
             />
             {errors.street && (
               <p className="text-sm text-red-600 mt-1">{errors.street.message}</p>
@@ -463,7 +467,7 @@ export function StoreSignupForm({ onSuccess, onError }: StoreSignupFormProps) {
 
       {/* Submit */}
       {submitError && (
-        <Alert variant="destructive">
+        <Alert variant="destructive" role="alert" aria-live="polite">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>{submitError}</AlertDescription>
         </Alert>

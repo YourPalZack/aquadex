@@ -139,6 +139,37 @@
 
 ---
 
+### ⏳ Phase 4: User Story 2 - Directory Search (In Progress - 3/19 tasks)
+
+- [x] T025: Implement store search server actions  
+  - `searchStoresAction` and `getStoreBySlugAction` in `src/lib/actions/store-supabase.ts`  
+  - Filters: text query, categories, pagination, verified+active stores  
+  - Distance to be added post-migrations (uses PostGIS)
+
+- [x] T026: Create StoreSearchForm component  
+  - `src/components/local-fish-stores/StoreSearchForm.tsx`  
+  - Fields: search query, category toggles, use-my-location (geolocation)
+
+- [x] T027: Create StoreCard component  
+  - `src/components/local-fish-stores/StoreCard.tsx`  
+  - Displays store name, location, specialties, contact, verified badge
+
+- [ ] T028: Create StoreMap component (Mapbox)  
+  - `src/components/local-fish-stores/StoreMap.tsx`
+
+- [ ] T029: Directory Page integration  
+  - Wire search form, list, and map together on `/local-fish-stores`
+
+- [ ] T030: Loading & Empty states  
+  - Skeletons and helpful empty results messaging
+
+- [ ] T031: Geocode & distance integration  
+  - Use PostGIS for ST_DWithin and distance ordering (after migrations)
+
+**Status**: Core search actions and UI scaffolding in place; ready to integrate on the page.
+
+---
+
 ## Next Steps
 
 ### Immediate Actions Required
