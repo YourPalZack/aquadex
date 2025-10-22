@@ -8,3 +8,4 @@ export { BusinessHoursDisplay } from './BusinessHoursDisplay';
 export { StoreGallery } from './StoreGallery';
 export { StoreSearchForm } from './StoreSearchForm';
 export { StoreCard } from './StoreCard';
+export { StoreMap } from './StoreMap';
