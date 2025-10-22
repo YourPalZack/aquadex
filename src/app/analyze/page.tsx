@@ -26,6 +26,7 @@ function AnalyzePageContent() {
   const [analysisResult, setAnalysisResult] = useState<AnalyzeTestStripOutput | null>(null);
   const [recommendations, setRecommendations] = useState<RecommendTreatmentProductsOutput | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [srMessage, setSrMessage] = useState('');
 
   const handleAquariumChange = (aquariumId: string) => {
     setSelectedAquariumId(aquariumId);
@@ -46,6 +47,7 @@ function AnalyzePageContent() {
     if (selectedAquariumId) {
       setIsSaving(true);
       try {
+        setSrMessage('Saving test results to aquarium history…');
         // Create basic water parameters from the text analysis
         // Since the AI returns a string description, we'll save it as notes
         // and create a simple placeholder parameter
@@ -75,11 +77,13 @@ function AnalyzePageContent() {
             description: `Test analyzed successfully, but could not save to history: ${result.error}`,
             variant: 'destructive',
           });
+          setSrMessage('Analysis complete. Saving to history failed.');
         } else {
           toast({
             title: 'Success',
             description: 'Test results saved to aquarium history',
           });
+          setSrMessage('Analysis complete. Test results saved to history.');
         }
       } catch (error) {
         console.error('Error saving test result:', error);
@@ -88,6 +92,7 @@ function AnalyzePageContent() {
           description: 'Test analyzed successfully, but could not save to history',
           variant: 'destructive',
         });
+        setSrMessage('Analysis complete. Could not save to history.');
       } finally {
         setIsSaving(false);
       }
@@ -98,6 +103,8 @@ function AnalyzePageContent() {
     <div className="container mx-auto py-8">
       <div className="space-y-8">
         <h1 className="sr-only">Water Test Analyzer</h1>
+        {/* Screen reader live region for saving status */}
+        <p aria-live="polite" role="status" className="sr-only">{srMessage}</p>
         <Breadcrumbs
           items={[
             { label: 'Home', href: '/' },

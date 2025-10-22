@@ -47,6 +47,10 @@ export default function ApplyToSellPage() {
   return (
     <div className="container mx-auto py-8">
       <h1 className="sr-only">Apply to Sell</h1>
+      {/* Screen reader live region for submission status */}
+      <p aria-live="polite" role="status" className="sr-only">
+        {isSubmitted ? 'Application submitted successfully.' : submissionError ? `Submission error: ${submissionError}` : ''}
+      </p>
       <Breadcrumbs
         items={[
           { label: 'Home', href: '/' },

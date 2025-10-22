@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, type ChangeEvent, type FormEvent, useRef } from 'react';
-import { useFormState, useFormStatus } from 'react-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -16,15 +15,7 @@ interface ImageUploadFormProps {
   onAnalysisComplete: (data: { analysis: AnalyzeTestStripOutput; recommendations: RecommendTreatmentProductsOutput | null }) => void;
 }
 
-const initialState = {
-  message: null,
-  analysis: null,
-  recommendations: null,
-  errors: null,
-};
-
-function SubmitButton() {
-  const { pending } = useFormStatus();
+function SubmitButton({ pending }: { pending: boolean }) {
   return (
     <Button type="submit" disabled={pending} className="w-full">
       {pending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <UploadCloud className="mr-2 h-4 w-4" />}
@@ -34,12 +25,13 @@ function SubmitButton() {
 }
 
 export default function ImageUploadForm({ onAnalysisComplete }: ImageUploadFormProps) {
-  const [state, formAction] = useFormState(analyzeStrip, initialState);
   const [preview, setPreview] = useState<string | null>(null);
   const [photoDataUri, setPhotoDataUri] = useState<string>('');
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [srMessage, setSrMessage] = useState<string>('');
+  const [serverMessage, setServerMessage] = useState<string | null>(null);
+  const [serverErrors, setServerErrors] = useState<Record<string, string[]> | null>(null);
 
   const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -71,6 +63,10 @@ export default function ImageUploadForm({ onAnalysisComplete }: ImageUploadFormP
       setIsAnalyzing(true);
       setSrMessage('Analyzing image…');
       const result = await analyzeStrip(null, formData);
+      setServerMessage(result.message ?? null);
+      // Normalize errors shape to Record<string, string[]> | null
+      const errs = result.errors as unknown as Record<string, string[]> | null;
+      setServerErrors(errs || null);
       if (result.analysis) {
         onAnalysisComplete({ analysis: result.analysis, recommendations: result.recommendations });
         setSrMessage('Analysis complete. Results are available below.');
@@ -115,14 +111,14 @@ export default function ImageUploadForm({ onAnalysisComplete }: ImageUploadFormP
             </div>
           )}
 
-          {state?.message && !state.analysis && (
-            <Alert variant={state.errors ? "destructive" : "default"} role={state.errors ? 'alert' : 'status'}>
+          {serverMessage && (
+            <Alert variant={serverErrors ? "destructive" : "default"} role={serverErrors ? 'alert' : 'status'}>
               <AlertCircle className="h-4 w-4" />
-              <AlertTitle>{state.errors ? 'Error' : 'Status'}</AlertTitle>
-              <AlertDescription>{state.message}</AlertDescription>
-              {state.errors && (
+              <AlertTitle>{serverErrors ? 'Error' : 'Status'}</AlertTitle>
+              <AlertDescription>{serverMessage}</AlertDescription>
+              {serverErrors && (
                 <ul className="mt-2 list-disc list-inside text-sm">
-                   {Object.entries(state.errors).map(([key, value]) => 
+                   {Object.entries(serverErrors).map(([key, value]) => 
                     Array.isArray(value) && value.map((err: string, i: number) => <li key={`${key}-${i}`}>{err}</li>)
                   )}
                 </ul>
@@ -131,7 +127,7 @@ export default function ImageUploadForm({ onAnalysisComplete }: ImageUploadFormP
           )}
         </CardContent>
         <CardFooter>
-          <SubmitButton />
+          <SubmitButton pending={isAnalyzing} />
         </CardFooter>
       </form>
     </Card>

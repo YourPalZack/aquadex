@@ -19,6 +19,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Loader2 } from 'lucide-react';
 import type { SellerApplicationFormValues } from '@/types';
 import { useState } from 'react';
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
 
 const sellerApplicationSchema = z.object({
   storeName: z.string().min(3, { message: 'Store name must be at least 3 characters.' }).max(50, { message: 'Store name cannot exceed 50 characters.' }),
@@ -52,9 +54,35 @@ export default function SellerApplicationForm({ onSubmit }: SellerApplicationFor
     // form.reset(); 
   };
 
+  // Focus first invalid field on failed submit
+  const onInvalid = (errors: Record<string, unknown>) => {
+    const first = Object.keys(errors)[0];
+    if (first) {
+      const el = document.querySelector(`[name="${first}"]`) as HTMLElement | null;
+      el?.focus();
+    }
+  };
+
+  const { errors } = form.formState;
+
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+      <form onSubmit={form.handleSubmit(handleSubmit, onInvalid)} className="space-y-6" noValidate>
+        {Object.keys(errors).length > 0 && (
+          <Alert variant="destructive" role="alert">
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>There’s a problem</AlertTitle>
+            <AlertDescription>
+              Please review the following fields:
+              <ul className="list-disc list-inside mt-2">
+                {Object.entries(errors).map(([name, err]) => {
+                  const msg = (err as any)?.message as string | undefined;
+                  return <li key={name}><strong>{name}</strong>{msg ? ` — ${msg}` : ''}</li>;
+                })}
+              </ul>
+            </AlertDescription>
+          </Alert>
+        )}
         <FormField
           control={form.control}
           name="storeName"
@@ -62,7 +90,7 @@ export default function SellerApplicationForm({ onSubmit }: SellerApplicationFor
             <FormItem>
               <FormLabel>Your Store/Seller Name</FormLabel>
               <FormControl>
-                <Input placeholder="e.g., Bob's Rare Fish, AquaGreen Plants" {...field} />
+                <Input placeholder="e.g., Bob's Rare Fish, AquaGreen Plants" required {...field} />
               </FormControl>
               <FormDescription>
                 The name that will be displayed to buyers.
@@ -79,7 +107,7 @@ export default function SellerApplicationForm({ onSubmit }: SellerApplicationFor
             <FormItem>
               <FormLabel>Contact Email</FormLabel>
               <FormControl>
-                <Input type="email" placeholder="you@example.com" {...field} />
+                <Input type="email" placeholder="you@example.com" required {...field} />
               </FormControl>
               <FormDescription>
                 We'll use this email to contact you regarding your application.
@@ -100,6 +128,7 @@ export default function SellerApplicationForm({ onSubmit }: SellerApplicationFor
                   placeholder="e.g., Home-bred freshwater fish, rare aquatic plants, used aquarium equipment, custom 3D printed accessories..."
                   className="resize-none"
                   rows={3}
+                  required
                   {...field}
                 />
               </FormControl>
@@ -122,6 +151,7 @@ export default function SellerApplicationForm({ onSubmit }: SellerApplicationFor
                   placeholder="e.g., I'm a hobbyist breeder looking to share my fish, I have surplus equipment, I create custom aquarium products..."
                   className="resize-none"
                   rows={3}
+                  required
                   {...field}
                 />
               </FormControl>

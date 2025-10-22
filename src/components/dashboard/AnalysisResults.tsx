@@ -61,21 +61,23 @@ const StatusIcon = ({ status }: { status: 'good' | 'warning' | 'danger' }) => {
 export default function AnalysisResults({ analysis }: AnalysisResultsProps) {
   if (!analysis) {
     return (
-      <Card className="w-full">
-        <CardHeader>
-          <CardTitle className="flex items-center">
-            <FileText className="w-6 h-6 mr-2 text-primary" />
-            Water Test Result
-          </CardTitle>
-          <CardDescription>Upload an image to see your water parameters.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-col items-center justify-center h-40 text-muted-foreground">
-            <Info className="h-10 w-10 mb-2" />
-            <p>No analysis data yet.</p>
-          </div>
-        </CardContent>
-      </Card>
+      <section aria-labelledby="analysis-results-title">
+        <Card className="w-full">
+          <CardHeader>
+            <CardTitle id="analysis-results-title" className="flex items-center">
+              <FileText className="w-6 h-6 mr-2 text-primary" />
+              Water Test Result
+            </CardTitle>
+            <CardDescription>Upload an image to see your water parameters.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-col items-center justify-center h-40 text-muted-foreground" role="status" aria-live="polite">
+              <Info className="h-10 w-10 mb-2" />
+              <p>No analysis data yet.</p>
+            </div>
+          </CardContent>
+        </Card>
+      </section>
     );
   }
 
@@ -84,50 +86,52 @@ export default function AnalysisResults({ analysis }: AnalysisResultsProps) {
 
 
   return (
-    <Card className="w-full shadow-lg">
-      <CardHeader>
-        <div className="flex justify-between items-start">
-          <div>
-            <CardTitle className="text-2xl flex items-center">
-                <FileText className="w-7 h-7 mr-3 text-primary" />
-                Water Test Result
-            </CardTitle>
-            <CardDescription>Here are the results from your most recent test strip.</CardDescription>
+    <section aria-labelledby="analysis-results-title">
+      <Card className="w-full shadow-lg">
+        <CardHeader>
+          <div className="flex justify-between items-start">
+            <div>
+              <CardTitle id="analysis-results-title" className="text-2xl flex items-center">
+                  <FileText className="w-7 h-7 mr-3 text-primary" />
+                  Water Test Result
+              </CardTitle>
+              <CardDescription>Here are the results from your most recent test strip.</CardDescription>
+            </div>
+            <ShareButton title="Share Water Analysis" text={shareText} />
           </div>
-          <ShareButton title="Share Water Analysis" text={shareText} />
-        </div>
-      </CardHeader>
-      <CardContent>
-        {parameters.length > 0 ? (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-1/12">Status</TableHead>
-                <TableHead className="w-5/12">Parameter</TableHead>
-                <TableHead className="w-6/12 text-right">Value</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {parameters.map((param, index) => (
-                <TableRow key={index} className={
-                  param.status === 'danger' ? 'bg-red-50 dark:bg-red-900/30' : 
-                  param.status === 'warning' ? 'bg-yellow-50 dark:bg-yellow-900/30' : ''
-                }>
-                  <TableCell><StatusIcon status={param.status} /></TableCell>
-                  <TableCell className="font-medium">{param.name}</TableCell>
-                  <TableCell className="text-right">{param.value}</TableCell>
+        </CardHeader>
+        <CardContent>
+          {parameters.length > 0 ? (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-1/12">Status</TableHead>
+                  <TableHead className="w-5/12">Parameter</TableHead>
+                  <TableHead className="w-6/12 text-right">Value</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        ) : (
-          <p className="text-muted-foreground">Could not parse parameters from the analysis.</p>
-        )}
-      </CardContent>
-      <CardFooter className="text-sm text-muted-foreground">
-        <Info className="h-4 w-4 mr-1.5" />
-        Results are AI-generated estimates. Always cross-verify with reliable test kits if unsure.
-      </CardFooter>
-    </Card>
+              </TableHeader>
+              <TableBody>
+                {parameters.map((param, index) => (
+                  <TableRow key={index} className={
+                    param.status === 'danger' ? 'bg-red-50 dark:bg-red-900/30' : 
+                    param.status === 'warning' ? 'bg-yellow-50 dark:bg-yellow-900/30' : ''
+                  }>
+                    <TableCell><StatusIcon status={param.status} /></TableCell>
+                    <TableCell className="font-medium">{param.name}</TableCell>
+                    <TableCell className="text-right">{param.value}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          ) : (
+            <p className="text-muted-foreground">Could not parse parameters from the analysis.</p>
+          )}
+        </CardContent>
+        <CardFooter className="text-sm text-muted-foreground">
+          <Info className="h-4 w-4 mr-1.5" />
+          Results are AI-generated estimates. Always cross-verify with reliable test kits if unsure.
+        </CardFooter>
+      </Card>
+    </section>
   );
 }
