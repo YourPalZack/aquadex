@@ -15,7 +15,8 @@
     "db:generate": "drizzle-kit generate",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
-    "db:migrate": "node scripts/run-migrations.mjs"
+    "db:migrate": "node scripts/run-migrations.mjs",
+    "validate:stores": "node scripts/validate-search-stores.mjs"
   },
   "dependencies": {
     "@genkit-ai/googleai": "^1.8.0",
