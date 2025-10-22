@@ -7,6 +7,7 @@ const footerLinks = {
     { name: 'For Brands', href: '/for-brands-stores' },
     { name: 'For Sellers', href: '/for-breeders-sellers' },
     { name: 'Marketplace', href: '/marketplace' },
+    { name: 'Local Fish Stores', href: '/local-fish-stores' },
   ],
   support: [
     { name: 'Help Center', href: '/contact-us' },

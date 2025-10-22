@@ -10,7 +10,8 @@ import {
   ShoppingCart,
   Sparkles,
   Menu,
-  X
+  X,
+  MapPin
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
@@ -22,6 +23,7 @@ const navigation = [
   { name: 'AI Tools', href: '/aiquarium-tools', icon: Sparkles },
   { name: 'Community', href: '/qa', icon: MessageSquare },
   { name: 'Marketplace', href: '/marketplace', icon: ShoppingCart },
+  { name: 'Local Fish Stores', href: '/local-fish-stores', icon: MapPin },
 ];
 
 export default function Navbar() {
