@@ -52,16 +52,26 @@ async function DirectoryContent({ searchParams }: { searchParams: SearchParams }
       </Card>
 
       <StoreSearchForm
-        defaultValues={{ q, categories: filteredCategories, radius: isNaN(radius) ? undefined : radius, pageSize: limit }}
+        defaultValues={{
+          q,
+          categories: filteredCategories,
+          radius: isNaN(radius) ? undefined : radius,
+          latitude: isNaN(lat) ? undefined : lat,
+          longitude: isNaN(lng) ? undefined : lng,
+          pageSize: limit,
+        }}
         onSearch={() => { /* navigation handled inside form via router.push */ }}
       />
 
-      <StoreMap stores={stores as any} />
+  <StoreMap stores={stores as any} userLatitude={isNaN(lat) ? undefined : lat} userLongitude={isNaN(lng) ? undefined : lng} />
 
       <div className="flex items-center justify-between text-sm text-muted-foreground">
         <div>
           {total > 0 ? (
-            <span>Showing {showingStart}-{showingEnd} of {total} stores</span>
+            <span>
+              Showing {showingStart}-{showingEnd} of {total} stores
+              {hasLocation && !isNaN(radius) ? ` within ${radius} mi` : ''}
+            </span>
           ) : (
             <span>No results</span>
           )}

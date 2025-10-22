@@ -19,10 +19,13 @@ export interface StoreMapProps {
     longitude?: number | null;
     city?: string | null;
     state?: string | null;
+    distance_miles?: number | null;
   }>;
+  userLatitude?: number;
+  userLongitude?: number;
 }
 
-export function StoreMap({ className, height = 420, stores }: StoreMapProps) {
+export function StoreMap({ className, height = 420, stores, userLatitude, userLongitude }: StoreMapProps) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const token = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
 
@@ -30,7 +33,9 @@ export function StoreMap({ className, height = 420, stores }: StoreMapProps) {
   const defaultCenter = { latitude: 39.8283, longitude: -98.5795, zoom: 3.5 };
 
   const firstWithCoords = stores.find((s) => typeof s.latitude === 'number' && typeof s.longitude === 'number');
-  const initialViewState = firstWithCoords && typeof firstWithCoords.latitude === 'number' && typeof firstWithCoords.longitude === 'number'
+  const initialViewState = typeof userLatitude === 'number' && typeof userLongitude === 'number'
+    ? { latitude: userLatitude, longitude: userLongitude, zoom: 9 }
+    : firstWithCoords && typeof firstWithCoords.latitude === 'number' && typeof firstWithCoords.longitude === 'number'
     ? { latitude: firstWithCoords.latitude!, longitude: firstWithCoords.longitude!, zoom: 9 }
     : defaultCenter;
 
@@ -62,6 +67,11 @@ export function StoreMap({ className, height = 420, stores }: StoreMapProps) {
         mapStyle="mapbox://styles/mapbox/streets-v12"
       >
         <NavigationControl position="top-left" />
+        {typeof userLatitude === 'number' && typeof userLongitude === 'number' && (
+          <Marker latitude={userLatitude} longitude={userLongitude} anchor="center">
+            <div className="w-3 h-3 rounded-full bg-blue-600 border-2 border-white shadow" aria-label="Your location" />
+          </Marker>
+        )}
         {stores.map((s) => {
           if (typeof s.latitude !== 'number' || typeof s.longitude !== 'number') return null;
           const title = s.business_name || s.name || 'Store';
@@ -91,6 +101,9 @@ export function StoreMap({ className, height = 420, stores }: StoreMapProps) {
               <div className="font-medium">{selected.business_name || selected.name || 'Store'}</div>
               {(selected.city || selected.state) && (
                 <div className="text-muted-foreground text-xs">{selected.city}{selected.city && selected.state ? ', ' : ''}{selected.state}</div>
+              )}
+              {typeof selected.distance_miles === 'number' && (
+                <div className="text-muted-foreground text-xs">{selected.distance_miles.toFixed(1)} mi away</div>
               )}
               {selected.slug && (
                 <Link className="text-primary hover:underline text-xs" href={`/local-fish-stores/${selected.slug}`}>View details</Link>
