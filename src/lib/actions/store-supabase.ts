@@ -96,7 +96,7 @@ export async function createStoreAction(data: StoreFormData) {
       };
     }
 
-    // Generate unique slug
+  // Generate unique slug
     let slug = generateSlug(data.business_name);
     let slugSuffix = 1;
     
@@ -116,25 +116,27 @@ export async function createStoreAction(data: StoreFormData) {
 
     // Prepare store data for insertion
     const storeData = {
-      owner_id: user.id,
+      user_id: user.id,
       business_name: data.business_name,
       slug,
       email: data.email,
       phone: data.phone,
       website: data.website || null,
       description: data.description || null,
-      street: data.address.street,
+      street_address: data.address.street,
       city: data.address.city,
       state: data.address.state,
-      zip: data.address.zip,
+      postal_code: data.address.zip,
       location: `POINT(${geocodeResult.longitude} ${geocodeResult.latitude})`,
+      latitude: geocodeResult.latitude,
+      longitude: geocodeResult.longitude,
       categories: data.categories,
       business_hours: data.business_hours,
       social_links: data.social_links || {},
-      is_active: false, // Requires email verification
+      is_active: false, // Requires email verification or manual activation
       verification_status: 'pending' as const,
       gallery_images: [],
-    };
+    } as const;
 
     // Insert store
     const { data: newStore, error: insertError } = await supabase
@@ -189,7 +191,7 @@ export async function uploadStoreImageAction(storeId: string, formData: FormData
     // Verify user owns the store
     const { data: store, error: storeError } = await supabase
       .from('stores')
-      .select('owner_id, gallery_images')
+  .select('user_id, gallery_images, slug')
       .eq('id', storeId)
       .single();
 
@@ -200,7 +202,7 @@ export async function uploadStoreImageAction(storeId: string, formData: FormData
       };
     }
 
-    if (store.owner_id !== user.id) {
+    if (store.user_id !== user.id) {
       return {
         success: false,
         error: 'You do not have permission to upload images to this store'
@@ -286,7 +288,7 @@ export async function uploadStoreImageAction(storeId: string, formData: FormData
     }
 
     // Revalidate paths
-    revalidatePath(`/local-fish-stores/${store}`);
+  revalidatePath(`/local-fish-stores/${store.slug}`);
     revalidatePath('/store-dashboard');
 
     return {
@@ -326,7 +328,7 @@ export async function updateStoreAction(storeId: string, data: Partial<StoreForm
     // Verify user owns the store
     const { data: store, error: storeError } = await supabase
       .from('stores')
-      .select('owner_id, slug, street, city, state, zip')
+  .select('user_id, slug, street_address, city, state, postal_code')
       .eq('id', storeId)
       .single();
 
@@ -337,7 +339,7 @@ export async function updateStoreAction(storeId: string, data: Partial<StoreForm
       };
     }
 
-    if (store.owner_id !== user.id) {
+    if (store.user_id !== user.id) {
       return {
         success: false,
         error: 'You do not have permission to update this store'
@@ -349,14 +351,14 @@ export async function updateStoreAction(storeId: string, data: Partial<StoreForm
 
     // Check if address changed (requires re-geocoding)
     const addressChanged = data.address && (
-      (data.address.street && data.address.street !== store.street) ||
+      (data.address.street && data.address.street !== store.street_address) ||
       (data.address.city && data.address.city !== store.city) ||
       (data.address.state && data.address.state !== store.state) ||
-      (data.address.zip && data.address.zip !== store.zip)
+      (data.address.zip && data.address.zip !== store.postal_code)
     );
 
     if (addressChanged && data.address) {
-      const fullAddress = `${data.address.street || store.street}, ${data.address.city || store.city}, ${data.address.state || store.state} ${data.address.zip || store.zip}`;
+  const fullAddress = `${data.address.street || store.street_address}, ${data.address.city || store.city}, ${data.address.state || store.state} ${data.address.zip || store.postal_code}`;
       const geocodeResult = await geocodeAddress(fullAddress);
 
       if (!geocodeResult) {
@@ -367,10 +369,12 @@ export async function updateStoreAction(storeId: string, data: Partial<StoreForm
       }
 
       updateData.location = `POINT(${geocodeResult.longitude} ${geocodeResult.latitude})`;
-      if (data.address.street) updateData.street = data.address.street;
+      updateData.latitude = geocodeResult.latitude;
+      updateData.longitude = geocodeResult.longitude;
+      if (data.address.street) updateData.street_address = data.address.street;
       if (data.address.city) updateData.city = data.address.city;
       if (data.address.state) updateData.state = data.address.state;
-      if (data.address.zip) updateData.zip = data.address.zip;
+      if (data.address.zip) updateData.postal_code = data.address.zip;
     }
 
     // Update other fields
@@ -438,7 +442,7 @@ export async function deleteStoreImageAction(storeId: string, imageUrl: string) 
     // Verify user owns the store
     const { data: store, error: storeError } = await supabase
       .from('stores')
-      .select('owner_id, gallery_images, slug')
+  .select('user_id, gallery_images, slug')
       .eq('id', storeId)
       .single();
 
@@ -449,7 +453,7 @@ export async function deleteStoreImageAction(storeId: string, imageUrl: string) 
       };
     }
 
-    if (store.owner_id !== user.id) {
+    if (store.user_id !== user.id) {
       return {
         success: false,
         error: 'You do not have permission to delete images from this store'
@@ -520,6 +524,9 @@ export interface SimpleSearchParams {
   categories?: string[];
   limit?: number;
   offset?: number;
+  lat?: number;
+  lng?: number;
+  radius?: number; // miles (UI only for now)
 }
 
 export async function searchStoresAction(params: SimpleSearchParams) {
@@ -533,7 +540,7 @@ export async function searchStoresAction(params: SimpleSearchParams) {
     let query = supabase
       .from('stores')
       .select(
-        `id, slug, business_name, city, state, zip, phone, website, categories, gallery_images, verification_status, is_active`
+        `id, slug, business_name, city, state, postal_code:zip, phone, website, categories, gallery_images, verification_status, is_active, latitude, longitude`
       , { count: 'exact' })
       .eq('is_active', true)
       .eq('verification_status', 'verified' as any)
@@ -545,7 +552,7 @@ export async function searchStoresAction(params: SimpleSearchParams) {
       const q = `%${params.q.trim()}%`;
       // PostgREST doesn't support OR ilike across multiple columns in one call; use filter() with or syntax
       query = query.or(
-        `business_name.ilike.${q},city.ilike.${q},state.ilike.${q},zip.ilike.${q}`
+        `business_name.ilike.${q},city.ilike.${q},state.ilike.${q},postal_code.ilike.${q}`
       );
     }
 
@@ -560,13 +567,20 @@ export async function searchStoresAction(params: SimpleSearchParams) {
       return { success: false, error: 'Failed to search stores' };
     }
 
+    // Compute distance if user coordinates are provided
+    const hasUserCoords = typeof params.lat === 'number' && typeof params.lng === 'number';
+    const storesWithDistance = (data || []).map((s: any) => {
+      let distance_miles: number | null = null;
+      if (hasUserCoords && typeof s.latitude === 'number' && typeof s.longitude === 'number') {
+        distance_miles = haversineMiles(params.lat as number, params.lng as number, s.latitude, s.longitude);
+      }
+      return { ...s, distance_miles };
+    });
+
     return {
       success: true,
       data: {
-        stores: (data || []).map((s) => ({
-          ...s,
-          distance_miles: null as unknown as number | null,
-        })),
+        stores: storesWithDistance,
         total_count: count ?? (data?.length ?? 0),
         has_more: (count ?? 0) > offset + (data?.length ?? 0),
       },
