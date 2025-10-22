@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { z } from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -24,6 +25,8 @@ interface StoreSearchFormProps {
 }
 
 export function StoreSearchForm({ defaultValues, onSearch }: StoreSearchFormProps) {
+  const router = useRouter();
+  const pathname = usePathname();
   const [values, setValues] = useState<StoreSearchValues>({
     q: defaultValues?.q || '',
     categories: defaultValues?.categories || [],
@@ -53,6 +56,16 @@ export function StoreSearchForm({ defaultValues, onSearch }: StoreSearchFormProp
     const parsed = searchSchema.safeParse(values);
     if (!parsed.success) return;
     onSearch(parsed.data);
+
+    // Build query string and navigate to trigger SSR refresh
+    const params = new URLSearchParams();
+    if (parsed.data.q) params.set('q', parsed.data.q);
+    if (parsed.data.categories && parsed.data.categories.length) params.set('categories', parsed.data.categories.join(','));
+    if (parsed.data.latitude && parsed.data.longitude) {
+      params.set('lat', String(parsed.data.latitude));
+      params.set('lng', String(parsed.data.longitude));
+    }
+    router.push(`${pathname}?${params.toString()}`);
   };
 
   const cats = [
