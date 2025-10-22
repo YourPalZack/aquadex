@@ -69,6 +69,94 @@ async function DirectoryContent({ searchParams }: { searchParams: SearchParams }
 
   <StoreMap stores={stores as any} userLatitude={isNaN(lat) ? undefined : lat} userLongitude={isNaN(lng) ? undefined : lng} />
 
+      {/* Active filters */}
+      {(q || filteredCategories.length > 0 || (!isNaN(radius) && hasLocation) || hasLocation) && (
+        <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+          <span className="font-semibold mr-1">Filters:</span>
+          {/* Query chip */}
+          {q && (
+            <Link
+              className="px-2 py-1 rounded border hover:bg-muted"
+              href={(() => {
+                const params = new URLSearchParams();
+                if (filteredCategories.length) params.set('categories', filteredCategories.join(','));
+                if (!isNaN(radius) && hasLocation) params.set('radius', String(radius));
+                if (!isNaN(lat) && !isNaN(lng)) { params.set('lat', String(lat)); params.set('lng', String(lng)); }
+                if (limit) params.set('pageSize', String(limit));
+                if (sort) params.set('sort', sort);
+                params.set('page', '1');
+                return `/local-fish-stores?${params.toString()}`;
+              })()}
+            >
+              “{q}” ×
+            </Link>
+          )}
+
+          {/* Category chips */}
+          {filteredCategories.map((c) => (
+            <Link
+              key={c}
+              className="px-2 py-1 rounded border hover:bg-muted"
+              href={(() => {
+                const params = new URLSearchParams();
+                const cats = filteredCategories.filter((x) => x !== c);
+                if (cats.length) params.set('categories', cats.join(','));
+                if (q) params.set('q', q);
+                if (!isNaN(radius) && hasLocation) params.set('radius', String(radius));
+                if (!isNaN(lat) && !isNaN(lng)) { params.set('lat', String(lat)); params.set('lng', String(lng)); }
+                if (limit) params.set('pageSize', String(limit));
+                if (sort) params.set('sort', sort);
+                params.set('page', '1');
+                return `/local-fish-stores?${params.toString()}`;
+              })()}
+            >
+              {c} ×
+            </Link>
+          ))}
+
+          {/* Radius chip (only meaningful with location) */}
+          {!isNaN(radius) && hasLocation && (
+            <Link
+              className="px-2 py-1 rounded border hover:bg-muted"
+              href={(() => {
+                const params = new URLSearchParams();
+                if (q) params.set('q', q);
+                if (filteredCategories.length) params.set('categories', filteredCategories.join(','));
+                if (!isNaN(lat) && !isNaN(lng)) { params.set('lat', String(lat)); params.set('lng', String(lng)); }
+                if (limit) params.set('pageSize', String(limit));
+                if (sort) params.set('sort', sort);
+                params.set('page', '1');
+                return `/local-fish-stores?${params.toString()}`;
+              })()}
+            >
+              within {radius} mi ×
+            </Link>
+          )}
+
+          {/* Location chip */}
+          {hasLocation && (
+            <Link
+              className="px-2 py-1 rounded border hover:bg-muted"
+              href={(() => {
+                const params = new URLSearchParams();
+                if (q) params.set('q', q);
+                if (filteredCategories.length) params.set('categories', filteredCategories.join(','));
+                // remove lat/lng and radius
+                if (limit) params.set('pageSize', String(limit));
+                if (sort) params.set('sort', sort);
+                params.set('page', '1');
+                return `/local-fish-stores?${params.toString()}`;
+              })()}
+            >
+              using your location ×
+            </Link>
+          )}
+
+          {/* Clear all */}
+          <Link className="px-2 py-1 rounded border hover:bg-muted" href="/local-fish-stores">Clear all</Link>
+        </div>
+      )}
+
       <div className="flex items-center justify-between text-sm text-muted-foreground">
         <div>
           {total > 0 ? (
@@ -114,6 +202,7 @@ async function DirectoryContent({ searchParams }: { searchParams: SearchParams }
                 if (q) params.set('q', q);
                 if (filteredCategories.length) params.set('categories', filteredCategories.join(','));
                 if (!isNaN(radius)) params.set('radius', String(radius));
+                if (!isNaN(lat) && !isNaN(lng)) { params.set('lat', String(lat)); params.set('lng', String(lng)); }
                 if (limit) params.set('pageSize', String(limit));
                 if (sort) params.set('sort', sort);
                 params.set('page', String(page - 1));
@@ -137,6 +226,7 @@ async function DirectoryContent({ searchParams }: { searchParams: SearchParams }
                 if (q) params.set('q', q);
                 if (filteredCategories.length) params.set('categories', filteredCategories.join(','));
                 if (!isNaN(radius)) params.set('radius', String(radius));
+                if (!isNaN(lat) && !isNaN(lng)) { params.set('lat', String(lat)); params.set('lng', String(lng)); }
                 if (limit) params.set('pageSize', String(limit));
                 if (sort) params.set('sort', sort);
                 params.set('page', String(page + 1));
