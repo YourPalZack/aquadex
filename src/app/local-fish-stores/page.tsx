@@ -26,8 +26,10 @@ async function DirectoryContent({ searchParams }: { searchParams: SearchParams }
   const limit = pageSizeParam && pageSizeParam > 0 ? Math.min(Math.max(pageSizeParam, 6), 60) : 24;
   const offset = (page - 1) * limit;
   const radius = Number(searchParams.radius ?? '');
+  const lat = Number(searchParams.lat ?? '');
+  const lng = Number(searchParams.lng ?? '');
 
-  const result = await searchStoresAction({ q, categories: filteredCategories, limit, offset });
+  const result = await searchStoresAction({ q, categories: filteredCategories, limit, offset, lat: isNaN(lat) ? undefined : lat, lng: isNaN(lng) ? undefined : lng, radius: isNaN(radius) ? undefined : radius });
   const stores = result.success ? (result as any).data.stores : [];
   const total = result.success ? (result as any).data.total_count : 0;
   const hasMore = result.success ? (result as any).data.has_more : false;

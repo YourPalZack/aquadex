@@ -68,6 +68,22 @@ function generateSlug(name: string): string {
 }
 
 /**
+ * Haversine distance between two lat/lng points in miles
+ */
+function haversineMiles(lat1: number, lon1: number, lat2: number, lon2: number): number {
+  const toRad = (d: number) => (d * Math.PI) / 180;
+  const R = 3958.7613; // Earth radius in miles
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
+
+/**
  * Create a new store with geocoding
  * T017: Implement createStoreAction
  */
@@ -127,6 +143,7 @@ export async function createStoreAction(data: StoreFormData) {
       city: data.address.city,
       state: data.address.state,
       postal_code: data.address.zip,
+      country: data.address.country || 'US',
       location: `POINT(${geocodeResult.longitude} ${geocodeResult.latitude})`,
       latitude: geocodeResult.latitude,
       longitude: geocodeResult.longitude,
@@ -540,7 +557,7 @@ export async function searchStoresAction(params: SimpleSearchParams) {
     let query = supabase
       .from('stores')
       .select(
-        `id, slug, business_name, city, state, postal_code:zip, phone, website, categories, gallery_images, verification_status, is_active, latitude, longitude`
+        `id, slug, business_name, city, state, zip:postal_code, phone, website, categories, gallery_images, verification_status, is_active, latitude, longitude`
       , { count: 'exact' })
       .eq('is_active', true)
       .eq('verification_status', 'verified' as any)
@@ -599,7 +616,13 @@ export async function getStoreBySlugAction(slug: string) {
 
     const { data, error } = await supabase
       .from('stores')
-      .select('*')
+      .select(`
+        id, slug, business_name, email, phone, website, description,
+        street:street_address, city, state, zip:postal_code, country,
+        business_hours, categories, gallery_images,
+        verification_status, is_active,
+        latitude, longitude
+      `)
       .eq('slug', slug)
       .single();
 
