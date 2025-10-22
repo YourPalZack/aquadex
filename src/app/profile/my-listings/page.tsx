@@ -3,6 +3,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
+import { Breadcrumbs } from '@/components/shared/Breadcrumbs'
+import { EmptyState } from '@/components/shared/EmptyState'
 
 // Mock data - replace with actual data fetching
 const mockListings = [
@@ -108,6 +110,15 @@ export default function MyListingsPage() {
 
   return (
     <div className="container mx-auto py-8 px-4">
+      <h1 className="sr-only">My Listings</h1>
+      <Breadcrumbs
+        items={[
+          { label: 'Home', href: '/' },
+          { label: 'Profile', href: '/profile' },
+          { label: 'My Listings' },
+        ]}
+        className="mb-4"
+      />
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-3xl font-bold">My Listings</h1>
@@ -168,14 +179,15 @@ export default function MyListingsPage() {
               <ListingCard key={listing.id} listing={listing} />
             ))
           ) : (
-            <Card>
-              <CardContent className="p-8 text-center">
-                <p className="text-gray-600 mb-4">You don't have any active listings.</p>
+            <EmptyState
+              title="No Active Listings"
+              description="You don't have any active listings. Create your first one to get started."
+              action={(
                 <Link href="/marketplace/add-listing">
-                  <Button>Create Your First Listing</Button>
+                  <Button size="sm">Create Your First Listing</Button>
                 </Link>
-              </CardContent>
-            </Card>
+              )}
+            />
           )}
         </TabsContent>
         
@@ -185,11 +197,10 @@ export default function MyListingsPage() {
               <ListingCard key={listing.id} listing={listing} />
             ))
           ) : (
-            <Card>
-              <CardContent className="p-8 text-center">
-                <p className="text-gray-600">No sold items yet.</p>
-              </CardContent>
-            </Card>
+            <EmptyState
+              title="No Sold Items Yet"
+              description="Once items are marked as sold, they'll appear here."
+            />
           )}
         </TabsContent>
         

@@ -17,6 +17,7 @@ import Link from 'next/link';
 import { getCurrentUserProfile, getUserDashboardData } from '@/lib/actions/profile-supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import type { UserProfile } from '@/lib/actions/profile-supabase';
+import { Breadcrumbs } from '@/components/shared/Breadcrumbs';
 
 export default function ProfileSettingsPage() {
   const { user } = useAuth();
@@ -81,6 +82,15 @@ export default function ProfileSettingsPage() {
 
   return (
     <div className="container mx-auto py-8">
+      <h1 className="sr-only">Profile Settings</h1>
+      <Breadcrumbs
+        items={[
+          { label: 'Home', href: '/' },
+          { label: 'Profile', href: '/profile' },
+          { label: 'Settings' },
+        ]}
+        className="mb-4"
+      />
       {/* Profile Header */}
       <Card className="mb-8 shadow-xl">
         <CardHeader className="bg-primary/10 border-b">
