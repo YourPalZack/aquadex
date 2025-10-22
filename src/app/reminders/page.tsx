@@ -10,6 +10,8 @@ import { BellRing, CalendarDays, Timer, AlertTriangle, Info, Eye } from 'lucide-
 import Link from 'next/link';
 import { format, differenceInDays, isPast, isToday, isFuture } from 'date-fns';
 import { cn } from '@/lib/utils';
+import { Breadcrumbs } from '@/components/shared/Breadcrumbs';
+import { EmptyState } from '@/components/shared/EmptyState';
 
 const getReminderStatus = (
   dueDate: Date,
@@ -137,6 +139,14 @@ export default function RemindersPage() {
 
   return (
     <div className="container mx-auto py-8">
+      <h1 className="sr-only">Upcoming Reminders</h1>
+      <Breadcrumbs
+        items={[
+          { label: 'Home', href: '/' },
+          { label: 'Reminders' },
+        ]}
+        className="mb-4"
+      />
       <Card className="mb-8 bg-primary/10 border-primary/30">
         <CardHeader>
           <CardTitle className="text-3xl flex items-center text-primary">
@@ -158,18 +168,16 @@ export default function RemindersPage() {
           ))}
         </div>
       ) : (
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-center text-muted-foreground py-10">
-              <Info className="w-16 h-16 mx-auto mb-4 opacity-50" />
-              <p className="text-xl font-semibold mb-2">No Reminders Found</p>
-              <p>You have no upcoming water change or feeding reminders set for your aquariums.</p>
-              <Button variant="link" asChild className="mt-4">
-                <Link href="/aquariums">Manage Your Aquariums</Link>
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+        <EmptyState
+          title="No Reminders Found"
+          description="You have no upcoming water change or feeding reminders set."
+          icon={<Info className="w-10 h-10" />}
+          action={(
+            <Button asChild size="sm">
+              <Link href="/aquariums">Manage Your Aquariums</Link>
+            </Button>
+          )}
+        />
       )}
     </div>
   );

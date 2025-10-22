@@ -19,6 +19,8 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from '@/components/ui/button';
+import { Breadcrumbs } from '@/components/shared/Breadcrumbs';
+import { EmptyState } from '@/components/shared/EmptyState';
 
 export const mockTestResults: TestResult[] = [
   {
@@ -122,6 +124,14 @@ export default function HistoryPage() {
 
   return (
     <div className="container mx-auto py-8">
+      <h1 className="sr-only">Test Result History</h1>
+      <Breadcrumbs
+        items={[
+          { label: 'Home', href: '/' },
+          { label: 'History' },
+        ]}
+        className="mb-4"
+      />
       <Card className="mb-8 bg-accent/20 border-accent/30">
         <CardHeader>
           <CardTitle className="text-3xl flex items-center text-accent">
@@ -146,18 +156,16 @@ export default function HistoryPage() {
           </CardContent>
         </Card>
       ) : (
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-center text-muted-foreground py-10">
-              <BookText className="w-16 h-16 mx-auto mb-4 opacity-50" />
-              <p className="text-xl font-semibold mb-2">No Test History Found</p>
-              <p>Your past test results will appear here once you analyze a test strip.</p>
-              <Button variant="link" className="mt-4" asChild>
-                <a href="/analyze">Analyze a New Strip</a>
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+        <EmptyState
+          title="No Test History Found"
+          description="Your past test results will appear here once you analyze a test strip."
+          icon={<BookText className="w-10 h-10" />}
+          action={(
+            <Button variant="default" asChild size="sm">
+              <a href="/analyze">Analyze a New Strip</a>
+            </Button>
+          )}
+        />
       )}
 
       {resultToDelete && (

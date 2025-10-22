@@ -6,6 +6,7 @@ import { getUserAquariums } from '@/lib/database';
 import WaterTestForm from '@/components/aquariums/WaterTestForm';
 import { Card, CardContent } from '@/components/ui/card';
 import { Loader2 } from 'lucide-react';
+import { Breadcrumbs } from '@/components/shared/Breadcrumbs';
 
 async function getServerAuth() {
   const cookieStore = await cookies();
@@ -50,6 +51,15 @@ function LoadingState() {
 export default function AddWaterTestPage() {
   return (
     <div className="container mx-auto py-8 px-4 max-w-4xl">
+      <h1 className="sr-only">Add Water Test</h1>
+      <Breadcrumbs
+        items={[
+          { label: 'Home', href: '/' },
+          { label: 'Water Tests', href: '/water-tests' },
+          { label: 'Add' },
+        ]}
+        className="mb-4"
+      />
       <Suspense fallback={<LoadingState />}>
         <WaterTestFormData />
       </Suspense>

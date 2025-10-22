@@ -7,6 +7,7 @@
 
 import { BatchTestEntry } from '@/components/aquariums/batch-test-entry';
 import type { WaterTest, Aquarium } from '@/types/aquarium';
+import { Breadcrumbs } from '@/components/shared/Breadcrumbs';
 
 // Mock aquarium data for demo
 const mockAquariums: Aquarium[] = [
@@ -82,6 +83,14 @@ export default function BatchTestEntryPage() {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-6xl">
+      <Breadcrumbs
+        items={[
+          { label: 'Home', href: '/' },
+          { label: 'Water Tests', href: '/water-tests' },
+          { label: 'Batch Entry' },
+        ]}
+        className="mb-4"
+      />
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">Batch Test Entry</h1>
         <p className="text-muted-foreground">
