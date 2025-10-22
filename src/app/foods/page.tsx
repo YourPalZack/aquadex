@@ -27,6 +27,8 @@ import { addFishFoodAction, type AddFishFoodActionState } from '@/lib/actions';
 import { useActionState } from 'react'; 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircle } from 'lucide-react';
+import { Breadcrumbs } from '@/components/shared/Breadcrumbs';
+import { EmptyState } from '@/components/shared/EmptyState';
 
 
 const initialFormState: AddFishFoodActionState = {
@@ -115,6 +117,14 @@ export default function ManageFoodsPage() {
 
   return (
     <div className="container mx-auto py-8">
+      <h1 className="sr-only">Manage Fish Foods</h1>
+      <Breadcrumbs
+        items={[
+          { label: 'Home', href: '/' },
+          { label: 'Foods' },
+        ]}
+        className="mb-4"
+      />
       <Card className="mb-8 bg-primary/10 border-primary/30 shadow-md">
         <CardHeader>
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -143,15 +153,16 @@ export default function ManageFoodsPage() {
       )}
 
       {!isSubmitting && fishFoods.length === 0 && (
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-center text-muted-foreground py-10">
-              <PackageSearch className="w-16 h-16 mx-auto mb-4 opacity-50" />
-              <p className="text-xl font-semibold mb-2">No Fish Foods Added Yet</p>
-              <p className="mb-4">Click "Add New Food" to get started and generate purchase links.</p>
-            </div>
-          </CardContent>
-        </Card>
+        <EmptyState
+          title="No Fish Foods Yet"
+          description="Click Add New Food to get started and generate purchase links."
+          icon={<PackageSearch className="w-10 h-10" />}
+          action={(
+            <Button size="sm" onClick={() => setIsFormOpen(true)}>
+              <PlusCircle className="w-4 h-4 mr-2" /> Add New Food
+            </Button>
+          )}
+        />
       )}
 
       {fishFoods.length > 0 && (

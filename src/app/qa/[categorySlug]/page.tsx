@@ -20,6 +20,8 @@ import {
 } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 import { useParams, useRouter } from 'next/navigation';
+import { Breadcrumbs } from '@/components/shared/Breadcrumbs';
+import { EmptyState } from '@/components/shared/EmptyState';
 
 // Re-using mock data structure, could be fetched or passed differently in a real app
 const mockUsers: UserProfile[] = [
@@ -160,6 +162,15 @@ export default function CategoryQAPage() {
 
   return (
     <div className="container mx-auto py-8">
+      <h1 className="sr-only">Community Q&A: {currentCategory.name}</h1>
+      <Breadcrumbs
+        items={[
+          { label: 'Home', href: '/' },
+          { label: 'Q&A', href: '/qa' },
+          { label: currentCategory.name },
+        ]}
+        className="mb-4"
+      />
       <div className="mb-6">
         <Button variant="outline" onClick={() => router.push('/qa')} className="mb-4">
           <ArrowLeft className="mr-2 h-4 w-4" />
@@ -205,15 +216,16 @@ export default function CategoryQAPage() {
           ))}
         </div>
       ) : (
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-center text-muted-foreground py-10">
-              <Search className="w-16 h-16 mx-auto mb-4 opacity-50" />
-              <p className="text-xl font-semibold mb-2">No Questions Found</p>
-              <p>There are no questions matching your search in the <span className="font-semibold">{currentCategory.name}</span> category yet. Be the first to ask!</p>
-            </div>
-          </CardContent>
-        </Card>
+        <EmptyState
+          title="No Questions Found"
+          description={`There are no questions matching your search in ${currentCategory.name}. Be the first to ask!`}
+          icon={<Search className="w-10 h-10" />}
+          action={(
+            <Button size="sm" onClick={() => setIsFormOpen(true)}>
+              <MessageSquarePlus className="w-4 h-4 mr-2" /> Ask a Question
+            </Button>
+          )}
+        />
       )}
 
       <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
