@@ -13,6 +13,8 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Separator } from '@/components/ui/separator';
+import { Breadcrumbs } from '@/components/shared/Breadcrumbs';
+import { EmptyState } from '@/components/shared/EmptyState';
 
 const initialActionState: FindDealsActionState = {
   message: null,
@@ -65,6 +67,14 @@ export default function DiscountsDealsPage() {
 
   return (
     <div className="container mx-auto py-8">
+      <h1 className="sr-only">Discounts and Deals</h1>
+      <Breadcrumbs
+        items={[
+          { label: 'Home', href: '/' },
+          { label: 'Discounts & Deals' },
+        ]}
+        className="mb-4"
+      />
       <Card className="mb-8 bg-primary/10 border-primary/30 shadow-md">
         <CardHeader>
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -159,17 +169,18 @@ export default function DiscountsDealsPage() {
       )}
 
       {!isActionPending && filteredDeals && filteredDeals.length === 0 && !actionState.errors && (
-         <Card className="mt-8">
-            <CardContent className="pt-6 text-center text-muted-foreground">
-                <Search className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                <p>
-                    {selectedCategory === 'All' 
-                        ? "No special deals found by the AI at the moment, or an issue occurred. Try refreshing!"
-                        : `No deals found in the "${selectedCategory}" category. Try other categories or "All Deals".`
-                    }
-                </p>
-            </CardContent>
-        </Card>
+        <EmptyState
+          title={selectedCategory === 'All' ? 'No Deals Found' : `No Deals in ${selectedCategory}`}
+          description={selectedCategory === 'All'
+            ? 'No special deals found by the AI at the moment. Try refreshing to check again.'
+            : 'Try another category or switch back to All Deals.'}
+          icon={<Search className="w-10 h-10" />}
+          action={(
+            <Button size="sm" onClick={() => startTransition(() => fetchDeals())}>
+              <RefreshCw className="mr-2 h-4 w-4" /> Refresh Deals
+            </Button>
+          )}
+        />
       )}
       
       <Alert variant="default" className="mt-8 bg-muted/50 border-border">

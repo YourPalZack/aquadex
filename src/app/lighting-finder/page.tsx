@@ -11,6 +11,8 @@ import type { FindLightingActionState } from '@/lib/actions';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
+import { Breadcrumbs } from '@/components/shared/Breadcrumbs';
+import { EmptyState } from '@/components/shared/EmptyState';
 
 export default function LightingFinderPage() {
   const [searchResults, setSearchResults] = useState<LightingListing[] | null>(null);
@@ -45,6 +47,14 @@ export default function LightingFinderPage() {
 
   return (
     <div className="container mx-auto py-8">
+      <h1 className="sr-only">Lighting Finder</h1>
+      <Breadcrumbs
+        items={[
+          { label: 'Home', href: '/' },
+          { label: 'Lighting Finder' },
+        ]}
+        className="mb-4"
+      />
       <Card className="mb-8 bg-primary/10 border-primary/30 shadow-md">
         <CardHeader>
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -108,12 +118,11 @@ export default function LightingFinderPage() {
       )}
       
       {searchResults === null && !recommendedListing && !isLoading && !aiMessage && (
-         <Card className="mt-8">
-            <CardContent className="pt-6 text-center text-muted-foreground">
-                <Search className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                <p>Enter lighting specifications above to start your search.</p>
-            </CardContent>
-        </Card>
+        <EmptyState
+          title="Start Your Search"
+          description="Enter lighting specifications above to find listings."
+          icon={<Search className="w-10 h-10" />}
+        />
       )}
     </div>
   );
