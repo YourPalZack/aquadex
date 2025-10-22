@@ -1,14 +1,34 @@
 
 import { Suspense } from 'react';
+import Link from 'next/link';
 import { Card, CardDescription, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Info, Store } from 'lucide-react';
 import { StoreSearchForm, StoreCard, StoreMap } from '@/components/local-fish-stores';
 import { searchStoresAction } from '@/lib/actions/store-supabase';
 
-async function DirectoryContent() {
-  const result = await searchStoresAction({ limit: 24, offset: 0 });
+type SearchParams = { [key: string]: string | string[] | undefined };
+
+function toArray(v: string | string[] | undefined): string[] {
+  if (!v) return [];
+  return Array.isArray(v) ? v : v.split(',').filter(Boolean);
+}
+
+async function DirectoryContent({ searchParams }: { searchParams: SearchParams }) {
+  const q = typeof searchParams.q === 'string' ? searchParams.q : '';
+  const categories = toArray(searchParams.categories as any);
+  const allowedCats = new Set(['freshwater','saltwater','plants','reptiles','general']);
+  const filteredCategories = categories.filter((c) => allowedCats.has(c)) as (
+    'freshwater' | 'saltwater' | 'plants' | 'reptiles' | 'general'
+  )[];
+  const page = Number(searchParams.page ?? '1') || 1;
+  const limit = 24;
+  const offset = (page - 1) * limit;
+
+  const result = await searchStoresAction({ q, categories: filteredCategories, limit, offset });
   const stores = result.success ? (result as any).data.stores : [];
+  const total = result.success ? (result as any).data.total_count : 0;
+  const hasMore = result.success ? (result as any).data.has_more : false;
 
   return (
     <div className="space-y-6">
@@ -24,7 +44,10 @@ async function DirectoryContent() {
         </CardHeader>
       </Card>
 
-      <StoreSearchForm onSearch={() => { /* TODO: wire client navigation with URL params */ }} />
+      <StoreSearchForm
+        defaultValues={{ q, categories: filteredCategories }}
+        onSearch={() => { /* navigation handled inside form via router.push */ }}
+      />
 
       <StoreMap stores={stores as any} />
 
@@ -46,6 +69,48 @@ async function DirectoryContent() {
         </Card>
       )}
 
+      {total > limit && (
+        <div className="flex items-center justify-center gap-4 pt-2">
+          {/* Prev */}
+          {page > 1 ? (
+            <Link
+              className="px-3 py-2 rounded border bg-background hover:bg-muted text-sm"
+              href={((): string => {
+                const params = new URLSearchParams();
+                if (q) params.set('q', q);
+                if (filteredCategories.length) params.set('categories', filteredCategories.join(','));
+                params.set('page', String(page - 1));
+                return `/local-fish-stores?${params.toString()}`;
+              })()}
+            >
+              Previous
+            </Link>
+          ) : (
+            <span className="px-3 py-2 rounded border text-muted-foreground/60 text-sm cursor-not-allowed">Previous</span>
+          )}
+
+          <span className="text-sm text-muted-foreground">Page {page} of {Math.max(1, Math.ceil(total / limit))}</span>
+
+          {/* Next */}
+          {hasMore ? (
+            <Link
+              className="px-3 py-2 rounded border bg-background hover:bg-muted text-sm"
+              href={((): string => {
+                const params = new URLSearchParams();
+                if (q) params.set('q', q);
+                if (filteredCategories.length) params.set('categories', filteredCategories.join(','));
+                params.set('page', String(page + 1));
+                return `/local-fish-stores?${params.toString()}`;
+              })()}
+            >
+              Next
+            </Link>
+          ) : (
+            <span className="px-3 py-2 rounded border text-muted-foreground/60 text-sm cursor-not-allowed">Next</span>
+          )}
+        </div>
+      )}
+
       <Alert variant="default" className="mt-2 bg-muted/50 border-border">
         <Info className="h-4 w-4" />
         <AlertTitle className="text-muted-foreground font-semibold">Please Note</AlertTitle>
@@ -57,11 +122,11 @@ async function DirectoryContent() {
   );
 }
 
-export default function LocalFishStoresPage() {
+export default function LocalFishStoresPage({ searchParams }: { searchParams: SearchParams }) {
   return (
     <div className="container mx-auto py-8">
       <Suspense fallback={<div className="h-64" />}>{/* lightweight fallback */}
-        <DirectoryContent />
+        <DirectoryContent searchParams={searchParams} />
       </Suspense>
     </div>
   );
