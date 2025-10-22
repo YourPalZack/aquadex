@@ -46,6 +46,11 @@ export default function EditProfileForm({
   const [success, setSuccess] = useState(false)
   const [isUploadingPhoto, setIsUploadingPhoto] = useState(false)
   const { toast } = useToast()
+  const [srMessage, setSrMessage] = useState("")
+  const [emailError, setEmailError] = useState<string | null>(null)
+  const [displayNameError, setDisplayNameError] = useState<string | null>(null)
+  const displayNameRef = useState<HTMLInputElement | null>(null)[0]
+  const emailRef = useState<HTMLInputElement | null>(null)[0]
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
@@ -66,20 +71,32 @@ export default function EditProfileForm({
     e.preventDefault()
     setError("")
     setSuccess(false)
+    setEmailError(null)
+    setDisplayNameError(null)
 
     // Basic validation
     if (!formData.displayName || !formData.email) {
       setError("Display name and email are required")
+      if (!formData.displayName) {
+        setDisplayNameError('Display name is required')
+        document.getElementById('displayName')?.focus()
+      } else if (!formData.email) {
+        setEmailError('Email is required')
+        document.getElementById('email')?.focus()
+      }
       return
     }
 
     if (!formData.email.includes("@")) {
       setError("Please enter a valid email address")
+      setEmailError('Please enter a valid email address')
+      document.getElementById('email')?.focus()
       return
     }
 
     startTransition(async () => {
       try {
+        setSrMessage('Saving profile changes…')
         const formDataToSend = new FormData()
         formDataToSend.append('display_name', formData.displayName)
         formDataToSend.append('full_name', formData.displayName)
@@ -91,6 +108,7 @@ export default function EditProfileForm({
         
         if (result.success) {
           setSuccess(true)
+          setSrMessage('Profile updated successfully.')
           toast({
             title: "Profile Updated",
             description: result.message,
@@ -98,6 +116,7 @@ export default function EditProfileForm({
           onSave?.(formData)
         } else {
           setError(result.error || result.message)
+          setSrMessage('Failed to update profile.')
           toast({
             title: "Error",
             description: result.error || result.message,
@@ -106,6 +125,7 @@ export default function EditProfileForm({
         }
       } catch (err) {
         setError("Failed to update profile. Please try again.")
+        setSrMessage('Failed to update profile.')
         toast({
           title: "Error",
           description: "Failed to update profile. Please try again.",
@@ -173,15 +193,17 @@ export default function EditProfileForm({
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6" aria-busy={isPending || isUploadingPhoto || undefined}>
+          {/* Screen reader live region for save status */}
+          <p className="sr-only" aria-live="polite" role="status">{srMessage}</p>
           {error && (
-            <Alert variant="destructive">
+            <Alert variant="destructive" role="alert">
               <AlertDescription>{error}</AlertDescription>
             </Alert>
           )}
           
           {success && (
-            <Alert>
+            <Alert role="status">
               <AlertDescription>Profile updated successfully!</AlertDescription>
             </Alert>
           )}
@@ -189,7 +211,7 @@ export default function EditProfileForm({
           {/* Profile Photo Section */}
           <div className="flex items-center gap-4">
             <Avatar className="w-20 h-20">
-              <AvatarImage src={formData.photoURL} />
+              <AvatarImage src={formData.photoURL} alt={formData.displayName ? `${formData.displayName} profile photo` : 'Profile photo'} />
               <AvatarFallback>
                 {formData.displayName.charAt(0).toUpperCase()}
               </AvatarFallback>
@@ -208,7 +230,7 @@ export default function EditProfileForm({
                 className="hidden"
                 onChange={handleImageUpload}
               />
-              <p className="text-sm text-gray-500 mt-1">
+              <p id="photo-help" className="text-sm text-gray-500 mt-1">
                 JPG, PNG or GIF. Max 5MB.
               </p>
             </div>
@@ -226,7 +248,12 @@ export default function EditProfileForm({
                 value={formData.displayName}
                 onChange={handleInputChange}
                 required
+                aria-invalid={!!displayNameError || undefined}
+                aria-describedby={displayNameError ? 'displayName-error' : undefined}
               />
+              {displayNameError && (
+                <p id="displayName-error" className="text-sm text-red-600 mt-1">{displayNameError}</p>
+              )}
             </div>
             
             <div className="space-y-2">
@@ -239,7 +266,12 @@ export default function EditProfileForm({
                 value={formData.email}
                 onChange={handleInputChange}
                 required
+                aria-invalid={!!emailError || undefined}
+                aria-describedby={emailError ? 'email-error' : undefined}
               />
+              {emailError && (
+                <p id="email-error" className="text-sm text-red-600 mt-1">{emailError}</p>
+              )}
             </div>
           </div>
           
@@ -274,7 +306,7 @@ export default function EditProfileForm({
                 value={formData.experienceLevel} 
                 onValueChange={(value) => handleSelectChange("experienceLevel", value)}
               >
-                <SelectTrigger>
+                <SelectTrigger id="experienceLevel" aria-labelledby="experienceLevel-label">
                   <SelectValue placeholder="Select your experience level" />
                 </SelectTrigger>
                 <SelectContent>
