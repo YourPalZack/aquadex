@@ -16,7 +16,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import type { StoreFormData, StoreCategory } from '@/types';
+import type { StoreFormData, StoreCategory } from '@/types/store';
 import { createStoreAction } from '@/lib/actions/store-supabase';
 import { useToast } from '@/hooks/use-toast';
 

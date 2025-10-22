@@ -10,7 +10,12 @@
     "src/components/local-fish-stores/**/*",
     "src/lib/actions/store-supabase.ts",
     "src/lib/mapbox.ts",
-    "src/types/**/*"
+    "src/types/store.ts",
+    "src/types/react-map-gl.d.ts"
   ],
-  "exclude": ["node_modules", ".next"]
+  "exclude": [
+    "node_modules",
+    ".next",
+    "src/components/local-fish-stores/LocalFishStoreCard.tsx"
+  ]
 }

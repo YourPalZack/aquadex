@@ -9,7 +9,7 @@ import { revalidatePath } from 'next/cache';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { geocodeAddress } from '@/lib/mapbox';
-import type { StoreFormData } from '@/types';
+import type { StoreFormData } from '@/types/store';
 
 /**
  * Maximum file size for store images (5MB)

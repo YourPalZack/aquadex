@@ -6,7 +6,7 @@
  */
 
 import { Clock, CheckCircle2, XCircle } from 'lucide-react';
-import type { BusinessHours, DayHours } from '@/types';
+import type { BusinessHours, DayHours } from '@/types/store';
 import { cn } from '@/lib/utils';
 
 interface BusinessHoursDisplayProps {
