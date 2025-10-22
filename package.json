@@ -13,7 +13,8 @@
     "typecheck:stores": "tsc --noEmit -p tsconfig.stores.json",
     "db:generate": "drizzle-kit generate",
     "db:push": "drizzle-kit push",
-    "db:studio": "drizzle-kit studio"
+    "db:studio": "drizzle-kit studio",
+    "db:migrate": "node scripts/run-migrations.mjs"
   },
   "dependencies": {
     "@genkit-ai/googleai": "^1.8.0",

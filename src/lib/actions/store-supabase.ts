@@ -554,6 +554,54 @@ export async function searchStoresAction(params: SimpleSearchParams) {
     const limit = params.limit ?? 24;
     const offset = params.offset ?? 0;
 
+    // Prefer RPC with PostGIS if available
+    try {
+      const { data: rpcData, error: rpcError } = await (async () => {
+        // Call RPC when available; works for both geo and non-geo queries
+        const payload: any = {
+          p_q: params.q ?? null,
+          p_categories: params.categories && params.categories.length ? params.categories : null,
+          p_lat: typeof params.lat === 'number' ? params.lat : null,
+          p_lng: typeof params.lng === 'number' ? params.lng : null,
+          p_radius_miles: typeof params.radius === 'number' ? params.radius : null,
+          p_limit: limit,
+          p_offset: offset,
+          p_sort_by: params.sort_by ?? 'latest',
+        };
+        return await supabase.rpc('search_stores', payload);
+      })();
+
+      if (!rpcError && Array.isArray(rpcData)) {
+        const stores = rpcData.map((row: any) => ({
+          id: row.id,
+          slug: row.slug,
+          business_name: row.business_name,
+          city: row.city,
+          state: row.state,
+          zip: row.postal_code,
+          phone: row.phone,
+          website: row.website,
+          categories: row.categories,
+          gallery_images: row.gallery_images,
+          verification_status: row.verification_status,
+          latitude: typeof row.latitude === 'number' ? row.latitude : Number(row.latitude),
+          longitude: typeof row.longitude === 'number' ? row.longitude : Number(row.longitude),
+          distance_miles: row.distance_miles != null ? Number(row.distance_miles) : null,
+        }));
+
+        const total_count = rpcData.length > 0 ? Number(rpcData[0].total_count) : 0;
+        const has_more = total_count > offset + stores.length;
+
+        return {
+          success: true,
+          data: { stores, total_count, has_more },
+        } as const;
+      }
+      // If RPC exists but errored, fall through to legacy path
+    } catch {
+      // ignore and use legacy
+    }
+
     // Base query: only verified and active stores
     let query = supabase
       .from('stores')
@@ -579,7 +627,7 @@ export async function searchStoresAction(params: SimpleSearchParams) {
       query = query.overlaps('categories' as any, params.categories as any);
     }
 
-    const { data, error, count } = await query;
+  const { data, error, count } = await query;
 
     if (error) {
       return { success: false, error: 'Failed to search stores' };
