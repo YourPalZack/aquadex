@@ -1,0 +1,16 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "strict": true
+  },
+  "include": [
+    "next-env.d.ts",
+    "src/app/local-fish-stores/**/*",
+    "src/components/local-fish-stores/**/*",
+    "src/lib/actions/store-supabase.ts",
+    "src/lib/mapbox.ts",
+    "src/types/**/*"
+  ],
+  "exclude": ["node_modules", ".next"]
+}

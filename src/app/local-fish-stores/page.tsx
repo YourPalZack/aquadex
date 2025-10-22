@@ -5,6 +5,7 @@ import { Card, CardDescription, CardHeader, CardTitle, CardContent } from '@/com
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Info, Store } from 'lucide-react';
 import { StoreSearchForm, StoreCard, StoreMap } from '@/components/local-fish-stores';
+import type { StoreListItem } from '@/types/store';
 import { searchStoresAction } from '@/lib/actions/store-supabase';
 
 type SearchParams = { [key: string]: string | string[] | undefined };
@@ -33,7 +34,7 @@ async function DirectoryContent({ searchParams }: { searchParams: SearchParams }
     : 'latest';
 
   const result = await searchStoresAction({ q, categories: filteredCategories, limit, offset, lat: isNaN(lat) ? undefined : lat, lng: isNaN(lng) ? undefined : lng, radius: isNaN(radius) ? undefined : radius, sort_by: sort as any });
-  const stores = result.success ? (result as any).data.stores : [];
+  const stores: StoreListItem[] = result.success ? (result as any).data.stores : [];
   const total = result.success ? (result as any).data.total_count : 0;
   const hasMore = result.success ? (result as any).data.has_more : false;
   const showingStart = stores.length > 0 ? offset + 1 : 0;
@@ -73,7 +74,7 @@ async function DirectoryContent({ searchParams }: { searchParams: SearchParams }
         onSearch={() => { /* navigation handled inside form via router.push */ }}
       />
 
-  <StoreMap stores={stores as any} userLatitude={isNaN(lat) ? undefined : lat} userLongitude={isNaN(lng) ? undefined : lng} />
+  <StoreMap stores={stores} userLatitude={isNaN(lat) ? undefined : lat} userLongitude={isNaN(lng) ? undefined : lng} />
 
       {/* Active filters */}
       {(q || filteredCategories.length > 0 || (!isNaN(radius) && hasLocation) || hasLocation) && (

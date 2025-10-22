@@ -5,22 +5,13 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import { MapPin } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
+import type { StoreListItem } from '@/types/store';
 import { useState, useCallback } from 'react';
 
 export interface StoreMapProps {
   className?: string;
   height?: number | string;
-  stores: Array<{
-    id: string;
-    slug?: string;
-    business_name?: string;
-    name?: string; // for mock fallback
-    latitude?: number | null;
-    longitude?: number | null;
-    city?: string | null;
-    state?: string | null;
-    distance_miles?: number | null;
-  }>;
+  stores: Array<StoreListItem | { id: string; name?: string; latitude?: number | null; longitude?: number | null; city?: string | null; state?: string | null; slug?: string; business_name?: string; distance_miles?: number | null; }>;
   userLatitude?: number;
   userLongitude?: number;
 }
@@ -74,7 +65,7 @@ export function StoreMap({ className, height = 420, stores, userLatitude, userLo
         )}
         {stores.map((s) => {
           if (typeof s.latitude !== 'number' || typeof s.longitude !== 'number') return null;
-          const title = s.business_name || s.name || 'Store';
+          const title = (('business_name' in s && s.business_name) ? s.business_name : (('name' in s && s.name) ? s.name : 'Store')) as string;
           return (
             <Marker key={s.id} latitude={s.latitude} longitude={s.longitude} anchor="bottom">
               <button
@@ -98,7 +89,7 @@ export function StoreMap({ className, height = 420, stores, userLatitude, userLo
             closeOnClick={false}
           >
             <div className="text-sm">
-              <div className="font-medium">{selected.business_name || selected.name || 'Store'}</div>
+              <div className="font-medium">{(('business_name' in selected && selected.business_name) ? selected.business_name : (('name' in selected && selected.name) ? selected.name : 'Store')) as string}</div>
               {(selected.city || selected.state) && (
                 <div className="text-muted-foreground text-xs">{selected.city}{selected.city && selected.state ? ', ' : ''}{selected.state}</div>
               )}

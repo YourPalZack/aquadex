@@ -2,24 +2,10 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import type { StoreListItem } from '@/types/store';
 import { MapPin, Globe, Phone, ShieldCheck, Building } from 'lucide-react';
 
-export interface StoreCardProps {
-  store: {
-    id: string;
-    slug: string;
-    business_name: string;
-    city: string;
-    state: string;
-    zip: string;
-    phone: string | null;
-    website: string | null;
-    categories: string[];
-    gallery_images: string[] | null;
-    verification_status?: string;
-    distance_miles?: number | null;
-  };
-}
+export interface StoreCardProps { store: StoreListItem }
 
 export function StoreCard({ store }: StoreCardProps) {
   const image = store.gallery_images?.[0];
