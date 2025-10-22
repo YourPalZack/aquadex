@@ -91,4 +91,14 @@ body {
   body {
     @apply bg-background text-foreground;
   }
+
+  /* Baseline focus-visible ring for keyboard users */
+  :focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 2px;
+  }
+  /* Reduce double focus styles when Tailwind ring utilities are used */
+  .focus\:ring-2:focus-visible, .focus\:ring:focus-visible {
+    outline: none;
+  }
 }
