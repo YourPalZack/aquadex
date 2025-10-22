@@ -15,6 +15,9 @@ export default function SignInForm() {
   const [password, setPassword] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
+  const [emailError, setEmailError] = useState<string | null>(null)
+  const [passwordError, setPasswordError] = useState<string | null>(null)
+  const [srMessage, setSrMessage] = useState("")
   
   const { signIn } = useAuth()
   const router = useRouter()
@@ -23,24 +26,37 @@ export default function SignInForm() {
     e.preventDefault()
     setIsLoading(true)
     setError("")
+    setEmailError(null)
+    setPasswordError(null)
 
     // Basic validation
     if (!email || !password) {
       setError("Please fill in all fields")
+      if (!email) {
+        setEmailError('Email is required')
+        document.getElementById('email')?.focus()
+      } else if (!password) {
+        setPasswordError('Password is required')
+        document.getElementById('password')?.focus()
+      }
       setIsLoading(false)
       return
     }
 
     if (!email.includes("@")) {
       setError("Please enter a valid email address")
+      setEmailError('Please enter a valid email address')
+      document.getElementById('email')?.focus()
       setIsLoading(false)
       return
     }
 
     try {
+      setSrMessage('Signing in…')
       await signIn(email, password)
       
       // Redirect to dashboard on successful sign in
+      setSrMessage('Signed in successfully. Redirecting to dashboard…')
       router.push("/dashboard")
     } catch (err: any) {
       console.error("Sign in error:", err)
@@ -56,6 +72,7 @@ export default function SignInForm() {
         setError("Failed to sign in. Please check your credentials and try again.")
       }
       
+      setSrMessage('Failed to sign in.')
       setIsLoading(false)
     }
   }
@@ -69,9 +86,11 @@ export default function SignInForm() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4" aria-busy={isLoading || undefined} noValidate>
+          {/* Live region for status updates */}
+          <p className="sr-only" aria-live="polite" role="status">{srMessage}</p>
           {error && (
-            <Alert variant="destructive">
+            <Alert variant="destructive" role="alert">
               <AlertDescription>{error}</AlertDescription>
             </Alert>
           )}
@@ -85,7 +104,10 @@ export default function SignInForm() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
+              aria-invalid={!!emailError || undefined}
+              aria-describedby={emailError ? 'email-error' : undefined}
             />
+            {emailError && <p id="email-error" className="text-sm text-red-600">{emailError}</p>}
           </div>
           
           <div className="space-y-2">
@@ -97,7 +119,10 @@ export default function SignInForm() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              aria-invalid={!!passwordError || undefined}
+              aria-describedby={passwordError ? 'password-error' : undefined}
             />
+            {passwordError && <p id="password-error" className="text-sm text-red-600">{passwordError}</p>}
           </div>
           
           <Button type="submit" className="w-full" disabled={isLoading}>

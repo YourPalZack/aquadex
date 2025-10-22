@@ -20,6 +20,8 @@ export default function SignUpForm() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
   const [success, setSuccess] = useState("")
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
+  const [srMessage, setSrMessage] = useState("")
   
   const { signUp } = useAuth()
   const router = useRouter()
@@ -36,39 +38,56 @@ export default function SignUpForm() {
     e.preventDefault()
     setIsLoading(true)
     setError("")
+    setFieldErrors({})
 
     // Validation
     if (!formData.username || !formData.email || !formData.password || !formData.confirmPassword) {
       setError("Please fill in all fields")
+      const errs: Record<string, string> = {}
+      if (!formData.username) errs.username = 'Username is required'
+      if (!formData.email) errs.email = 'Email is required'
+      if (!formData.password) errs.password = 'Password is required'
+      if (!formData.confirmPassword) errs.confirmPassword = 'Confirm your password'
+      setFieldErrors(errs)
+      const first = Object.keys(errs)[0]
+      if (first) document.getElementById(first)?.focus()
       setIsLoading(false)
       return
     }
 
     if (!formData.email.includes("@")) {
       setError("Please enter a valid email address")
+      setFieldErrors(prev => ({ ...prev, email: 'Please enter a valid email address' }))
+      document.getElementById('email')?.focus()
       setIsLoading(false)
       return
     }
 
     if (formData.password.length < 6) {
       setError("Password must be at least 6 characters long")
+      setFieldErrors(prev => ({ ...prev, password: 'Password must be at least 6 characters' }))
+      document.getElementById('password')?.focus()
       setIsLoading(false)
       return
     }
 
     if (formData.password !== formData.confirmPassword) {
       setError("Passwords do not match")
+      setFieldErrors(prev => ({ ...prev, confirmPassword: 'Passwords do not match' }))
+      document.getElementById('confirmPassword')?.focus()
       setIsLoading(false)
       return
     }
 
     try {
+      setSrMessage('Creating your account…')
       await signUp(formData.email, formData.password, {
         display_name: formData.username,
         full_name: formData.username
       })
       
       setSuccess("Account created successfully! Please check your email to confirm your account before signing in.")
+      setSrMessage('Account created successfully. Check your email to confirm your account.')
       
       // Reset form
       setFormData({
@@ -92,6 +111,7 @@ export default function SignUpForm() {
       } else {
         setError("Failed to create account. Please try again.")
       }
+      setSrMessage('Failed to create account.')
     } finally {
       setIsLoading(false)
     }
@@ -106,15 +126,16 @@ export default function SignUpForm() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4" aria-busy={isLoading || undefined} noValidate>
+          <p className="sr-only" aria-live="polite" role="status">{srMessage}</p>
           {error && (
-            <Alert variant="destructive">
+            <Alert variant="destructive" role="alert">
               <AlertDescription>{error}</AlertDescription>
             </Alert>
           )}
           
           {success && (
-            <Alert>
+            <Alert role="status">
               <AlertDescription>{success}</AlertDescription>
             </Alert>
           )}
@@ -129,7 +150,10 @@ export default function SignUpForm() {
               value={formData.username}
               onChange={handleInputChange}
               required
+              aria-invalid={!!fieldErrors.username || undefined}
+              aria-describedby={fieldErrors.username ? 'username-error' : undefined}
             />
+            {fieldErrors.username && <p id="username-error" className="text-sm text-red-600">{fieldErrors.username}</p>}
           </div>
           
           <div className="space-y-2">
@@ -142,7 +166,10 @@ export default function SignUpForm() {
               value={formData.email}
               onChange={handleInputChange}
               required
+              aria-invalid={!!fieldErrors.email || undefined}
+              aria-describedby={fieldErrors.email ? 'email-error' : undefined}
             />
+            {fieldErrors.email && <p id="email-error" className="text-sm text-red-600">{fieldErrors.email}</p>}
           </div>
           
           <div className="space-y-2">
@@ -155,7 +182,10 @@ export default function SignUpForm() {
               value={formData.password}
               onChange={handleInputChange}
               required
+              aria-invalid={!!fieldErrors.password || undefined}
+              aria-describedby={fieldErrors.password ? 'password-error' : undefined}
             />
+            {fieldErrors.password && <p id="password-error" className="text-sm text-red-600">{fieldErrors.password}</p>}
           </div>
           
           <div className="space-y-2">
@@ -168,7 +198,10 @@ export default function SignUpForm() {
               value={formData.confirmPassword}
               onChange={handleInputChange}
               required
+              aria-invalid={!!fieldErrors.confirmPassword || undefined}
+              aria-describedby={fieldErrors.confirmPassword ? 'confirmPassword-error' : undefined}
             />
+            {fieldErrors.confirmPassword && <p id="confirmPassword-error" className="text-sm text-red-600">{fieldErrors.confirmPassword}</p>}
           </div>
           
           <Button type="submit" className="w-full" disabled={isLoading}>

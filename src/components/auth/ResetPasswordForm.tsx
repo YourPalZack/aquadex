@@ -18,6 +18,8 @@ export default function ResetPasswordForm() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
   const [success, setSuccess] = useState(false)
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
+  const [srMessage, setSrMessage] = useState("")
   
   const { updatePassword } = useAuth()
   const router = useRouter()
@@ -45,27 +47,39 @@ export default function ResetPasswordForm() {
     e.preventDefault()
     setIsLoading(true)
     setError("")
+    setFieldErrors({})
 
     // Validation
     if (!formData.password || !formData.confirmPassword) {
       setError("Please fill in all fields")
+      const errs: Record<string, string> = {}
+      if (!formData.password) errs.password = 'New password is required'
+      if (!formData.confirmPassword) errs.confirmPassword = 'Please confirm your new password'
+      setFieldErrors(errs)
+      const first = Object.keys(errs)[0]
+      if (first) document.getElementById(first)?.focus()
       setIsLoading(false)
       return
     }
 
     if (formData.password.length < 6) {
       setError("Password must be at least 6 characters long")
+      setFieldErrors(prev => ({ ...prev, password: 'Password must be at least 6 characters' }))
+      document.getElementById('password')?.focus()
       setIsLoading(false)
       return
     }
 
     if (formData.password !== formData.confirmPassword) {
       setError("Passwords do not match")
+      setFieldErrors(prev => ({ ...prev, confirmPassword: 'Passwords do not match' }))
+      document.getElementById('confirmPassword')?.focus()
       setIsLoading(false)
       return
     }
 
     try {
+      setSrMessage('Resetting your password…')
       await updatePassword(formData.password)
       setSuccess(true)
       
@@ -86,6 +100,7 @@ export default function ResetPasswordForm() {
       } else {
         setError("Failed to reset password. Please try again or request a new reset link.")
       }
+      setSrMessage('Failed to reset password.')
     } finally {
       setIsLoading(false)
     }
@@ -128,9 +143,10 @@ export default function ResetPasswordForm() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4" aria-busy={isLoading || undefined} noValidate>
+          <p className="sr-only" aria-live="polite" role="status">{srMessage}</p>
           {error && (
-            <Alert variant="destructive">
+            <Alert variant="destructive" role="alert">
               <AlertDescription>{error}</AlertDescription>
             </Alert>
           )}
@@ -145,7 +161,10 @@ export default function ResetPasswordForm() {
               value={formData.password}
               onChange={handleInputChange}
               required
+              aria-invalid={!!fieldErrors.password || undefined}
+              aria-describedby={fieldErrors.password ? 'password-error' : undefined}
             />
+            {fieldErrors.password && <p id="password-error" className="text-sm text-red-600">{fieldErrors.password}</p>}
           </div>
           
           <div className="space-y-2">
@@ -158,7 +177,10 @@ export default function ResetPasswordForm() {
               value={formData.confirmPassword}
               onChange={handleInputChange}
               required
+              aria-invalid={!!fieldErrors.confirmPassword || undefined}
+              aria-describedby={fieldErrors.confirmPassword ? 'confirmPassword-error' : undefined}
             />
+            {fieldErrors.confirmPassword && <p id="confirmPassword-error" className="text-sm text-red-600">{fieldErrors.confirmPassword}</p>}
           </div>
           
           <Button type="submit" className="w-full" disabled={isLoading}>

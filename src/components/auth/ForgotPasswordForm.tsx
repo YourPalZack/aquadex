@@ -14,6 +14,8 @@ export default function ForgotPasswordForm() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
   const [success, setSuccess] = useState(false)
+  const [emailError, setEmailError] = useState<string | null>(null)
+  const [srMessage, setSrMessage] = useState("")
   
   const { resetPassword } = useAuth()
 
@@ -21,21 +23,27 @@ export default function ForgotPasswordForm() {
     e.preventDefault()
     setIsLoading(true)
     setError("")
+    setEmailError(null)
 
     // Basic validation
     if (!email) {
       setError("Please enter your email address")
+      setEmailError('Email is required')
+      document.getElementById('email')?.focus()
       setIsLoading(false)
       return
     }
 
     if (!email.includes("@")) {
       setError("Please enter a valid email address")
+      setEmailError('Please enter a valid email address')
+      document.getElementById('email')?.focus()
       setIsLoading(false)
       return
     }
 
     try {
+      setSrMessage('Sending password reset link…')
       await resetPassword(email)
       setSuccess(true)
     } catch (err: any) {
@@ -49,6 +57,7 @@ export default function ForgotPasswordForm() {
       } else {
         setError("Failed to send reset email. Please try again.")
       }
+      setSrMessage('Failed to send reset email.')
     } finally {
       setIsLoading(false)
     }
@@ -101,9 +110,10 @@ export default function ForgotPasswordForm() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4" aria-busy={isLoading || undefined} noValidate>
+          <p className="sr-only" aria-live="polite" role="status">{srMessage}</p>
           {error && (
-            <Alert variant="destructive">
+            <Alert variant="destructive" role="alert">
               <AlertDescription>{error}</AlertDescription>
             </Alert>
           )}
@@ -117,7 +127,10 @@ export default function ForgotPasswordForm() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
+              aria-invalid={!!emailError || undefined}
+              aria-describedby={emailError ? 'email-error' : undefined}
             />
+            {emailError && <p id="email-error" className="text-sm text-red-600">{emailError}</p>}
           </div>
           
           <Button type="submit" className="w-full" disabled={isLoading}>
