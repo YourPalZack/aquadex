@@ -17,6 +17,7 @@ export interface StoreCardProps {
     categories: string[];
     gallery_images: string[] | null;
     verification_status?: string;
+    distance_miles?: number | null;
   };
 }
 
@@ -44,9 +45,14 @@ export function StoreCard({ store }: StoreCardProps) {
             {store.business_name}
           </CardTitle>
         </Link>
-        <CardDescription className="flex items-center text-sm pt-1">
+        <CardDescription className="flex items-center text-sm pt-1 gap-2 flex-wrap">
           <MapPin className="h-4 w-4 mr-1.5 text-muted-foreground" />
-          {store.city}, {store.state} {store.zip}
+          <span>
+            {store.city}, {store.state} {store.zip}
+          </span>
+          {typeof store.distance_miles === 'number' && !Number.isNaN(store.distance_miles) && (
+            <span className="text-muted-foreground/80">• {store.distance_miles.toFixed(1)} mi</span>
+          )}
         </CardDescription>
       </CardHeader>
 

@@ -35,6 +35,7 @@ async function DirectoryContent({ searchParams }: { searchParams: SearchParams }
   const hasMore = result.success ? (result as any).data.has_more : false;
   const showingStart = stores.length > 0 ? offset + 1 : 0;
   const showingEnd = offset + stores.length;
+  const hasLocation = !isNaN(lat) && !isNaN(lng);
 
   return (
     <div className="space-y-6">
@@ -65,6 +66,9 @@ async function DirectoryContent({ searchParams }: { searchParams: SearchParams }
             <span>No results</span>
           )}
         </div>
+        {hasLocation && (
+          <div className="text-xs text-muted-foreground/80">Distances shown from your location</div>
+        )}
       </div>
 
       {stores.length > 0 ? (
