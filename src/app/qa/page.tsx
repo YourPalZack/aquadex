@@ -19,6 +19,8 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
+import { Breadcrumbs } from '@/components/shared/Breadcrumbs';
+import { EmptyState } from '@/components/shared/EmptyState';
 
 const mockUsers: UserProfile[] = [
   { id: 'user1', name: 'Alice Aqua', avatarUrl: 'https://placehold.co/40x40.png?text=AA&bg=22c55e&fc=ffffff' , dataAiHint: 'female avatar' },
@@ -137,6 +139,14 @@ export default function QAPage() {
 
   return (
     <div className="container mx-auto py-8">
+      <h1 className="sr-only">Community Q&amp;A</h1>
+      <Breadcrumbs
+        items={[
+          { label: 'Home', href: '/' },
+          { label: 'Q&A' },
+        ]}
+        className="mb-4"
+      />
       <Card className="mb-8 bg-primary/10 border-primary/30">
         <CardHeader>
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -192,15 +202,16 @@ export default function QAPage() {
           ))}
         </div>
       ) : (
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-center text-muted-foreground py-10">
-              <Search className="w-16 h-16 mx-auto mb-4 opacity-50" />
-              <p className="text-xl font-semibold mb-2">No Questions Found</p>
-              <p>No questions match your search criteria. Try broadening your search or ask a new question!</p>
-            </div>
-          </CardContent>
-        </Card>
+        <EmptyState
+          title="No Questions Found"
+          description="Try broadening your search or ask a new question!"
+          icon={<Search className="w-10 h-10" />}
+          action={(
+            <Button size="sm" onClick={() => setIsFormOpen(true)}>
+              <MessageSquarePlus className="w-4 h-4 mr-2" /> Ask a Question
+            </Button>
+          )}
+        />
       )}
 
       <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>

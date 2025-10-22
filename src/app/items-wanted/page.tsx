@@ -18,6 +18,8 @@ import {
 } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 import { Input } from '@/components/ui/input';
+import { Breadcrumbs } from '@/components/shared/Breadcrumbs';
+import { EmptyState } from '@/components/shared/EmptyState';
 
 // Mock user data (replace with actual user data if available)
 const mockUsers: UserProfile[] = [
@@ -114,6 +116,14 @@ export default function ItemsWantedPage() {
 
   return (
     <div className="container mx-auto py-8">
+      <h1 className="sr-only">Items Wanted</h1>
+      <Breadcrumbs
+        items={[
+          { label: 'Home', href: '/' },
+          { label: 'Items Wanted' },
+        ]}
+        className="mb-4"
+      />
       <Card className="mb-8 bg-primary/10 border-primary/30 shadow-md">
         <CardHeader>
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -153,20 +163,20 @@ export default function ItemsWantedPage() {
           ))}
         </div>
       ) : (
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-center text-muted-foreground py-10">
-              <Search className="w-16 h-16 mx-auto mb-4 opacity-50" />
-              <p className="text-xl font-semibold mb-2">No Wanted Items Found</p>
-              <p>
-                {searchTerm 
-                    ? `No items match your search "${searchTerm}".`
-                    : "There are currently no approved 'wanted' items listed. Be the first to post one!"
-                }
-              </p>
-            </div>
-          </CardContent>
-        </Card>
+        <EmptyState
+          title="No Wanted Items Found"
+          description={
+            searchTerm
+              ? `No items match your search "${searchTerm}".`
+              : "There are currently no approved 'wanted' items listed. Be the first to post one!"
+          }
+          icon={<Search className="w-10 h-10" />}
+          action={(
+            <Button size="sm" onClick={() => setIsFormOpen(true)}>
+              <PlusCircle className="w-4 h-4 mr-2" /> Post an Item Wanted
+            </Button>
+          )}
+        />
       )}
 
       <Alert variant="default" className="mt-8 bg-muted/50 border-border">

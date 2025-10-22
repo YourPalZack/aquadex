@@ -10,6 +10,8 @@ import { Button } from '@/components/ui/button';
 import { ShoppingCart, PlusCircle, Tag, Edit, Search, Fish, Leaf, Package as PackageIcon, HardHat } from 'lucide-react';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
+import { Breadcrumbs } from '@/components/shared/Breadcrumbs';
+import { EmptyState } from '@/components/shared/EmptyState';
 
 // Mock Data for listings - categories data is now imported
 export const mockMarketplaceListingsData: MarketplaceListing[] = [
@@ -105,6 +107,14 @@ export default function MarketplacePage() {
 
   return (
     <div className="container mx-auto py-8">
+      <h1 className="sr-only">AquaDex Marketplace</h1>
+      <Breadcrumbs
+        items={[
+          { label: 'Home', href: '/' },
+          { label: 'Marketplace' },
+        ]}
+        className="mb-4"
+      />
       <Card className="mb-8 bg-primary/10 border-primary/30 shadow-md">
         <CardHeader>
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -145,18 +155,28 @@ export default function MarketplacePage() {
         </div>
       </section>
 
-      {featuredListings.length > 0 && (
+      {featuredListings.length > 0 ? (
         <section>
-            <h2 className="text-2xl font-semibold mb-6 flex items-center">
-                <Search className="w-6 h-6 mr-2 text-primary" />
-                Featured Listings
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {featuredListings.map(listing => (
-                    <MarketplaceListingCard key={listing.id} listing={listing} />
-                ))}
-            </div>
+          <h2 className="text-2xl font-semibold mb-6 flex items-center">
+            <Search className="w-6 h-6 mr-2 text-primary" />
+            Featured Listings
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {featuredListings.map((listing) => (
+              <MarketplaceListingCard key={listing.id} listing={listing} />
+            ))}
+          </div>
         </section>
+      ) : (
+        <EmptyState
+          title="No Featured Listings"
+          description="Check back soon, or browse categories below to find items that interest you."
+          action={(
+            <Button asChild variant="outline" size="sm">
+              <Link href="/marketplace/apply-to-sell">Become a Seller</Link>
+            </Button>
+          )}
+        />
       )}
 
       <Card className="mt-12 bg-accent/20 border-accent/30">
