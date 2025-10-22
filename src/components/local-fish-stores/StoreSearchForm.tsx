@@ -9,9 +9,10 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
 import { MapPin, Search } from 'lucide-react';
 
+const storeCategories = ['freshwater','saltwater','plants','reptiles','general'] as const;
 const searchSchema = z.object({
   q: z.string().optional(),
-  categories: z.array(z.enum(['freshwater','saltwater','plants','reptiles','general'])).optional(),
+  categories: z.array(z.enum(storeCategories)).optional(),
   radius: z.number().min(1).max(250).optional(),
   latitude: z.number().optional(),
   longitude: z.number().optional(),
@@ -51,7 +52,7 @@ export function StoreSearchForm({ defaultValues, onSearch }: StoreSearchFormProp
   const handleUseLocation = () => {
     if (!navigator.geolocation) return;
     navigator.geolocation.getCurrentPosition((pos) => {
-      setValues((v) => ({ ...v, latitude: pos.coords.latitude, longitude: pos.coords.longitude }));
+      setValues((v) => ({ ...v, latitude: pos.coords.latitude, longitude: pos.coords.longitude, radius: v.radius ?? 25 }));
     });
   };
 
@@ -73,7 +74,7 @@ export function StoreSearchForm({ defaultValues, onSearch }: StoreSearchFormProp
       params.set('lat', String(parsed.data.latitude));
       params.set('lng', String(parsed.data.longitude));
     }
-    if (parsed.data.radius) params.set('radius', String(parsed.data.radius));
+    if (parsed.data.radius && parsed.data.latitude && parsed.data.longitude) params.set('radius', String(parsed.data.radius));
   if (parsed.data.pageSize) params.set('pageSize', String(parsed.data.pageSize));
   if (parsed.data.sortBy) params.set('sort', parsed.data.sortBy);
     // Reset to first page on new search
@@ -116,7 +117,7 @@ export function StoreSearchForm({ defaultValues, onSearch }: StoreSearchFormProp
           <div>
             <Label htmlFor="radius">Radius (mi)</Label>
             <div className="flex gap-2">
-              <Input id="radius" type="number" min={1} max={250} value={values.radius ?? ''} onChange={(e) => setValues({ ...values, radius: e.target.value ? Number(e.target.value) : undefined })} className="w-24" />
+              <Input id="radius" type="number" min={1} max={250} value={values.radius ?? ''} onChange={(e) => setValues({ ...values, radius: e.target.value ? Number(e.target.value) : undefined })} className="w-24" disabled={values.latitude == null || values.longitude == null} />
               <Button type="button" variant="outline" onClick={handleUseLocation}>
                 <MapPin className="h-4 w-4 mr-2" /> Use location
               </Button>
@@ -143,6 +144,16 @@ export function StoreSearchForm({ defaultValues, onSearch }: StoreSearchFormProp
               <MapPin className="h-4 w-4 mr-2" /> Reset location
             </Button>
             <Button type="submit">Search</Button>
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => {
+                setValues({ q: '', categories: [], radius: undefined, latitude: undefined, longitude: undefined, pageSize: 24, sortBy: 'latest' });
+                router.push(pathname);
+              }}
+            >
+              Reset all
+            </Button>
           </div>
         </form>
       </CardContent>

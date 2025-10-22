@@ -595,6 +595,11 @@ export async function searchStoresAction(params: SimpleSearchParams) {
       return { ...s, distance_miles };
     });
 
+    // Temporary: apply radius filter client-side on current page until PostGIS is enabled
+    if (hasUserCoords && typeof params.radius === 'number') {
+      storesWithDistance = storesWithDistance.filter((s: any) => typeof s.distance_miles === 'number' && (s.distance_miles as number) <= (params.radius as number));
+    }
+
     // Optional sort by nearest for current page results
     if (params.sort_by === 'nearest' && hasUserCoords) {
       storesWithDistance = storesWithDistance.sort((a: any, b: any) => {
