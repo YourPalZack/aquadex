@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { ArrowLeft, MapPin, Phone, Globe, ShieldCheck, Building } from 'lucide-react';
+import { Breadcrumbs } from '@/components/shared/Breadcrumbs';
 
 export default async function LocalFishStoreProfilePage({ params }: { params: { storeSlug: string } }) {
   const slug = params.storeSlug;
@@ -36,6 +37,14 @@ export default async function LocalFishStoreProfilePage({ params }: { params: { 
 
   return (
     <div className="container mx-auto py-8 space-y-8">
+      <Breadcrumbs
+        className="mb-2"
+        items={[
+          { label: 'Home', href: '/' },
+          { label: 'Local Fish Stores', href: '/local-fish-stores' },
+          { label: store.business_name },
+        ]}
+      />
       <div>
         <Button variant="outline" asChild className="mb-6 shadow-sm">
           <Link href="/local-fish-stores">

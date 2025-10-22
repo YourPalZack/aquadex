@@ -7,6 +7,8 @@ import { Info, Store } from 'lucide-react';
 import { StoreSearchForm, StoreCard, StoreMap } from '@/components/local-fish-stores';
 import type { StoreListItem } from '@/types/store';
 import { searchStoresAction } from '@/lib/actions/store-supabase';
+import { EmptyState } from '@/components/shared/EmptyState';
+import { Breadcrumbs } from '@/components/shared/Breadcrumbs';
 
 type SearchParams = { [key: string]: string | string[] | undefined };
 
@@ -49,6 +51,12 @@ async function DirectoryContent({ searchParams }: { searchParams: SearchParams }
 
   return (
     <div className="space-y-6">
+      <Breadcrumbs
+        items={[
+          { label: 'Home', href: '/' },
+          { label: 'Local Fish Stores' },
+        ]}
+      />
       <Card className="bg-primary/10 border-primary/30 shadow-md">
         <CardHeader>
           <CardTitle className="text-3xl flex items-center text-primary">
@@ -187,15 +195,23 @@ async function DirectoryContent({ searchParams }: { searchParams: SearchParams }
           ))}
         </div>
       ) : (
-        <Card>
-          <CardContent className="pt-6 text-center text-muted-foreground py-10">
-            <Info className="w-12 h-12 mx-auto mb-3 opacity-50" />
-            <p className="text-xl font-semibold mb-2">No Stores Found</p>
-            <p>
-              There are currently no stores to display. Once your database is configured, results will appear here.
-            </p>
-          </CardContent>
-        </Card>
+        <EmptyState
+          title="No Stores Found"
+          description={
+            hasLocation
+              ? 'Try widening your radius, removing filters, or searching by city or state.'
+              : 'Try adding a location, removing filters, or searching by city or state.'
+          }
+          icon={<Info className="w-10 h-10" />}
+          action={(
+            <Link
+              className="px-3 py-2 rounded border bg-background hover:bg-muted text-sm"
+              href="/local-fish-stores"
+            >
+              Clear all filters
+            </Link>
+          )}
+        />
       )}
 
       {total > limit && (
