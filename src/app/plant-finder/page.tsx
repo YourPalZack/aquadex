@@ -11,6 +11,8 @@ import type { FindPlantActionState } from '@/lib/actions';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
+import { Breadcrumbs } from '@/components/shared/Breadcrumbs';
+import { EmptyState } from '@/components/shared/EmptyState';
 
 export default function PlantFinderPage() {
   const [searchResults, setSearchResults] = useState<PlantListing[] | null>(null);
@@ -40,6 +42,14 @@ export default function PlantFinderPage() {
 
   return (
     <div className="container mx-auto py-8">
+      <h1 className="sr-only">Aquatic Plant Finder</h1>
+      <Breadcrumbs
+        items={[
+          { label: 'Home', href: '/' },
+          { label: 'Plant Finder' },
+        ]}
+        className="mb-4"
+      />
       <Card className="mb-8 bg-primary/10 border-primary/30 shadow-md">
         <CardHeader>
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -90,12 +100,11 @@ export default function PlantFinderPage() {
       )}
 
       {searchResults === null && !isLoading && !aiMessage && (
-         <Card className="mt-8">
-            <CardContent className="pt-6 text-center text-muted-foreground">
-                <Search className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                <p>Enter a plant species name above to start your search.</p>
-            </CardContent>
-        </Card>
+        <EmptyState
+          title="Start Your Search"
+          description="Enter a plant species name above to find listings."
+          icon={<Search className="w-10 h-10" />}
+        />
       )}
     </div>
   );
