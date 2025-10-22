@@ -29,6 +29,8 @@ async function DirectoryContent({ searchParams }: { searchParams: SearchParams }
   const stores = result.success ? (result as any).data.stores : [];
   const total = result.success ? (result as any).data.total_count : 0;
   const hasMore = result.success ? (result as any).data.has_more : false;
+  const showingStart = stores.length > 0 ? offset + 1 : 0;
+  const showingEnd = offset + stores.length;
 
   return (
     <div className="space-y-6">
@@ -50,6 +52,16 @@ async function DirectoryContent({ searchParams }: { searchParams: SearchParams }
       />
 
       <StoreMap stores={stores as any} />
+
+      <div className="flex items-center justify-between text-sm text-muted-foreground">
+        <div>
+          {total > 0 ? (
+            <span>Showing {showingStart}-{showingEnd} of {total} stores</span>
+          ) : (
+            <span>No results</span>
+          )}
+        </div>
+      </div>
 
       {stores.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
