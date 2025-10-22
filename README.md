@@ -41,6 +41,7 @@ Visit [http://localhost:3000](http://localhost:3000) to see the application.
 - **[Environment Variables](./.env.local.example)** - Required configuration
 - **[Database Schema](./database/schema.sql)** - PostgreSQL setup
 - **[Storage Setup](./database/storage-buckets.sql)** - Supabase storage configuration
+ - **[Local Fish Store Directory: Pre-Production Checklist](./docs/PREPROD_CHECKLIST.md)** - Go-live tasks for the directory feature
 
 ### Feature Documentation
 - **[Backend Integration Complete](./docs/BACKEND_INTEGRATION_COMPLETE.md)** - Implementation summary
