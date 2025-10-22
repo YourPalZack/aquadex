@@ -28,8 +28,11 @@ async function DirectoryContent({ searchParams }: { searchParams: SearchParams }
   const radius = Number(searchParams.radius ?? '');
   const lat = Number(searchParams.lat ?? '');
   const lng = Number(searchParams.lng ?? '');
+  const sort = typeof searchParams.sort === 'string' && (searchParams.sort === 'nearest' || searchParams.sort === 'latest')
+    ? searchParams.sort
+    : 'latest';
 
-  const result = await searchStoresAction({ q, categories: filteredCategories, limit, offset, lat: isNaN(lat) ? undefined : lat, lng: isNaN(lng) ? undefined : lng, radius: isNaN(radius) ? undefined : radius });
+  const result = await searchStoresAction({ q, categories: filteredCategories, limit, offset, lat: isNaN(lat) ? undefined : lat, lng: isNaN(lng) ? undefined : lng, radius: isNaN(radius) ? undefined : radius, sort_by: sort as any });
   const stores = result.success ? (result as any).data.stores : [];
   const total = result.success ? (result as any).data.total_count : 0;
   const hasMore = result.success ? (result as any).data.has_more : false;
@@ -59,6 +62,7 @@ async function DirectoryContent({ searchParams }: { searchParams: SearchParams }
           latitude: isNaN(lat) ? undefined : lat,
           longitude: isNaN(lng) ? undefined : lng,
           pageSize: limit,
+          sortBy: sort as any,
         }}
         onSearch={() => { /* navigation handled inside form via router.push */ }}
       />
@@ -111,6 +115,7 @@ async function DirectoryContent({ searchParams }: { searchParams: SearchParams }
                 if (filteredCategories.length) params.set('categories', filteredCategories.join(','));
                 if (!isNaN(radius)) params.set('radius', String(radius));
                 if (limit) params.set('pageSize', String(limit));
+                if (sort) params.set('sort', sort);
                 params.set('page', String(page - 1));
                 return `/local-fish-stores?${params.toString()}`;
               })()}
@@ -133,6 +138,7 @@ async function DirectoryContent({ searchParams }: { searchParams: SearchParams }
                 if (filteredCategories.length) params.set('categories', filteredCategories.join(','));
                 if (!isNaN(radius)) params.set('radius', String(radius));
                 if (limit) params.set('pageSize', String(limit));
+                if (sort) params.set('sort', sort);
                 params.set('page', String(page + 1));
                 return `/local-fish-stores?${params.toString()}`;
               })()}

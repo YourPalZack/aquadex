@@ -544,6 +544,7 @@ export interface SimpleSearchParams {
   lat?: number;
   lng?: number;
   radius?: number; // miles (UI only for now)
+  sort_by?: 'latest' | 'nearest';
 }
 
 export async function searchStoresAction(params: SimpleSearchParams) {
@@ -586,13 +587,22 @@ export async function searchStoresAction(params: SimpleSearchParams) {
 
     // Compute distance if user coordinates are provided
     const hasUserCoords = typeof params.lat === 'number' && typeof params.lng === 'number';
-    const storesWithDistance = (data || []).map((s: any) => {
+    let storesWithDistance = (data || []).map((s: any) => {
       let distance_miles: number | null = null;
       if (hasUserCoords && typeof s.latitude === 'number' && typeof s.longitude === 'number') {
         distance_miles = haversineMiles(params.lat as number, params.lng as number, s.latitude, s.longitude);
       }
       return { ...s, distance_miles };
     });
+
+    // Optional sort by nearest for current page results
+    if (params.sort_by === 'nearest' && hasUserCoords) {
+      storesWithDistance = storesWithDistance.sort((a: any, b: any) => {
+        const da = typeof a.distance_miles === 'number' ? a.distance_miles : Number.POSITIVE_INFINITY;
+        const db = typeof b.distance_miles === 'number' ? b.distance_miles : Number.POSITIVE_INFINITY;
+        return da - db;
+      });
+    }
 
     return {
       success: true,

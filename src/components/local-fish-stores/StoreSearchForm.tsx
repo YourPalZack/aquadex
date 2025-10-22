@@ -16,6 +16,7 @@ const searchSchema = z.object({
   latitude: z.number().optional(),
   longitude: z.number().optional(),
   pageSize: z.number().min(6).max(60).optional(),
+  sortBy: z.enum(['latest','nearest']).optional(),
 });
 
 export type StoreSearchValues = z.infer<typeof searchSchema>;
@@ -35,6 +36,7 @@ export function StoreSearchForm({ defaultValues, onSearch }: StoreSearchFormProp
     latitude: defaultValues?.latitude,
     longitude: defaultValues?.longitude,
     pageSize: defaultValues?.pageSize || 24,
+    sortBy: defaultValues?.sortBy || 'latest',
   });
 
   type Cat = 'freshwater'|'saltwater'|'plants'|'reptiles'|'general';
@@ -68,7 +70,8 @@ export function StoreSearchForm({ defaultValues, onSearch }: StoreSearchFormProp
       params.set('lng', String(parsed.data.longitude));
     }
     if (parsed.data.radius) params.set('radius', String(parsed.data.radius));
-    if (parsed.data.pageSize) params.set('pageSize', String(parsed.data.pageSize));
+  if (parsed.data.pageSize) params.set('pageSize', String(parsed.data.pageSize));
+  if (parsed.data.sortBy) params.set('sort', parsed.data.sortBy);
     // Reset to first page on new search
     params.set('page', '1');
     router.push(`${pathname}?${params.toString()}`);
@@ -85,7 +88,7 @@ export function StoreSearchForm({ defaultValues, onSearch }: StoreSearchFormProp
   return (
     <Card>
       <CardContent className="p-4">
-        <form onSubmit={submit} className="grid gap-3 md:grid-cols-5 items-end">
+  <form onSubmit={submit} className="grid gap-3 md:grid-cols-6 items-end">
           <div className="md:col-span-2">
             <Label htmlFor="q">Search</Label>
             <div className="relative">
@@ -116,13 +119,20 @@ export function StoreSearchForm({ defaultValues, onSearch }: StoreSearchFormProp
             </div>
           </div>
 
-          <div className="flex gap-2 items-end">
+          <div className="flex gap-2 items-end col-span-2 md:col-span-2">
             <div>
               <Label htmlFor="pageSize">Per page</Label>
               <select id="pageSize" className="border rounded h-9 px-2" value={values.pageSize} onChange={(e) => setValues({ ...values, pageSize: Number(e.target.value) })}>
                 {[12,24,36,48].map((n) => (
                   <option key={n} value={n}>{n}</option>
                 ))}
+              </select>
+            </div>
+            <div>
+              <Label htmlFor="sortBy">Sort</Label>
+              <select id="sortBy" className="border rounded h-9 px-2" value={values.sortBy} onChange={(e) => setValues({ ...values, sortBy: e.target.value as 'latest'|'nearest' })}>
+                <option value="latest">Latest</option>
+                <option value="nearest">Nearest</option>
               </select>
             </div>
             <Button type="button" variant="outline" onClick={handleUseLocation}>
