@@ -55,6 +55,10 @@ export function StoreSearchForm({ defaultValues, onSearch }: StoreSearchFormProp
     });
   };
 
+  const handleResetLocation = () => {
+    setValues((v) => ({ ...v, latitude: undefined, longitude: undefined, radius: undefined }));
+  };
+
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
     const parsed = searchSchema.safeParse(values);
@@ -135,8 +139,8 @@ export function StoreSearchForm({ defaultValues, onSearch }: StoreSearchFormProp
                 <option value="nearest">Nearest</option>
               </select>
             </div>
-            <Button type="button" variant="outline" onClick={handleUseLocation}>
-              <MapPin className="h-4 w-4 mr-2" /> Use location
+            <Button type="button" variant="outline" onClick={handleResetLocation}>
+              <MapPin className="h-4 w-4 mr-2" /> Reset location
             </Button>
             <Button type="submit">Search</Button>
           </div>

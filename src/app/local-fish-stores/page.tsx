@@ -39,6 +39,12 @@ async function DirectoryContent({ searchParams }: { searchParams: SearchParams }
   const showingStart = stores.length > 0 ? offset + 1 : 0;
   const showingEnd = offset + stores.length;
   const hasLocation = !isNaN(lat) && !isNaN(lng);
+  const activeFiltersCount = (
+    (q ? 1 : 0) +
+    (filteredCategories.length) +
+    (hasLocation ? 1 : 0) +
+    (!isNaN(radius) && hasLocation ? 1 : 0)
+  );
 
   return (
     <div className="space-y-6">
@@ -72,7 +78,7 @@ async function DirectoryContent({ searchParams }: { searchParams: SearchParams }
       {/* Active filters */}
       {(q || filteredCategories.length > 0 || (!isNaN(radius) && hasLocation) || hasLocation) && (
         <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-          <span className="font-semibold mr-1">Filters:</span>
+          <span className="font-semibold mr-1">Filters{activeFiltersCount ? ` (${activeFiltersCount})` : ''}:</span>
           {/* Query chip */}
           {q && (
             <Link
