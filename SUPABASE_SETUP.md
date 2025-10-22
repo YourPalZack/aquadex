@@ -134,3 +134,26 @@ Once setup is complete, you can:
 4. Ask questions in the Q&A section
 
 For help, check the [Supabase Documentation](https://supabase.com/docs) or the AquaDex project README.
+
+---
+
+## Automated migrations (alternative to manual SQL)
+
+If you prefer not to use the dashboard, you can apply the SQL migrations in `database/migrations` from your terminal.
+
+1. Ensure your `.env.local` contains a valid `DATABASE_URL` to your Supabase Postgres (or Neon) instance.
+2. Run the migration script:
+
+```bash
+npm run db:migrate
+```
+
+This will:
+- Create the `stores` and `deals` tables with PostGIS enabled
+- Add spatial indexes and helpful views
+- Create the RPC function `search_stores` for geospatial search with pagination and ordering
+- Create the public storage bucket `store-images` and basic policies
+
+Notes:
+- The script records applied files in a `migration_history` table and is safe to re-run.
+- The `search_stores` RPC is used automatically by the app when present; otherwise, the app falls back to a basic search.

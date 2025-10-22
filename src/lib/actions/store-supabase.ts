@@ -9,6 +9,7 @@ import { revalidatePath } from 'next/cache';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { geocodeAddress } from '@/lib/mapbox';
+import { mockStores } from '@/lib/mock/mock-stores';
 import type { StoreFormData } from '@/types/store';
 
 /**
@@ -549,6 +550,79 @@ export interface SimpleSearchParams {
 
 export async function searchStoresAction(params: SimpleSearchParams) {
   try {
+    // Mock mode: return filtered/paginated mock stores without DB
+    if (process.env.USE_MOCK_DATA === 'true') {
+      const limit = params.limit ?? 24;
+      const offset = params.offset ?? 0;
+      const q = (params.q || '').trim().toLowerCase();
+
+      // Filter
+      let filtered = mockStores.filter((s) => s.verification_status !== 'rejected' && (s.is_active ?? true));
+      if (q) {
+        filtered = filtered.filter((s) => {
+          const text = `${s.business_name} ${s.city} ${s.state} ${s.zip}`.toLowerCase();
+          return text.includes(q);
+        });
+      }
+      if (params.categories && params.categories.length) {
+        const set = new Set(params.categories);
+        filtered = filtered.filter((s) => s.categories.some((c) => set.has(c)));
+      }
+
+      // Compute distance from user if present
+      const hasUser = typeof params.lat === 'number' && typeof params.lng === 'number';
+      let withDistance = filtered.map((s) => {
+        const latitude = s.latitude ?? null;
+        const longitude = s.longitude ?? null;
+        let distance_miles: number | null = null;
+        if (hasUser && typeof latitude === 'number' && typeof longitude === 'number') {
+          distance_miles = haversineMiles(params.lat as number, params.lng as number, latitude, longitude);
+        }
+        return {
+          id: s.id,
+          slug: s.slug,
+          business_name: s.business_name,
+          city: s.city,
+          state: s.state,
+          zip: s.zip,
+          phone: s.phone ?? null,
+          website: s.website ?? null,
+          categories: s.categories,
+          gallery_images: s.gallery_images ?? [],
+          verification_status: s.verification_status ?? 'verified',
+          latitude,
+          longitude,
+          distance_miles,
+        };
+      });
+
+      // Apply radius if provided
+      if (hasUser && typeof params.radius === 'number') {
+        withDistance = withDistance.filter((s: any) => typeof s.distance_miles === 'number' && (s.distance_miles as number) <= (params.radius as number));
+      }
+
+      // Sort
+      if (params.sort_by === 'nearest' && hasUser) {
+        withDistance.sort((a: any, b: any) => (a.distance_miles ?? Infinity) - (b.distance_miles ?? Infinity));
+      } else {
+        // Stable order for mock: by name desc as a proxy for "latest"
+        withDistance.sort((a: any, b: any) => b.business_name.localeCompare(a.business_name));
+      }
+
+      // Pagination on filtered set
+      const total_count = withDistance.length;
+      const paged = withDistance.slice(offset, offset + limit);
+
+      return {
+        success: true,
+        data: {
+          stores: paged,
+          total_count,
+          has_more: total_count > offset + paged.length,
+        },
+      } as const;
+    }
+
     const supabase = await createServerSupabaseClient();
 
     const limit = params.limit ?? 24;
@@ -675,6 +749,44 @@ export async function searchStoresAction(params: SimpleSearchParams) {
  */
 export async function getStoreBySlugAction(slug: string) {
   try {
+    // Mock mode: find by slug
+    if (process.env.USE_MOCK_DATA === 'true') {
+      const s = mockStores.find((m) => m.slug === slug);
+      if (!s) return { success: false, error: 'Store not found' } as const;
+      return {
+        success: true,
+        data: {
+          id: s.id,
+          slug: s.slug,
+          business_name: s.business_name,
+          email: s.email ?? null,
+          phone: s.phone ?? null,
+          website: s.website ?? null,
+          description: s.description ?? null,
+          street: s.street ?? '123 Main Street',
+          city: s.city,
+          state: s.state,
+          zip: s.zip,
+          country: s.country ?? 'US',
+          business_hours: s.business_hours ?? {
+            monday: { open: '10:00', close: '19:00' },
+            tuesday: { open: '10:00', close: '19:00' },
+            wednesday: { open: '10:00', close: '19:00' },
+            thursday: { open: '10:00', close: '20:00' },
+            friday: { open: '10:00', close: '20:00' },
+            saturday: { open: '10:00', close: '18:00' },
+            sunday: { open: '12:00', close: '17:00' },
+          },
+          categories: s.categories,
+          gallery_images: s.gallery_images ?? [],
+          verification_status: s.verification_status ?? 'verified',
+          is_active: s.is_active ?? true,
+          latitude: s.latitude ?? null,
+          longitude: s.longitude ?? null,
+        },
+      } as const;
+    }
+
     const supabase = await createServerSupabaseClient();
 
     const { data, error } = await supabase

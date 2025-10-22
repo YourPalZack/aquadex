@@ -9,6 +9,7 @@
     "src/app/local-fish-stores/**/*",
     "src/components/local-fish-stores/**/*",
     "src/lib/actions/store-supabase.ts",
+    "src/lib/mock/**/*",
     "src/lib/mapbox.ts",
     "src/types/store.ts",
     "src/types/react-map-gl.d.ts"
