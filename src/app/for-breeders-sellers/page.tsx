@@ -2,6 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import Logo from "@/components/layout/Logo";
+import { Breadcrumbs } from "@/components/shared/Breadcrumbs";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, ShoppingCart, Award, HeartHandshake, ListPlus, MessageSquare, Users2 } from "lucide-react";
@@ -49,6 +50,15 @@ export default function ForBreedersSellersPage() {
       </header>
 
       <main className="flex-1">
+        {/* Breadcrumbs: keep visible H1 in hero; provide breadcrumb nav above */}
+        <div className="container mx-auto px-4 md:px-6 pt-4">
+          <Breadcrumbs
+            items={[
+              { label: 'Home', href: '/' },
+              { label: 'For Breeders & Sellers' },
+            ]}
+          />
+        </div>
         <section className="container mx-auto py-12 md:py-20 px-4 md:px-6 text-center">
           <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-primary mb-4">
             Reach More Aquarists. Sell Your Stock with AquaDex.

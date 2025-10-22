@@ -15,6 +15,7 @@ import {
   ArrowRight
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
+import { Breadcrumbs } from '@/components/shared/Breadcrumbs';
 
 interface ToolCardProps {
   icon: LucideIcon;
@@ -88,6 +89,14 @@ const aiTools = [
 export default function AIQuariumToolsPage() {
   return (
     <div className="container mx-auto py-8">
+      <h1 className="sr-only">AIQuarium Tools</h1>
+      <Breadcrumbs
+        items={[
+          { label: 'Home', href: '/' },
+          { label: 'AI Tools' },
+        ]}
+        className="mb-4"
+      />
       <Card className="mb-8 bg-primary/10 border-primary/30 shadow-md">
         <CardHeader>
           <CardTitle className="text-3xl flex items-center text-primary">
