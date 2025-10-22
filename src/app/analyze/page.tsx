@@ -14,6 +14,7 @@ import type { WaterParameter } from '@/types/aquarium';
 import { Card, CardDescription, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { FileScan, Sparkles } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { Breadcrumbs } from '@/components/shared/Breadcrumbs';
 
 function AnalyzePageContent() {
   const searchParams = useSearchParams();
@@ -96,6 +97,14 @@ function AnalyzePageContent() {
   return (
     <div className="container mx-auto py-8">
       <div className="space-y-8">
+        <h1 className="sr-only">Water Test Analyzer</h1>
+        <Breadcrumbs
+          items={[
+            { label: 'Home', href: '/' },
+            { label: 'Water Test' },
+          ]}
+          className="mb-2"
+        />
         <Card>
             <CardHeader>
                 <CardTitle className="text-3xl flex items-center">

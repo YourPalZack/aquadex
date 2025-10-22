@@ -11,12 +11,21 @@ import {
 } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
+import { Breadcrumbs } from '@/components/shared/Breadcrumbs';
 
 export default function ProfilePage() {
   const user = mockCurrentUser; // Using the mock current user
 
   return (
     <div className="container mx-auto py-8">
+      <h1 className="sr-only">Profile</h1>
+      <Breadcrumbs
+        items={[
+          { label: 'Home', href: '/' },
+          { label: 'Profile' },
+        ]}
+        className="mb-4"
+      />
       <Card className="max-w-4xl mx-auto shadow-xl">
         <CardHeader className="bg-primary/10 border-b border-primary/20">
           <div className="flex flex-col md:flex-row items-center gap-6">

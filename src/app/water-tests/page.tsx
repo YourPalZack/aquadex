@@ -6,10 +6,18 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Droplet, Loader2, Beaker, Plus, BarChart3 } from 'lucide-react';
 import Link from 'next/link';
+import { Breadcrumbs } from '@/components/shared/Breadcrumbs';
 
 export default async function WaterTestsPage() {
   return (
     <div className="container mx-auto py-8 px-4 max-w-6xl">
+      <Breadcrumbs
+        items={[
+          { label: 'Home', href: '/' },
+          { label: 'Water Tests' },
+        ]}
+        className="mb-4"
+      />
       {/* Header */}
       <div className="mb-8">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-4">

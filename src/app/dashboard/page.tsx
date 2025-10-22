@@ -16,6 +16,7 @@ import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
+import { Breadcrumbs } from '@/components/shared/Breadcrumbs';
 
 const ReminderStatus: React.FC<{ reminderDate?: Date; type: 'Water Change' | 'Feeding'; className?: string }> = ({ reminderDate, type, className }) => {
   if (!reminderDate) return null;
@@ -162,6 +163,14 @@ function DashboardContent() {
 
   return (
     <div className="container mx-auto py-8 px-2 sm:px-4 md:px-6 lg:px-8">
+      <h1 className="sr-only">Dashboard</h1>
+      <Breadcrumbs
+        items={[
+          { label: 'Home', href: '/' },
+          { label: 'Dashboard' },
+        ]}
+        className="mb-4"
+      />
       <div className="space-y-8">
         <Card className="bg-primary/10 border-primary/30">
           <CardHeader>
