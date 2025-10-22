@@ -51,6 +51,7 @@ async function DirectoryContent({ searchParams }: { searchParams: SearchParams }
 
   return (
     <div className="space-y-6">
+      <h1 className="sr-only">Local Fish Stores</h1>
       <Breadcrumbs
         items={[
           { label: 'Home', href: '/' },
@@ -290,12 +291,29 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
     ? `Browse aquarium stores${q ? ` matching “${q}”` : ''}${cats.length ? ` in ${cats.join(', ')}` : ''}.`
     : 'Find aquarium stores near you. Search by name, city, state, zip, and specialties.';
 
+  // Build canonical URL for this search state
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+  const url = new URL('/local-fish-stores', baseUrl);
+  const params = new URLSearchParams();
+  if (q) params.set('q', q);
+  if (cats.length) params.set('categories', cats.join(','));
+  if (typeof searchParams.pageSize === 'string') params.set('pageSize', searchParams.pageSize);
+  if (typeof searchParams.lat === 'string') params.set('lat', searchParams.lat);
+  if (typeof searchParams.lng === 'string') params.set('lng', searchParams.lng);
+  if (typeof searchParams.radius === 'string') params.set('radius', searchParams.radius);
+  if (typeof searchParams.sort === 'string') params.set('sort', searchParams.sort);
+  if (page > 1) params.set('page', String(page));
+  const qs = params.toString();
+  if (qs) url.search = qs;
+
   return {
     title,
     description,
+    alternates: { canonical: url.toString() },
     openGraph: {
       title,
       description,
+      url: url.toString(),
       type: 'website',
     },
     twitter: {

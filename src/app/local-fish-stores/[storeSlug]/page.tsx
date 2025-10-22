@@ -45,6 +45,7 @@ export default async function LocalFishStoreProfilePage({ params }: { params: { 
           { label: store.business_name },
         ]}
       />
+      <h1 className="sr-only">{store.business_name}</h1>
       <div>
         <Button variant="outline" asChild className="mb-6 shadow-sm">
           <Link href="/local-fish-stores">
@@ -138,12 +139,16 @@ export async function generateMetadata({ params }: { params: { storeSlug: string
   const store: any = result.data;
   const title = `${store.business_name} · ${store.city}, ${store.state}`;
   const description = store.description?.slice(0, 160) || `View ${store.business_name} in ${store.city}, ${store.state}.`;
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+  const canonical = new URL(`/local-fish-stores/${slug}`, baseUrl).toString();
   return {
     title,
     description,
+    alternates: { canonical },
     openGraph: {
       title,
       description,
+      url: canonical,
       type: 'article',
     },
     twitter: {
