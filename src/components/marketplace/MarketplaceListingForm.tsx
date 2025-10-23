@@ -30,7 +30,7 @@ import {
     type MarketplaceItemCondition
 } from '@/types';
 import { Loader2 } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 const listingFormSchema = z.object({
   title: z.string().min(5, { message: 'Title must be at least 5 characters.' }).max(100, { message: 'Title cannot exceed 100 characters.' }),
@@ -54,6 +54,9 @@ interface MarketplaceListingFormProps {
 
 export default function MarketplaceListingForm({ onSubmit, onCancel, isLoading: parentIsLoading, defaultValues }: MarketplaceListingFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [liveMessage, setLiveMessage] = useState<string>('');
+  const errorSummaryRef = useRef<HTMLDivElement | null>(null);
+  const [errorList, setErrorList] = useState<Array<{ name: keyof MarketplaceListingFormValues; message: string }>>([]);
   
   const form = useForm<MarketplaceListingFormValues>({
     resolver: zodResolver(listingFormSchema),
@@ -72,10 +75,60 @@ export default function MarketplaceListingForm({ onSubmit, onCancel, isLoading: 
 
   const handleSubmit = async (values: MarketplaceListingFormValues) => {
     setIsSubmitting(true);
+    setLiveMessage('Submitting your listing...');
     await onSubmit(values);
     setIsSubmitting(false);
+    setLiveMessage('Listing submitted successfully.');
     // form.reset(); // Parent component will handle redirection/toast, so reset might not be needed here.
   };
+
+  const handleError = (errors: Parameters<ReturnType<typeof form.handleSubmit>>[1]) => {
+    // Build a flat error list and focus the first invalid field
+    const entries = Object.entries(form.formState.errors) as Array<[
+      keyof MarketplaceListingFormValues,
+      { message?: string }
+    ]>;
+    const list = entries
+      .filter(([, err]) => !!err)
+      .map(([name, err]) => ({ name, message: err.message ?? 'This field is required.' }));
+    setErrorList(list);
+    setLiveMessage('Please correct the errors in the form.');
+
+    // Focus first invalid field by name attribute
+    const first = list[0]?.name as string | undefined;
+    if (first) {
+      const el = document.querySelector<HTMLElement>(`[name="${first}"]`) ||
+                 document.getElementById(`listing-${first}`) as HTMLElement | null;
+      if (el?.focus) el.focus();
+    }
+
+    // Move screen reader cursor to the error summary
+    if (errorSummaryRef.current) {
+      errorSummaryRef.current.focus();
+    }
+  };
+
+  // Derive ids for accessibility wiring
+  const ids = {
+    title: 'listing-title',
+    titleDesc: 'listing-title-desc',
+    category: 'listing-category',
+    categoryLabel: 'listing-category-label',
+    categoryDesc: 'listing-category-desc',
+    price: 'listing-price',
+    priceDesc: 'listing-price-desc',
+    condition: 'listing-condition',
+    conditionLabel: 'listing-condition-label',
+    description: 'listing-description',
+    imageUrl: 'listing-image-url',
+    imageUrlDesc: 'listing-image-url-desc',
+    imageHint: 'listing-image-hint',
+    imageHintDesc: 'listing-image-hint-desc',
+    location: 'listing-location',
+    locationDesc: 'listing-location-desc',
+    tags: 'listing-tags',
+    tagsDesc: 'listing-tags-desc',
+  } as const;
   
   const conditionDisplay: Record<MarketplaceItemCondition, string> = {
     'new': 'New',
@@ -88,17 +141,50 @@ export default function MarketplaceListingForm({ onSubmit, onCancel, isLoading: 
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+      {/* Live region for submit and error updates */}
+      <p aria-live="polite" role="status" className="sr-only">{liveMessage}</p>
+      <form
+        onSubmit={form.handleSubmit(handleSubmit, handleError)}
+        className="space-y-6"
+        noValidate
+        aria-busy={isSubmitting || !!parentIsLoading}
+      >
+        {errorList.length > 0 && (
+          <div
+            ref={errorSummaryRef}
+            tabIndex={-1}
+            role="alert"
+            aria-labelledby="listing-error-summary-title"
+            className="rounded-md border border-destructive bg-destructive/5 p-4 text-destructive"
+          >
+            <h2 id="listing-error-summary-title" className="font-semibold">Please correct the following errors:</h2>
+            <ul className="list-disc pl-5 mt-2">
+              {errorList.map((err, idx) => (
+                <li key={idx}>
+                  <a href={`#listing-${err.name}`} className="underline">
+                    {err.message}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
         <FormField
           control={form.control}
           name="title"
-          render={({ field }) => (
+          render={({ field, fieldState }) => (
             <FormItem>
-              <FormLabel>Listing Title</FormLabel>
+              <FormLabel htmlFor={ids.title}>Listing Title</FormLabel>
               <FormControl>
-                <Input placeholder="e.g., Beautiful Blue Ram Cichlid Pair" {...field} />
+                <Input
+                  id={ids.title}
+                  placeholder="e.g., Beautiful Blue Ram Cichlid Pair"
+                  aria-describedby={ids.titleDesc}
+                  aria-invalid={!!fieldState.error}
+                  {...field}
+                />
               </FormControl>
-              <FormDescription>
+              <FormDescription id={ids.titleDesc}>
                 A clear, concise title for your item.
               </FormDescription>
               <FormMessage />
@@ -109,12 +195,17 @@ export default function MarketplaceListingForm({ onSubmit, onCancel, isLoading: 
         <FormField
           control={form.control}
           name="categorySlug"
-          render={({ field }) => (
+          render={({ field, fieldState }) => (
             <FormItem>
-              <FormLabel>Category</FormLabel>
+              <FormLabel id={ids.categoryLabel}>Category</FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
-                  <SelectTrigger>
+                  <SelectTrigger
+                    id={ids.category}
+                    aria-labelledby={ids.categoryLabel}
+                    aria-describedby={ids.categoryDesc}
+                    aria-invalid={!!fieldState.error}
+                  >
                     <SelectValue placeholder="Select a category for your item" />
                   </SelectTrigger>
                 </FormControl>
@@ -126,6 +217,9 @@ export default function MarketplaceListingForm({ onSubmit, onCancel, isLoading: 
                   ))}
                 </SelectContent>
               </Select>
+              <FormDescription id={ids.categoryDesc}>
+                Choose the most relevant category to help buyers find your item.
+              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -134,13 +228,19 @@ export default function MarketplaceListingForm({ onSubmit, onCancel, isLoading: 
         <FormField
           control={form.control}
           name="price"
-          render={({ field }) => (
+          render={({ field, fieldState }) => (
             <FormItem>
-              <FormLabel>Price</FormLabel>
+              <FormLabel htmlFor={ids.price}>Price</FormLabel>
               <FormControl>
-                <Input placeholder="e.g., $25.00 or OBO or Contact for Price" {...field} />
+                <Input
+                  id={ids.price}
+                  placeholder="e.g., $25.00 or OBO or Contact for Price"
+                  aria-describedby={ids.priceDesc}
+                  aria-invalid={!!fieldState.error}
+                  {...field}
+                />
               </FormControl>
-              <FormDescription>
+              <FormDescription id={ids.priceDesc}>
                 Enter the price or how buyers should inquire.
               </FormDescription>
               <FormMessage />
@@ -151,12 +251,16 @@ export default function MarketplaceListingForm({ onSubmit, onCancel, isLoading: 
         <FormField
           control={form.control}
           name="condition"
-          render={({ field }) => (
+          render={({ field, fieldState }) => (
             <FormItem>
-              <FormLabel>Condition</FormLabel>
+              <FormLabel id={ids.conditionLabel}>Condition</FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
-                  <SelectTrigger>
+                  <SelectTrigger
+                    id={ids.condition}
+                    aria-labelledby={ids.conditionLabel}
+                    aria-invalid={!!fieldState.error}
+                  >
                     <SelectValue placeholder="Select item condition" />
                   </SelectTrigger>
                 </FormControl>
@@ -176,13 +280,15 @@ export default function MarketplaceListingForm({ onSubmit, onCancel, isLoading: 
         <FormField
           control={form.control}
           name="description"
-          render={({ field }) => (
+          render={({ field, fieldState }) => (
             <FormItem>
-              <FormLabel>Detailed Description</FormLabel>
+              <FormLabel htmlFor={ids.description}>Detailed Description</FormLabel>
               <FormControl>
                 <Textarea
+                  id={ids.description}
                   placeholder="Describe your item thoroughly. Include details like age, size, quantity, specific features, reasons for selling, etc. Be honest about any flaws if it's a used item."
                   className="resize-none min-h-[150px]"
+                  aria-invalid={!!fieldState.error}
                   {...field}
                 />
               </FormControl>
@@ -194,13 +300,20 @@ export default function MarketplaceListingForm({ onSubmit, onCancel, isLoading: 
         <FormField
           control={form.control}
           name="imageUrl"
-          render={({ field }) => (
+          render={({ field, fieldState }) => (
             <FormItem>
-              <FormLabel>Image URL</FormLabel>
+              <FormLabel htmlFor={ids.imageUrl}>Image URL</FormLabel>
               <FormControl>
-                <Input type="url" placeholder="https://example.com/your-item.jpg" {...field} />
+                <Input
+                  id={ids.imageUrl}
+                  type="url"
+                  placeholder="https://example.com/your-item.jpg"
+                  aria-describedby={ids.imageUrlDesc}
+                  aria-invalid={!!fieldState.error}
+                  {...field}
+                />
               </FormControl>
-              <FormDescription>
+              <FormDescription id={ids.imageUrlDesc}>
                 A direct link to an image of your item. Use a service like Imgur if needed.
               </FormDescription>
               <FormMessage />
@@ -211,13 +324,19 @@ export default function MarketplaceListingForm({ onSubmit, onCancel, isLoading: 
          <FormField
           control={form.control}
           name="imageHint"
-          render={({ field }) => (
+          render={({ field, fieldState }) => (
             <FormItem>
-              <FormLabel>Image Hint (Optional)</FormLabel>
+              <FormLabel htmlFor={ids.imageHint}>Image Hint (Optional)</FormLabel>
               <FormControl>
-                <Input placeholder="e.g., blue cichlid, planted tank light" {...field} />
+                <Input
+                  id={ids.imageHint}
+                  placeholder="e.g., blue cichlid, planted tank light"
+                  aria-describedby={ids.imageHintDesc}
+                  aria-invalid={!!fieldState.error}
+                  {...field}
+                />
               </FormControl>
-              <FormDescription>
+              <FormDescription id={ids.imageHintDesc}>
                 One or two keywords for the placeholder image if a real image URL isn't used immediately (e.g., during testing).
               </FormDescription>
               <FormMessage />
@@ -228,13 +347,19 @@ export default function MarketplaceListingForm({ onSubmit, onCancel, isLoading: 
         <FormField
           control={form.control}
           name="location"
-          render={({ field }) => (
+          render={({ field, fieldState }) => (
             <FormItem>
-              <FormLabel>Location (Optional)</FormLabel>
+              <FormLabel htmlFor={ids.location}>Location (Optional)</FormLabel>
               <FormControl>
-                <Input placeholder="e.g., Springfield, IL or Local Pickup Only" {...field} />
+                <Input
+                  id={ids.location}
+                  placeholder="e.g., Springfield, IL or Local Pickup Only"
+                  aria-describedby={ids.locationDesc}
+                  aria-invalid={!!fieldState.error}
+                  {...field}
+                />
               </FormControl>
-              <FormDescription>
+              <FormDescription id={ids.locationDesc}>
                 City/State, or if it's for local pickup only.
               </FormDescription>
               <FormMessage />
@@ -245,19 +370,22 @@ export default function MarketplaceListingForm({ onSubmit, onCancel, isLoading: 
         <FormField
           control={form.control}
           name="tags"
-          render={({ field }) => (
+          render={({ field, fieldState }) => (
             <FormItem>
-              <FormLabel>Tags (Optional)</FormLabel>
+              <FormLabel htmlFor={ids.tags}>Tags (Optional)</FormLabel>
               <FormControl>
                  <Input 
+                    id={ids.tags}
                     placeholder="e.g., freshwater, cichlid, rare, LED light" 
                     {...field}
                     // @ts-ignore 
                     value={Array.isArray(field.value) ? field.value.join(', ') : field.value || ''}
                     onChange={e => field.onChange(e.target.value)}
+                    aria-describedby={ids.tagsDesc}
+                    aria-invalid={!!fieldState.error}
                  />
               </FormControl>
-              <FormDescription>
+              <FormDescription id={ids.tagsDesc}>
                 Comma-separated keywords to help buyers find your item.
               </FormDescription>
               <FormMessage />
