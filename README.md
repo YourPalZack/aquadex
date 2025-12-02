@@ -84,6 +84,27 @@ npm run lint         # Run ESLint
 npm run typecheck    # Check TypeScript types
 ```
 
+## 🔍 Debug & Testing
+
+```bash
+# Run comprehensive application audit
+./scripts/debug-test.sh
+
+# The debug test checks:
+# - Environment setup
+# - File integrity
+# - Security vulnerabilities
+# - TypeScript type checking
+# - Build status
+# - Dependencies
+# - Source code analysis
+# - Configuration files
+# - Documentation
+
+# Results are saved to debug_test_results.txt
+# See docs/AUDIT_REPORT.md for detailed findings
+```
+
 ## 🔐 Environment Setup
 
 Required environment variables (see `.env.example`):
