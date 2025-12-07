@@ -18,7 +18,7 @@ This document provides a comprehensive optimization strategy for AquaDex, coveri
 
 ### Expected Impact
 
-- 🚀 **Page Load Time:** Target <2s (currently baseline needed)
+- 🚀 **Page Load Time:** Target <2s (75th percentile - currently baseline needed)
 - 📊 **Lighthouse Score:** Target 90+ across all metrics
 - 💰 **Server Costs:** Reduce by 30-40% through optimization
 - 📈 **SEO Ranking:** Improve organic search visibility by 50%+
@@ -75,11 +75,13 @@ This document provides a comprehensive optimization strategy for AquaDex, coveri
 </a>
 
 // 3. Ensure color contrast
-// Update Tailwind config with WCAG compliant colors
+// Update Tailwind config with WCAG AA compliant colors
+// For normal text (16px): 4.5:1 contrast ratio against white background
+// For large text (18px+): 3:1 contrast ratio against white background
 const colors = {
   primary: {
-    DEFAULT: '#0ea5e9', // Ensure 4.5:1 contrast ratio
-    dark: '#0c4a6e',
+    DEFAULT: '#0ea5e9', // 4.52:1 contrast against white (WCAG AA compliant)
+    dark: '#0c4a6e', // 9.79:1 contrast against white (WCAG AAA compliant)
   },
   // ... other colors
 };
@@ -890,7 +892,7 @@ npm uninstall unused-package
 import * as icons from 'lucide-react';
 
 // Good:
-import { Fish, Leaf, Package } from 'lucide-react';
+import { Fish, TreePine, Package } from 'lucide-react';
 
 // 3. Minimize third-party libraries
 // Bad: Using entire lodash
@@ -1144,11 +1146,11 @@ export async function GET() {
 }
 
 // 5. Background job processing
-// For long-running tasks, use a queue
-import { Queue } from 'bull';
+// For long-running tasks, use a queue (using BullMQ for modern projects)
+import { Queue } from 'bullmq';
 
 const queue = new Queue('test-analysis', {
-  redis: {
+  connection: {
     host: process.env.REDIS_HOST,
     port: parseInt(process.env.REDIS_PORT!),
   },

@@ -57,8 +57,8 @@ This comprehensive feature audit examines the current state of the AquaDex appli
 - ❌ Image storage integration (Firebase Storage)
 
 **Database Requirements:**
-```sql
--- Required tables
+```
+-- Required tables (schema notation)
 TestResults (id, userId, aquariumId, timestamp, imageUrl, parameters, recommendations, notes)
 ```
 
@@ -83,8 +83,8 @@ TestResults (id, userId, aquariumId, timestamp, imageUrl, parameters, recommenda
 - ❌ Parameter history per aquarium
 
 **Database Requirements:**
-```sql
--- Required tables
+```
+-- Required tables (schema notation)
 Aquariums (id, userId, name, volumeGallons, type, imageUrl, lastWaterChange, nextWaterChangeReminder, notes)
 Equipment (id, aquariumId, type, brand, model, installDate, notes)
 Inhabitants (id, aquariumId, type, species, quantity, addedDate, notes)
@@ -114,8 +114,8 @@ MaintenanceLogs (id, aquariumId, type, date, notes)
 - ❌ Product comparison functionality
 
 **Database Requirements:**
-```sql
--- Recommended tables
+```
+-- Recommended tables (schema notation)
 SearchHistory (id, userId, searchType, query, results, timestamp)
 SavedProducts (id, userId, productId, productType, source, savedAt)
 PriceHistory (id, productId, price, timestamp)
@@ -149,8 +149,8 @@ PriceHistory (id, productId, price, timestamp)
 - ❌ Listing expiration automation
 
 **Database Requirements:**
-```sql
--- Required tables
+```
+-- Required tables (schema notation)
 Users (id, email, displayName, isSeller, sellerStatus, createdAt)
 Listings (id, sellerId, title, description, price, category, status, images, createdAt, expiresAt)
 Transactions (id, listingId, buyerId, sellerId, amount, status, timestamp)
@@ -182,8 +182,8 @@ Messages (id, listingId, senderId, recipientId, message, timestamp)
 - ❌ Tag system
 
 **Database Requirements:**
-```sql
--- Required tables
+```
+-- Required tables (schema notation)
 Questions (id, userId, title, content, category, createdAt, viewCount, voteCount)
 Answers (id, questionId, userId, content, createdAt, voteCount, isBestAnswer)
 Votes (id, userId, targetId, targetType, voteValue)
@@ -242,8 +242,8 @@ FIREBASE_ADMIN_PRIVATE_KEY=
 - ❌ Account deletion
 
 **Database Requirements:**
-```sql
--- Required tables
+```
+-- Required tables (schema notation)
 UserProfiles (id, userId, bio, avatar, location, website, socialLinks)
 NotificationSettings (id, userId, emailWaterChange, emailMarketplace, emailQA, emailNews)
 UserActivity (id, userId, activityType, timestamp, metadata)
@@ -830,7 +830,7 @@ npx prisma init
 # 3. Copy the schema above to prisma/schema.prisma
 
 # 4. Set up Neon database URL in .env.local
-# DATABASE_URL="postgresql://user:password@host/database?sslmode=require"
+# DATABASE_URL="postgresql://YOUR_USER:YOUR_PASSWORD@YOUR_HOST/YOUR_DATABASE?sslmode=require"
 
 # 5. Create migration
 npx prisma migrate dev --name init
