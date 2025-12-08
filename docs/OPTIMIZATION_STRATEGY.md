@@ -408,10 +408,12 @@ export function AquariumStructuredData({ aquarium }) {
     // ... additional schema.org properties
   };
   
+  // Escape < to prevent XSS in JSON-LD
+  const safeJson = JSON.stringify(structuredData).replace(/</g, '\\u003c');
   return (
     <script
       type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      dangerouslySetInnerHTML={{ __html: safeJson }}
     />
   );
 }
