@@ -556,7 +556,7 @@ export function Breadcrumbs({ items }: BreadcrumbsProps) {
 }
 
 // 4. Internal linking strategy
-// Create a components for related content
+// Create a component for related content
 export function RelatedContent({ items }) {
   return (
     <aside className="mt-8 p-4 bg-muted rounded-lg">
