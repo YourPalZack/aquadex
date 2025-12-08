@@ -1146,7 +1146,7 @@ export async function GET() {
 }
 
 // 5. Background job processing
-// For long-running tasks, use a queue (using BullMQ for modern projects)
+// For long-running tasks, use a queue. BullMQ is a Redis-based queue for Node.js, recommended for background job processing in modern Node.js applications.
 import { Queue } from 'bullmq';
 
 const queue = new Queue('test-analysis', {
