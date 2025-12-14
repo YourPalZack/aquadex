@@ -1,8 +1,8 @@
-
 'use client';
 
 import { useState, useEffect } from 'react';
 import type { TestResult } from '@/types';
+import { mockTestResults } from '@/types';
 import HistoryTable from '@/components/history/HistoryTable';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { BookText, Trash2 } from 'lucide-react';
@@ -19,58 +19,6 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from '@/components/ui/button';
-
-export const mockTestResults: TestResult[] = [
-  {
-    id: 'tr1',
-    userId: 'user123',
-    aquariumId: 'aqua1', // Linked to Living Room Reef
-    timestamp: new Date('2024-07-20T10:00:00Z'),
-    parameters: 'pH: 7.2, Ammonia: 0 ppm, Nitrite: 0 ppm, Nitrate: 10 ppm, GH: 6 dGH, KH: 4 dKH',
-    recommendations: {
-      products: ['Seachem Prime', 'API Stress Coat+'],
-      reasoning: 'Overall good parameters. Prime for general conditioning and Stress Coat for fish health.',
-    },
-    notes: 'Routine check for the community tank.',
-    imageUrl: 'https://placehold.co/300x200.png?text=Test+Strip+1',
-  },
-  {
-    id: 'tr2',
-    userId: 'user123',
-    aquariumId: 'aqua2', // Linked to Betta Paradise
-    timestamp: new Date('2024-07-15T18:30:00Z'),
-    parameters: 'pH: 6.8, Ammonia: 0.25 ppm, Nitrite: 0 ppm, Nitrate: 5 ppm',
-    recommendations: {
-      products: ['Seachem Stability', 'FritzZyme 7'],
-      reasoning: 'Slight ammonia detected, recommend beneficial bacteria to boost cycle.',
-    },
-    notes: 'New fish added, monitoring cycle.',
-  },
-  {
-    id: 'tr3',
-    userId: 'user123',
-    aquariumId: 'aqua1', // Linked to Living Room Reef
-    timestamp: new Date('2024-07-10T09:15:00Z'),
-    parameters: 'pH: 7.0, Ammonia: 0 ppm, Nitrite: 0 ppm, Nitrate: 20 ppm, Chlorine: 0.02 ppm',
-    recommendations: {
-        products: ['Seachem Safe', 'AquaClear Filter Media'],
-        reasoning: 'Trace chlorine detected, use dechlorinator. Ensure filter media is clean.'
-    },
-    imageUrl: 'https://placehold.co/300x200.png?text=Test+Strip+3',
-  },
-    {
-    id: 'tr4',
-    userId: 'user123',
-    // aquariumId: 'aquaUnassigned', // Example of a test not linked
-    timestamp: new Date('2024-06-25T12:00:00Z'),
-    parameters: 'pH: 7.5, Ammonia: 0 ppm, Nitrite: 0.1 ppm, Nitrate: 40 ppm, GH: 8 dGH, KH: 5 dKH',
-    recommendations: {
-      products: ['Seachem Prime', 'Partial Water Change'],
-      reasoning: 'Nitrite slightly elevated and nitrates are high. Perform a 25% water change and use Prime.',
-    },
-    notes: 'Pre-vacation check.',
-  },
-];
 
 export default function HistoryPage() {
   const [testResults, setTestResults] = useState<TestResult[]>([]);
