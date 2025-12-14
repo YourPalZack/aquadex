@@ -31,8 +31,8 @@ import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import type { Aquarium, AquariumType, SourceWaterType } from '@/types';
 
-const aquariumTypes: AquariumType[] = ['freshwater', 'saltwater', 'brackish', 'reef'];
-const sourceWaterTypes: SourceWaterType[] = ['tap', 'ro', 'premixed_saltwater'];
+const aquariumTypes = ['freshwater', 'saltwater', 'brackish', 'reef'] as const;
+const sourceWaterTypes = ['tap', 'ro', 'premixed_saltwater'] as const;
 
 const aquariumFormSchema = z.object({
   name: z.string().min(2, { message: 'Name must be at least 2 characters.' }).max(50),

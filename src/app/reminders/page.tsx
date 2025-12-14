@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import type { Aquarium, ReminderItem } from '@/types';
-import { mockAquariumsData } from '@/app/aquariums/page';
+import { mockAquariumsData } from '@/types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { BellRing, CalendarDays, Timer, AlertTriangle, Info, Eye } from 'lucide-react';

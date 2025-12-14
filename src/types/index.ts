@@ -1,6 +1,7 @@
 
 import type { AnalyzeTestStripOutput, RecommendTreatmentProductsOutput } from '@/ai/flows';
 import type { LucideProps } from 'lucide-react';
+import type { ElementType } from 'react';
 import { 
     Fish, 
     Leaf, 
@@ -9,7 +10,6 @@ import {
     HeartHandshake, 
     Gift, 
     MessageSquare,
-    type ElementType, 
     ShoppingCart, 
     SearchCheck, 
     Store as StoreIcon, 
