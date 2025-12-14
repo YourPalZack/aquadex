@@ -41,7 +41,10 @@ const listingFormSchema = z.object({
   imageUrl: z.string().url({ message: 'Please enter a valid image URL.' }).min(1, {message: 'Image URL is required.'}),
   imageHint: z.string().max(50, { message: 'Image hint cannot exceed 50 characters.' }).optional(),
   location: z.string().max(100, { message: 'Location cannot exceed 100 characters.' }).optional(),
-  tags: z.string().optional().transform(val => val ? val.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0) : []),
+  tags: z.union([
+    z.string().transform(val => val ? val.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0) : []),
+    z.array(z.string())
+  ]).optional(),
 });
 
 

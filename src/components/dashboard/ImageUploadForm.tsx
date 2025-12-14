@@ -17,7 +17,7 @@ interface ImageUploadFormProps {
 }
 
 const initialState = {
-  message: null,
+  message: '',
   analysis: null,
   recommendations: null,
   errors: null,
