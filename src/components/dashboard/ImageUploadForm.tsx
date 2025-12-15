@@ -9,18 +9,18 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { UploadCloud, AlertCircle, Loader2 } from 'lucide-react';
 import Image from 'next/image';
-import { analyzeStrip } from '@/lib/actions';
+import { analyzeStrip, type AnalyzeStripState } from '@/lib/actions';
 import type { AnalyzeTestStripOutput, RecommendTreatmentProductsOutput } from '@/types';
 
 interface ImageUploadFormProps {
   onAnalysisComplete: (data: { analysis: AnalyzeTestStripOutput; recommendations: RecommendTreatmentProductsOutput | null }) => void;
 }
 
-const initialState = {
-  message: null,
+const initialState: AnalyzeStripState = {
+  message: '',
   analysis: null,
   recommendations: null,
-  errors: null,
+  errors: { photoDataUri: [] },
 };
 
 function SubmitButton() {

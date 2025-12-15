@@ -107,7 +107,7 @@ export default function LandingPage() {
   );
 }
 
-function FeatureCard({ icon, ReactNode, title, description }: { icon: React.ReactNode; title: string; description: string }) {
+function FeatureCard({ icon, title, description }: { icon: React.ReactNode; title: string; description: string }) {
   return (
     <Card className="bg-card/80 backdrop-blur-sm hover:shadow-lg transition-shadow duration-300">
       <CardHeader className="items-center">

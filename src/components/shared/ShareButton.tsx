@@ -15,9 +15,10 @@ interface ShareButtonProps {
 export function ShareButton({ title, text, url }: ShareButtonProps) {
   const { toast } = useToast();
   const shareUrl = url || (typeof window !== 'undefined' ? window.location.href : '');
+  const canShare = typeof navigator !== 'undefined' && navigator.share !== undefined;
 
   const handleShare = async () => {
-    if (navigator.share) {
+    if (canShare) {
       try {
         await navigator.share({
           title: title,
@@ -49,11 +50,11 @@ export function ShareButton({ title, text, url }: ShareButtonProps) {
       <Tooltip>
         <TooltipTrigger asChild>
           <Button variant="outline" size="icon" onClick={handleShare} aria-label="Share results">
-            {navigator.share ? <Share2 className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+            {canShare ? <Share2 className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
           </Button>
         </TooltipTrigger>
         <TooltipContent>
-          <p>{navigator.share ? 'Share' : 'Copy to Clipboard'}</p>
+          <p>{canShare ? 'Share' : 'Copy to Clipboard'}</p>
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>

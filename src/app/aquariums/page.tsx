@@ -1,9 +1,9 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import type { Aquarium, AquariumFormValues as AquariumFormData } from '@/types';
-import { mockAquariumsData } from '@/types'; // Updated import path
+import { mockAquariumsData } from '@/types';
 import AquariumCard from '@/components/aquariums/AquariumCard';
 import AquariumForm from '@/components/aquariums/AquariumForm';
 import { Button } from '@/components/ui/button';
@@ -27,7 +27,7 @@ import { useSearchParams } from 'next/navigation';
 // Removed date-fns imports as they are now handled in types.ts with mockAquariumsData
 
 
-export default function AquariumsPage() {
+function AquariumsContent() {
   const [aquariums, setAquariums] = useState<Aquarium[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingAquarium, setEditingAquarium] = useState<Aquarium | null>(null);
@@ -212,6 +212,20 @@ export default function AquariumsPage() {
         </DialogContent>
       </Dialog>
     </div>
+  );
+}
+
+export default function AquariumsPage() {
+  return (
+    <Suspense fallback={
+      <div className="container mx-auto py-8">
+        <div className="flex justify-center items-center h-64">
+          <Loader2 className="w-12 h-12 animate-spin text-primary" />
+        </div>
+      </div>
+    }>
+      <AquariumsContent />
+    </Suspense>
   );
 }
 

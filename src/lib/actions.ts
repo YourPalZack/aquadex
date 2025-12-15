@@ -41,11 +41,17 @@ import type {
 } from '@/types'; 
 import { z } from 'zod';
 
+// Define the state type for analyzeStrip form action
+export type AnalyzeStripState = 
+  | { message: string; errors: { photoDataUri?: string[] }; analysis: null; recommendations: null }
+  | { message: string; analysis: AnalyzeTestStripOutput; recommendations: RecommendTreatmentProductsOutput; errors: null }
+  | { message: string; analysis: null; recommendations: null; errors: { _form: string[] } };
+
 const analyzeStripSchema = z.object({
   photoDataUri: z.string().min(1, { message: 'Image data URI is required.' }),
 });
 
-export async function analyzeStrip(prevState: any, formData: FormData) {
+export async function analyzeStrip(prevState: AnalyzeStripState, formData: FormData): Promise<AnalyzeStripState> {
   try {
     const validatedFields = analyzeStripSchema.safeParse({
       photoDataUri: formData.get('photoDataUri'),

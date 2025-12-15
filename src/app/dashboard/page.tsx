@@ -9,7 +9,7 @@ import { Lightbulb, Droplet, CalendarDays, Timer, AlertTriangle, BellRing, Eye, 
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 // import { mockAquariumsData } from '@/app/aquariums/page'; // Removed old import
-import { mockTestResults } from '@/app/history/page';
+import { mockTestResults } from '@/types';
 import { format, differenceInDays, isPast, isToday, isFuture } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';

@@ -24,7 +24,7 @@ const DealItemSchema = z.object({
   imageUrl: z.string().describe("An image URL for the product. MUST use `https://placehold.co/300x200.png` format."),
   dataAiHint: z.string().describe("One or two keywords for Unsplash search if using a placeholder image (e.g., 'aquarium filter', 'fish food'). Max two words."),
   description: z.string().optional().describe("A brief description of the product or why it's a good deal."),
-  category: z.nativeEnum(dealCategories).optional().describe(`The category of the product. Choose one from: ${dealCategories.join(', ')}. If unsure, it can be omitted.`),
+  category: z.enum(dealCategories).optional().describe(`The category of the product. Choose one from: ${dealCategories.join(', ')}. If unsure, it can be omitted.`),
 });
 
 const FindDealsOutputSchema = z.object({

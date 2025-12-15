@@ -48,6 +48,24 @@ import {
 import { marketplaceCategoriesData, type MarketplaceCategory, mockCurrentUser, questionCategories } from '@/types';
 import type { ReactElement, ElementType } from 'react';
 import { cn } from '@/lib/utils';
+import type { LucideIcon } from 'lucide-react';
+
+// Type definitions for navigation items
+type IconType = LucideIcon | ElementType;
+
+interface BaseNavItem {
+  href: string;
+  label: string;
+  icon: IconType;
+  className?: string;
+  iconClassName?: string;
+}
+
+interface NavItemWithSubItems extends BaseNavItem {
+  subItems?: NavItem[];
+}
+
+type NavItem = BaseNavItem | NavItemWithSubItems;
 
 
 // Define navigation items with potential sub-items
@@ -137,10 +155,11 @@ export default function AppSidebar() {
     // This prevents the parent from staying "more active" than a specific child.
     if (href === '/') return pathname === href;
 
-    const parentItem = navItemsConfig.find(item => item.href === href && item.subItems && item.subItems.length > 0);
-    if (parentItem) {
+    const parentItem = navItemsConfig.find(item => item.href === href);
+    const subItems = parentItem ? (parentItem as NavItemWithSubItems).subItems : undefined;
+    if (parentItem && subItems && subItems.length > 0) {
         // If any sub-item is active, parent is "section active" but not "direct active"
-        const isSubItemActive = parentItem.subItems.some(sub => sub.href && pathname.startsWith(sub.href));
+        const isSubItemActive = subItems.some(sub => sub.href && pathname.startsWith(sub.href));
         if (isSubItemActive) {
             return pathname === href; // Only true if current page is exactly the parent link
         }
@@ -148,11 +167,12 @@ export default function AppSidebar() {
     return pathname.startsWith(href);
   };
   
-  const isSectionActive = (item: typeof navItemsConfig[0] | typeof navItemsConfig[0]['subItems'][0]) => {
+  const isSectionActive = (item: NavItem): boolean => {
     if (!item.href) return false;
     if (pathname.startsWith(item.href)) return true;
-    if (item.subItems && item.subItems.length > 0) { // Check if subItems exists and is not empty
-        return item.subItems.some(sub => sub.href && pathname.startsWith(sub.href));
+    const subItems = (item as NavItemWithSubItems).subItems;
+    if (subItems && subItems.length > 0) { // Check if subItems exists and is not empty
+        return subItems.some(sub => sub.href && pathname.startsWith(sub.href));
     }
     return false;
   };
@@ -168,7 +188,8 @@ export default function AppSidebar() {
       <SidebarContent className="flex-grow p-2">
         <SidebarMenu>
           {navItemsConfig.map((item) => {
-            const hasSubItems = item.subItems && item.subItems.length > 0;
+            const subItems = (item as NavItemWithSubItems).subItems;
+            const hasSubItems = subItems && subItems.length > 0;
             const currentSectionActive = isSectionActive(item);
 
 
@@ -197,10 +218,11 @@ export default function AppSidebar() {
                 </Link>
                 {hasSubItems && currentSectionActive && (
                   <SidebarMenuSub>
-                    {item.subItems.map((subItem) => {
+                    {subItems!.map((subItem) => {
                        const SubIcon = subItem.icon as ElementType;
                        // Recursive check for nested sub-items
-                       const hasNestedSubItems = subItem.subItems && subItem.subItems.length > 0;
+                       const nestedSubItems = (subItem as NavItemWithSubItems).subItems;
+                       const hasNestedSubItems = nestedSubItems && nestedSubItems.length > 0;
                        const isNestedSectionActive = isSectionActive(subItem);
 
                        return (
@@ -208,7 +230,7 @@ export default function AppSidebar() {
                             <Link href={subItem.href} passHref legacyBehavior>
                               <SidebarMenuSubButton
                                 asChild
-                                isActive={subItem.href && pathname.startsWith(subItem.href) && (!hasNestedSubItems || subItem.href === pathname)}
+                                isActive={!!(subItem.href && pathname.startsWith(subItem.href) && (!hasNestedSubItems || subItem.href === pathname))}
                                 onClick={() => {
                                    if (openMobile && !hasNestedSubItems) setOpenMobile(false);
                                 }}
@@ -227,14 +249,14 @@ export default function AppSidebar() {
                             </Link>
                             {hasNestedSubItems && isNestedSectionActive && (
                                 <SidebarMenuSub>
-                                    {subItem.subItems.map(nestedSubItem => {
+                                    {nestedSubItems!.map(nestedSubItem => {
                                         const NestedSubIcon = nestedSubItem.icon as ElementType;
                                         return (
                                             <SidebarMenuSubItem key={nestedSubItem.label}>
                                                 <Link href={nestedSubItem.href} passHref legacyBehavior>
                                                     <SidebarMenuSubButton
                                                         asChild
-                                                        isActive={nestedSubItem.href && pathname.startsWith(nestedSubItem.href)}
+                                                        isActive={!!(nestedSubItem.href && pathname.startsWith(nestedSubItem.href))}
                                                         onClick={() => openMobile && setOpenMobile(false)}
                                                         className={cn("pl-6", nestedSubItem.className)} // Indent further
                                                     >

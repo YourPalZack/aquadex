@@ -31,7 +31,10 @@ const wantedItemFormSchema = z.object({
   title: z.string().min(5, { message: 'Title must be at least 5 characters.' }).max(100, { message: 'Title cannot exceed 100 characters.' }),
   description: z.string().min(20, { message: 'Description must be at least 20 characters.' }).max(1000, { message: 'Description cannot exceed 1000 characters.' }),
   categorySlug: z.string().optional(),
-  tags: z.string().optional().transform(val => val ? val.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0) : []),
+  tags: z.union([
+    z.string().transform(val => val ? val.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0) : []),
+    z.array(z.string())
+  ]).optional(),
 });
 
 
